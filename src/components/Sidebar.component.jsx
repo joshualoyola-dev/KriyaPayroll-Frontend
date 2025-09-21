@@ -1,10 +1,24 @@
-import { RocketLaunchIcon } from "@heroicons/react/16/solid";
+import { RocketLaunchIcon, ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
 import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
 import CompanySelection from "./CompanySelection";
 
 const Sidebar = () => {
     const location = useLocation();
     const isActive = (path) => location.pathname === path;
+
+    // State to track which sections are collapsed
+    const [collapsedSections, setCollapsedSections] = useState(new Set());
+
+    const toggleSection = (sectionIndex) => {
+        const newCollapsed = new Set(collapsedSections);
+        if (newCollapsed.has(sectionIndex)) {
+            newCollapsed.delete(sectionIndex);
+        } else {
+            newCollapsed.add(sectionIndex);
+        }
+        setCollapsedSections(newCollapsed);
+    };
 
     const navItemClasses = (path) =>
         `flex items-center gap-2 px-2 py-1 rounded-md transition-colors text-sm
@@ -50,7 +64,6 @@ const Sidebar = () => {
                 { label: "Comp. Config.", path: "/configuration/company-configuration" },
             ],
         },
-
     ];
 
     return (
@@ -60,14 +73,25 @@ const Sidebar = () => {
                 {sidebarSections.map((section, idx) => (
                     <div key={idx}>
                         {section.title && (
-                            <h3 className="text-[11px] font-semibold text-gray-400 uppercase mb-1 tracking-wide">
-                                {section.title}
-                            </h3>
+                            <button
+                                onClick={() => toggleSection(idx)}
+                                className="flex items-center justify-between w-full text-left text-[11px] font-semibold text-gray-400 uppercase mb-1 tracking-wide hover:text-gray-600 transition-colors py-1"
+                            >
+                                <span>{section.title}</span>
+                                {collapsedSections.has(idx) ? (
+                                    <ChevronRightIcon className="w-3 h-3" />
+                                ) : (
+                                    <ChevronDownIcon className="w-3 h-3" />
+                                )}
+                            </button>
                         )}
 
                         <div
                             className={`flex flex-col ${section.title ? "pl-4 border-l border-gray-200" : ""
-                                } space-y-1`}
+                                } space-y-1 transition-all duration-200 ease-in-out ${section.title && collapsedSections.has(idx)
+                                    ? "max-h-0 overflow-hidden opacity-0"
+                                    : "max-h-96 opacity-100"
+                                }`}
                         >
                             {section.items.map((item) => (
                                 <Link
