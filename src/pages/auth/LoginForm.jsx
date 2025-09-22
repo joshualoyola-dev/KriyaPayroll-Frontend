@@ -40,6 +40,7 @@ const LoginForm = () => {
             {/* Submit Button */}
             <button
                 type="submit"
+                disabled={isLoading}
                 className="w-full py-2.5 rounded-lg bg-teal-600 text-white font-medium hover:bg-teal-700 transition"
             >
                 {isLoading ? "Loading..." : "Login"}
