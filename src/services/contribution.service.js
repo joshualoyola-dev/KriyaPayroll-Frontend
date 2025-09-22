@@ -10,7 +10,12 @@ export const updateHdmfRecord = async (hdmf_contribution_rate_id, formData) => {
 };
 
 //phic service
-
+export const fetchPhics = async () => {
+    return await payroll_api.get('/api/v1/contributions/phic');
+};
+export const updatePhicRecord = async (phic_contribution_rate_id, formData) => {
+    return await payroll_api.patch(`/api/v1/contributions/phic/${phic_contribution_rate_id}`, formData);
+};
 
 //sss service
 
