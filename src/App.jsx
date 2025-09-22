@@ -33,6 +33,8 @@ import RecurringPayPage from "./pages/main/configuration/recurring-pay/Recurring
 import LastPayrunPage from "./pages/main/payrun/last/LastPayrunPage"
 import SpecialPayrunPage from "./pages/main/payrun/special/SpecialPayrunPage"
 import ContributionPage from "./pages/main/configuration/contributions/ContributionPage"
+import { ContributionProvider } from "./contexts/ContributionProvider"
+import { HdmfProvider } from "./contexts/HdmfProvider"
 
 function App() {
   return (
@@ -50,42 +52,46 @@ function App() {
                           <PayitemProvider >
                             <RegularPayrunProvider>
                               <RecurringPayProvider >
-                                <Routes>
-                                  {/* Public routes */}
-                                  <Route path="/" element={<HomePage />} />
-                                  {/* Navitate to Dasboard if there's token */}
-                                  <Route element={<PublicRoute />}>
-                                    <Route path="/auth/login" element={<LoginPage />} />
-                                  </Route>
+                                <ContributionProvider >
+                                  <HdmfProvider >
+                                    <Routes>
+                                      {/* Public routes */}
+                                      <Route path="/" element={<HomePage />} />
+                                      {/* Navitate to Dasboard if there's token */}
+                                      <Route element={<PublicRoute />}>
+                                        <Route path="/auth/login" element={<LoginPage />} />
+                                      </Route>
 
-                                  {/* Protected routes with MainLayout */}
-                                  <Route element={<MainLayout />}>
-                                    <Route element={<ProtectedRoute />} >
-                                      <Route path="/dashboard" element={<DashboardPage />} />
+                                      {/* Protected routes with MainLayout */}
+                                      <Route element={<MainLayout />}>
+                                        <Route element={<ProtectedRoute />} >
+                                          <Route path="/dashboard" element={<DashboardPage />} />
 
-                                      <Route path="/payrun" element={<PayrunPage />} />
-                                      <Route path="/payrun/regular" element={< RegularPayrunPage />} />
-                                      <Route path="/payrun/special" element={<SpecialPayrunPage />} />
-                                      <Route path="/payrun/last" element={<LastPayrunPage />} />
+                                          <Route path="/payrun" element={<PayrunPage />} />
+                                          <Route path="/payrun/regular" element={< RegularPayrunPage />} />
+                                          <Route path="/payrun/special" element={<SpecialPayrunPage />} />
+                                          <Route path="/payrun/last" element={<LastPayrunPage />} />
 
-                                      <Route path="/employee" element={<EmployeePage />} />
+                                          <Route path="/employee" element={<EmployeePage />} />
 
-                                      <Route path="/attendance" element={<AttendancePage />} />
-                                      <Route path="/attendance/absence" element={<AbsencePage />} />
-                                      <Route path="/attendance/leave" element={<LeavePage />} />
-                                      <Route path="/attendance/overtime" element={<OvertimePage />} />
-                                      <Route path="/attendance/restday" element={<RestdayPage />} />
-                                      <Route path="/attendance/holiday" element={<HolidayPage />} />
+                                          <Route path="/attendance" element={<AttendancePage />} />
+                                          <Route path="/attendance/absence" element={<AbsencePage />} />
+                                          <Route path="/attendance/leave" element={<LeavePage />} />
+                                          <Route path="/attendance/overtime" element={<OvertimePage />} />
+                                          <Route path="/attendance/restday" element={<RestdayPage />} />
+                                          <Route path="/attendance/holiday" element={<HolidayPage />} />
 
 
-                                      <Route path="/configuration/payitem" element={<PayitemPage />} />
-                                      <Route path="/configuration/company-configuration" element={<CompanyConfigsPage />} />
-                                      <Route path="/configuration/recurring-pay" element={<RecurringPayPage />} />
-                                      <Route path="/configuration/contribution" element={<ContributionPage />} />
+                                          <Route path="/configuration/payitem" element={<PayitemPage />} />
+                                          <Route path="/configuration/company-configuration" element={<CompanyConfigsPage />} />
+                                          <Route path="/configuration/recurring-pay" element={<RecurringPayPage />} />
+                                          <Route path="/configuration/contribution" element={<ContributionPage />} />
 
-                                    </Route>
-                                  </Route>
-                                </Routes>
+                                        </Route>
+                                      </Route>
+                                    </Routes>
+                                  </HdmfProvider>
+                                </ContributionProvider>
                               </RecurringPayProvider>
                             </RegularPayrunProvider>
                           </PayitemProvider>
