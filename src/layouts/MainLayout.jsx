@@ -4,7 +4,7 @@ import TopNav from "../components/TopNav.component";
 
 const MainLayout = () => {
     return (
-        <div className="flex h-screen ">
+        <div className="flex min-h-screen ">
             <Sidebar />
             <div className="flex flex-col flex-1">
                 <TopNav />

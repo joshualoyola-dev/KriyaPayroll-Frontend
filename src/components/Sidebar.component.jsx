@@ -67,7 +67,7 @@ const Sidebar = () => {
     ];
 
     return (
-        <aside className="w-52 bg-white border-r border-gray-200 h-screen p-4 flex flex-col">
+        <aside className="w-52 bg-white border-r border-gray-200 min-h-screen p-4 flex flex-col">
             <CompanySelection />
             <nav className="flex flex-col pt-2 gap-y-1.5 text-sm">
                 {sidebarSections.map((section, idx) => (
