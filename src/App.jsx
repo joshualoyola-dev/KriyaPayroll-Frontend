@@ -32,6 +32,7 @@ import CompanyConfigsPage from "./pages/main/configuration/company-configs/Compa
 import RecurringPayPage from "./pages/main/configuration/recurring-pay/RecurringPayPage"
 import LastPayrunPage from "./pages/main/payrun/last/LastPayrunPage"
 import SpecialPayrunPage from "./pages/main/payrun/special/SpecialPayrunPage"
+import ContributionPage from "./pages/main/configuration/contributions/ContributionPage"
 
 function App() {
   return (
@@ -80,6 +81,7 @@ function App() {
                                       <Route path="/configuration/payitem" element={<PayitemPage />} />
                                       <Route path="/configuration/company-configuration" element={<CompanyConfigsPage />} />
                                       <Route path="/configuration/recurring-pay" element={<RecurringPayPage />} />
+                                      <Route path="/configuration/contribution" element={<ContributionPage />} />
 
                                     </Route>
                                   </Route>

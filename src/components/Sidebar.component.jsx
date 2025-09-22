@@ -62,6 +62,7 @@ const Sidebar = () => {
                 { label: "Payitems", path: "/configuration/payitem" },
                 { label: "Recurring Pay", path: "/configuration/recurring-pay" },
                 { label: "Comp. Config.", path: "/configuration/company-configuration" },
+                { label: "Contributions", path: "/configuration/contribution" },
             ],
         },
     ];
