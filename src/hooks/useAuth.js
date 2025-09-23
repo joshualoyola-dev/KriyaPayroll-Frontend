@@ -28,7 +28,7 @@ const useAuth = () => {
             localStorage.setItem('token', token);
             // window.location.href = "/dashboard";
             // navigate('/dashboard', { replace: true });
-            navigate("/dashboard");
+            // navigate("/dashboard");
             window.location.reload();
         } catch (error) {
             console.log('error: ', error);
