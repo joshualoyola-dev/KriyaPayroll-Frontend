@@ -20,4 +20,10 @@ export const updatePhicRecord = async (phic_contribution_rate_id, formData) => {
 //sss service
 
 
-//withholding service
+//withholding 
+export const fetchWithholdings = async () => {
+    return await payroll_api.get('/api/v1/contributions/withholding');
+};
+export const updateWithholdings = async (withholding_tax_id, formData) => {
+    return await payroll_api.patch(`/api/v1/contributions/withholding/${withholding_tax_id}`, formData);
+};
