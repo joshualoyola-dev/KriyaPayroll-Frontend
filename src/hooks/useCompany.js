@@ -58,41 +58,42 @@ const useCompany = () => {
 
     const { addToast } = useToastContext();
 
-    useEffect(() => {
-        const fetchCompanies = async () => {
-            setLoading(true);
-            try {
-                const response = await getCompaniesService();
-                const fetchedCompanies = response?.data?.companies ?? [];
-                setCompanies(fetchedCompanies);
+    const fetchCompanies = async () => {
+        setLoading(true);
+        try {
+            const response = await getCompaniesService();
+            const fetchedCompanies = response?.data?.companies ?? [];
+            setCompanies(fetchedCompanies);
 
-                // Get last selected company_id from localStorage
-                const savedCompanyId = localStorage.getItem("selected_company_id");
+            // Get last selected company_id from localStorage
+            const savedCompanyId = localStorage.getItem("selected_company_id");
 
-                let selected = null;
-                if (savedCompanyId) {
-                    selected = fetchedCompanies.find(
-                        (c) => c.company_id === savedCompanyId
-                    );
-                }
-
-                // fallback: if no saved company OR not found in fetched list
-                if (!selected && fetchedCompanies.length > 0) {
-                    selected = fetchedCompanies[0];
-                }
-
-                setCompany(selected ?? null);
-                console.log('selected', selected);
-
-            } catch (error) {
-                console.error("Failed to fetch companies:", error);
-                setCompanies([]);
-                setCompany(null);
-            } finally {
-                setLoading(false);
+            let selected = null;
+            if (savedCompanyId) {
+                selected = fetchedCompanies.find(
+                    (c) => c.company_id === savedCompanyId
+                );
             }
-        };
 
+            // fallback: if no saved company OR not found in fetched list
+            if (!selected && fetchedCompanies.length > 0) {
+                selected = fetchedCompanies[0];
+            }
+
+            setCompany(selected ?? null);
+            console.log('selected', selected);
+
+        } catch (error) {
+            console.error("Failed to fetch companies:", error);
+            setCompanies([]);
+            setCompany(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    useEffect(() => {
         fetchCompanies();
     }, []);
 
