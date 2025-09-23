@@ -1,7 +1,18 @@
 import payroll_api from "../configs/payroll_api.config";
 
-export const getRecurringPays = async (company_id) => {
-    return await payroll_api.get(`/api/v1/employees/companies/${company_id}/recurring-pays`)
+export const getRecurringPays = async (company_id, employee_id = null, from = null, to = null) => {
+    let query = '';
+    if (employee_id) {
+        query = `${query}&employee_id=${employee_id}`;
+    }
+    if (from) {
+        query = `${query}&from=${from}`;
+    }
+    if (to) {
+        query = `${query}&to=${to}`;
+    }
+
+    return await payroll_api.get(`/api/v1/employees/companies/${company_id}/recurring-pays?${query}`)
 };
 
 export const addOneRecurringPay = async (company_id, formData) => {

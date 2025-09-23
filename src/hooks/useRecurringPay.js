@@ -3,6 +3,7 @@ import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { addOneRecurringPay, deleteOneRecurringPay, getRecurringPays } from "../services/recurring-pay.service";
 import { formatDateToISO18601, normalizeHeader, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
+import useDebounce from "./useDebounce";
 
 const formData = {
     employee_id: '',
@@ -30,6 +31,10 @@ const useRecurringPay = () => {
     ]);
     const [filters, setFilters] = useState({ ...filterFields });
 
+    const debouncedQuery_employee_id = useDebounce(filters.employee_id, 800);
+    const debouncedQuery_to = useDebounce(filters.to, 800);
+    const debouncedQuery_from = useDebounce(filters.from, 800);
+
 
     const { company } = useCompanyContext();
     const { addToast } = useToastContext();
@@ -38,7 +43,12 @@ const useRecurringPay = () => {
         setRecurringPaysLoading(true);
 
         try {
-            const result = await getRecurringPays(company.company_id);
+            const result = await getRecurringPays(
+                company.company_id,
+                debouncedQuery_employee_id || null,
+                debouncedQuery_from || null,
+                debouncedQuery_to || null
+            );
             setRecurringPays(result.data.recurring_pays);
         } catch (error) {
             console.log(error);
@@ -53,7 +63,7 @@ const useRecurringPay = () => {
         if (!company) return;
 
         handleFetchRecurringPays();
-    }, [company]);
+    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from]);
 
     // Form data manipulation
     const handleAddRow = () => {
@@ -78,59 +88,6 @@ const useRecurringPay = () => {
     const handleResetForm = () => setRecurringPayFormData([{ id: Date.now(), ...formData }]);
 
     const handleShowRecurringPayModal = () => setShowRecurringPayModal(!showRecurringPayModal);
-
-    // const handleAddRecurringPays = async () => {
-    //     setRecurringPayAddLoading(true);
-
-    //     try {
-    //         const failedRecurringPays = [];
-
-    //         for (const recurring of recurringPayFormData) {
-    //             try {
-    //                 const cleaned = { ...recurring };
-    //                 delete cleaned.id; // Remove the UI-only id field
-
-    //                 // Convert string numbers to actual numbers for backend
-    //                 const numberFields = [
-    //                     'amount',
-    //                 ];
-
-    //                 numberFields.forEach(field => {
-    //                     if (cleaned[field] !== '' && cleaned[field] !== null && cleaned[field] !== undefined) {
-    //                         const numValue = Number(cleaned[field]);
-    //                         cleaned[field] = isNaN(numValue) ? null : numValue;
-    //                     } else {
-    //                         cleaned[field] = null;
-    //                     }
-    //                 });
-
-    //                 await addOneRecurringPay(company.company_id, cleaned);
-    //                 addToast(`Successfully added recurring pay: ${cleaned.employee_id}`, "success");
-    //             } catch (error) {
-    //                 console.error('Error adding recurring pay:', error);
-    //                 addToast(`Error adding recurring pay for employee: ${recurring.employee_id}`, "error");
-    //                 failedRecurringPays.push(recurring);
-    //             }
-    //         }
-
-    //         if (failedRecurringPays.length > 0) {
-    //             setRecurringPayFormData(failedRecurringPays);
-    //             await handleFetchRecurringPays();
-    //         }
-    //         else {
-    //             handleResetForm();
-    //             await handleFetchRecurringPays();
-    //             //close modal
-    //             handleShowRecurringPayModal();
-    //         }
-    //     } catch (error) {
-    //         console.error('Error:', error);
-    //         addToast("Failed to add recurring pays", "error");
-    //     }
-    //     finally {
-    //         setRecurringPayAddLoading(false);
-    //     }
-    // };
 
     const handleAddRecurringPays = async () => {
         setRecurringPayAddLoading(true);
