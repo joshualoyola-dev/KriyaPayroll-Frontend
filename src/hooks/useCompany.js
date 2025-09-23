@@ -12,6 +12,7 @@ import {
     updateCompanyInfo,
 } from "../services/company.service";
 import { useToastContext } from "../contexts/ToastProvider";
+import { useAuthContext } from "../contexts/AuthProvider";
 
 const initialFormData = {
     company_id: "",
@@ -57,6 +58,7 @@ const useCompany = () => {
     const [payrollFrequency, setPayrollFrequency] = useState();
 
     const { addToast } = useToastContext();
+    const { token } = useAuthContext();
 
     const fetchCompanies = async () => {
         setLoading(true);
@@ -94,8 +96,9 @@ const useCompany = () => {
 
 
     useEffect(() => {
+        if (!token) return;
         fetchCompanies();
-    }, []);
+    }, [token]);
 
     useEffect(() => {
         if (company) {

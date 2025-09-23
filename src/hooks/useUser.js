@@ -8,6 +8,8 @@ const useUser = () => {
     const [loading, setLoading] = useState(false);
     const [isUsersLoading, setIsUsersLoading] = useState(false);
 
+    const { token } = useAuthContext();
+
     const fetchUserInfo = async () => {
         setLoading(true);
         try {
@@ -44,13 +46,17 @@ const useUser = () => {
 
 
     useEffect(() => {
+        if (!token) return;
+
         fetchUserInfo();
-    }, []);
+    }, [token]);
 
 
     useEffect(() => {
+        if (!token) return;
+
         fetchPayrollUsers();
-    }, []);
+    }, [token]);
 
     return {
         users, setUsers,
