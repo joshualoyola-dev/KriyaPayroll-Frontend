@@ -1,9 +1,10 @@
 import Input from "../../components/Input.component";
+import { useAuthContext } from "../../contexts/AuthProvider";
 import useAuth from "../../hooks/useAuth";
 import { Link } from "react-router-dom";
 
 const LoginForm = () => {
-    const { formData, setFormData, isLoading, handleLogin } = useAuth();
+    const { formData, setFormData, isLoading, handleLogin } = useAuthContext();
 
     const handleSubmit = (e) => {
         e.preventDefault();
