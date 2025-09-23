@@ -33,7 +33,7 @@ const useAuth = () => {
 
             setToken(token);
 
-            window.location.href = "/dashboard";
+            navigate('/dashboard');
         } catch (error) {
             console.log('error: ', error);
             setError("Registration failed");
