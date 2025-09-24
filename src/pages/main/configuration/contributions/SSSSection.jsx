@@ -15,7 +15,6 @@ const SSSSection = () => {
 
         'employee_regular_ss',
         'employee_regular_mpf',
-        'employee_regular_ec',
 
         'effective_date_start',
         'effective_date_end'
@@ -31,7 +30,6 @@ const SSSSection = () => {
 
         'employee_regular_ss',
         'employee_regular_mpf',
-        'employee_regular_ec',
 
         'effective_date_start',
         'effective_date_end'

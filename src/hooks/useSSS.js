@@ -49,7 +49,6 @@ const useSSS = () => {
 
                 employee_regular_ss: Number(updatedData.employee_regular_ss),
                 employee_regular_mpf: Number(updatedData.employee_regular_mpf),
-                employee_regular_ec: Number(updatedData.employee_regular_ec),
 
                 effective_date_start: convertToISO8601(updatedData.effective_date_start),
                 effective_date_end: convertToISO8601(updatedData.effective_date_end),
