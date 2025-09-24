@@ -38,6 +38,7 @@ import { HdmfProvider } from "./contexts/HdmfProvider"
 import { PhicProvider } from "./contexts/PhicProvider"
 import { AuthProvider } from "./contexts/AuthProvider"
 import { WithholdingProvider } from "./contexts/WithholdingProvider"
+import { SssProvider } from "./contexts/SssProvider"
 
 function App() {
   return (
@@ -60,42 +61,44 @@ function App() {
                                     <HdmfProvider >
                                       <PhicProvider>
                                         <WithholdingProvider>
-                                          <Routes>
-                                            {/* Public routes */}
-                                            <Route path="/" element={<HomePage />} />
-                                            {/* Navitate to Dasboard if there's token */}
-                                            <Route element={<PublicRoute />}>
-                                              <Route path="/auth/login" element={<LoginPage />} />
-                                            </Route>
-
-                                            {/* Protected routes with MainLayout */}
-                                            <Route element={<MainLayout />}>
-                                              <Route element={<ProtectedRoute />} >
-                                                <Route path="/dashboard" element={<DashboardPage />} />
-
-                                                <Route path="/payrun" element={<PayrunPage />} />
-                                                <Route path="/payrun/regular" element={< RegularPayrunPage />} />
-                                                <Route path="/payrun/special" element={<SpecialPayrunPage />} />
-                                                <Route path="/payrun/last" element={<LastPayrunPage />} />
-
-                                                <Route path="/employee" element={<EmployeePage />} />
-
-                                                <Route path="/attendance" element={<AttendancePage />} />
-                                                <Route path="/attendance/absence" element={<AbsencePage />} />
-                                                <Route path="/attendance/leave" element={<LeavePage />} />
-                                                <Route path="/attendance/overtime" element={<OvertimePage />} />
-                                                <Route path="/attendance/restday" element={<RestdayPage />} />
-                                                <Route path="/attendance/holiday" element={<HolidayPage />} />
-
-
-                                                <Route path="/configuration/payitem" element={<PayitemPage />} />
-                                                <Route path="/configuration/company-configuration" element={<CompanyConfigsPage />} />
-                                                <Route path="/configuration/recurring-pay" element={<RecurringPayPage />} />
-                                                <Route path="/configuration/contribution" element={<ContributionPage />} />
-
+                                          <SssProvider>
+                                            <Routes>
+                                              {/* Public routes */}
+                                              <Route path="/" element={<HomePage />} />
+                                              {/* Navitate to Dasboard if there's token */}
+                                              <Route element={<PublicRoute />}>
+                                                <Route path="/auth/login" element={<LoginPage />} />
                                               </Route>
-                                            </Route>
-                                          </Routes>
+
+                                              {/* Protected routes with MainLayout */}
+                                              <Route element={<MainLayout />}>
+                                                <Route element={<ProtectedRoute />} >
+                                                  <Route path="/dashboard" element={<DashboardPage />} />
+
+                                                  <Route path="/payrun" element={<PayrunPage />} />
+                                                  <Route path="/payrun/regular" element={< RegularPayrunPage />} />
+                                                  <Route path="/payrun/special" element={<SpecialPayrunPage />} />
+                                                  <Route path="/payrun/last" element={<LastPayrunPage />} />
+
+                                                  <Route path="/employee" element={<EmployeePage />} />
+
+                                                  <Route path="/attendance" element={<AttendancePage />} />
+                                                  <Route path="/attendance/absence" element={<AbsencePage />} />
+                                                  <Route path="/attendance/leave" element={<LeavePage />} />
+                                                  <Route path="/attendance/overtime" element={<OvertimePage />} />
+                                                  <Route path="/attendance/restday" element={<RestdayPage />} />
+                                                  <Route path="/attendance/holiday" element={<HolidayPage />} />
+
+
+                                                  <Route path="/configuration/payitem" element={<PayitemPage />} />
+                                                  <Route path="/configuration/company-configuration" element={<CompanyConfigsPage />} />
+                                                  <Route path="/configuration/recurring-pay" element={<RecurringPayPage />} />
+                                                  <Route path="/configuration/contribution" element={<ContributionPage />} />
+
+                                                </Route>
+                                              </Route>
+                                            </Routes>
+                                          </SssProvider>
                                         </WithholdingProvider>
                                       </PhicProvider>
                                     </HdmfProvider>
