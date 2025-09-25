@@ -21,6 +21,9 @@ const useRegularPayrun = () => {
     const [options, setOptions] = useState({ ...formData });
     const [isValidating, setIsValidating] = useState(false);
 
+    const [payslips, setPayslips] = useState([]);
+    const [payslipsLoading, setPayslipsLoading] = useState(false);
+
     const { payitems } = usePayitemContext();
     const { activeEmployees } = useEmployeeContext();
     const { addToast } = useToastContext();
@@ -96,19 +99,22 @@ const useRegularPayrun = () => {
     };
 
     const handleGenerate = async () => {
+        setPayslipsLoading(true);
         //turn payitems into flat array of ids
         const payitem_ids = options.pay_items.flatMap(payitem => Object.keys(payitem));
 
         try {
             const result = await generateRegularPayrun(company.company_id, { payitem_ids });
-            console.log('result', result);
-
+            console.log('generated payslip result', result);
+            setPayslips(result.data.payslips);
         } catch (error) {
             console.log(error);
             addToast(`Error occured in generating payroll.`, "error");
         }
+        finally {
+            setPayslipsLoading(false);
+        }
     }
-
 
     return {
         options, setOptions,
@@ -121,7 +127,9 @@ const useRegularPayrun = () => {
         isValidating, setIsValidating,
         validateEmployeesDailyRecordAgainstPayrunPeriod,
 
-
+        //payslip
+        payslips, setPayslips,
+        payslipsLoading, setPayslipsLoading,
     };
 };
 
