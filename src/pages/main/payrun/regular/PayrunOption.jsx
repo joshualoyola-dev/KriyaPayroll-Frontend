@@ -125,7 +125,6 @@ const PayrunOption = () => {
                             }}
                             className="w-full px-3 py-2.5 pr-10 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none cursor-pointer text-gray-500"
                             defaultValue=""
-                            disabled={!payrun ? false : true}
                         >
                             <option value="" disabled>Select Payitems</option>
                             {payitems
@@ -144,7 +143,6 @@ const PayrunOption = () => {
                         <ChevronDownIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
-
 
                 {/* Draft/Generate  */}
                 {
@@ -165,7 +163,7 @@ const PayrunOption = () => {
             </form>
 
             {/* Selected Payitems (if any) */}
-            {
+            {!payrun &&
                 options.pay_items.length > 0 && (
                     <div className="mb-6">
                         <p className="text-xs font-medium text-gray-600 mb-2">Selected Pay Items:</p>

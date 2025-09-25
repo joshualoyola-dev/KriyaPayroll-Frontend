@@ -52,6 +52,12 @@ const useRegularPayrun = () => {
 
         if (payrun_id) {
             //trigger the fetch of existing payrun
+            //fetch payrun
+
+            //populate the options
+
+            //populate the payslips. this will cause the save draft to hide. 
+            // and show the save edit or finalize
         }
     }, [location.search]);
 
