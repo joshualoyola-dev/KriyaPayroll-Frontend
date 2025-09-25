@@ -5,7 +5,13 @@ import { useToastContext } from "../../../../contexts/ToastProvider";
 
 const PayrunOption = () => {
     const { payitems } = usePayitemContext();
-    const { options, handleInputChange, handlePayitemChange, removePayitem, handleGenerate, isValidating, validateEmployeesDailyRecordAgainstPayrunPeriod } = useRegularPayrunContext();
+    const {
+        options, handleInputChange,
+        handlePayitemChange, removePayitem,
+        handleGenerate, isValidating,
+        validateEmployeesDailyRecordAgainstPayrunPeriod,
+        payrun, payslips, handleSaveDraft
+    } = useRegularPayrunContext();
 
     const { addToast } = useToastContext();
 
@@ -24,7 +30,15 @@ const PayrunOption = () => {
     }
 
     return (
-        <div className="bg-white p-6 rounded-xl border border-gray-200">
+        <div className="relative bg-white p-6 rounded-xl border border-gray-200">
+            <button
+                onClick={handleSaveDraft}
+                className="absolute top-4 right-4 px-3 py-1  bg-teal-700 text-white hover:cursor-pointer"
+            >
+                save
+            </button>
+
+
             {/* Main form grid */}
             <form
                 onSubmit={handleSubmit}

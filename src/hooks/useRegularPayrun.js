@@ -1,3 +1,14 @@
+/**
+ * we have 3 cases: 
+ * 1) generate a payrun
+ * 2) payrun is already generated. for editing
+ * 3) payrun is already generated. for viewing (i.e., approved)
+ * 
+ * 
+ * to check for a currently selected regular payrun, we can rely on the url.
+ * i.e., if it is /payruns/regular?payrun_id=123, we run a useeffect to get the record of payrun 123. 
+ */
+
 import { useEffect, useState } from "react";
 import { usePayitemContext } from "../contexts/PayitemProvider";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
@@ -6,6 +17,8 @@ import { validateDailyRecordOfOneEmployee } from "../services/attendance.service
 import { convertToISO8601 } from "../utility/datetime.utility";
 import { generateRegularPayrun } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
+import { useLocation } from "react-router-dom";
+import { sanitizedPayslips } from "../utility/payrun.utility";
 
 const formData = {
     date_from: '',
@@ -15,23 +28,33 @@ const formData = {
         { 'pay-item-01': "Tax Withheld" },
         { 'pay-item-02': "Basic Pay" },
     ], //payitem_id : pay_item_name in the column
-}
+};
 
 const useRegularPayrun = () => {
-    const [options, setOptions] = useState({ ...formData });
-    const [isValidating, setIsValidating] = useState(false);
+    const [payrun, setPayrun] = useState();
 
-    const [payslips, setPayslips] = useState([]);
-    const [payslipsLoading, setPayslipsLoading] = useState(false);
+    const [options, setOptions] = useState({ ...formData }); //case 1, 2, 3
+    const [isValidating, setIsValidating] = useState(false); //case 1,
+    const [payslips, setPayslips] = useState([]); //case: 1, 2, 3
+    const [payslipsLoading, setPayslipsLoading] = useState(false); //case: 1, 2, 3
+    const [isSaving, setIsSaving] = useState(false); //use for both saving draft and save edit
 
     const { payitems } = usePayitemContext();
     const { activeEmployees } = useEmployeeContext();
     const { addToast } = useToastContext();
     const { company } = useCompanyContext();
 
+    const location = useLocation();
+
     useEffect(() => {
-        console.log("running regular payrun hook");
-    }, []);
+        const params = new URLSearchParams(location.search);
+        const payrun_id = params.get("payrun_id");
+
+        if (payrun_id) {
+            //trigger the fetch of existing payrun
+        }
+    }, [location.search]);
+
 
     // Handle input changes
     const handleInputChange = (field, value) => {
@@ -116,6 +139,24 @@ const useRegularPayrun = () => {
         }
     }
 
+    const handleSaveDraft = async () => {
+        setIsSaving(true);
+        try {
+            const cleanedPayslips = sanitizedPayslips(payslips);
+            console.log('cleaned payslips: ', cleanedPayslips);
+
+            //logic for saving. 
+        } catch (error) {
+            console.log(error);
+            addToast(`Error occurred in saving payroll.`, "error");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+
+
+
     return {
         options, setOptions,
         //options controll
@@ -130,6 +171,8 @@ const useRegularPayrun = () => {
         //payslip
         payslips, setPayslips,
         payslipsLoading, setPayslipsLoading,
+        isSaving, setIsSaving,
+        handleSaveDraft
     };
 };
 

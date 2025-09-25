@@ -5,11 +5,13 @@ const PayslipTable = ({ data, setData }) => {
     );
 
     const handleChange = (employee_id, payitem_id, value) => {
+        // Only allow numbers (empty string is allowed too)
+        const numericValue = value.replace(/[^0-9]/g, "");
         setData((prev) => ({
             ...prev,
             [employee_id]: {
                 ...prev[employee_id],
-                [payitem_id]: value,
+                [payitem_id]: numericValue,
             },
         }));
     };
@@ -39,7 +41,8 @@ const PayslipTable = ({ data, setData }) => {
                             {payitem_ids.map((payitem_id) => (
                                 <td key={payitem_id} className="border border-gray-300 px-2 py-1">
                                     <input
-                                        type="text"
+                                        type="number"
+                                        inputMode="numeric"
                                         value={data[employee_id][payitem_id] ?? ""}
                                         onChange={(e) =>
                                             handleChange(employee_id, payitem_id, e.target.value)
