@@ -96,16 +96,8 @@ const useRegularPayrun = () => {
     };
 
     const handleGenerate = async () => {
-        const allValid = await validateEmployeesDailyRecordAgainstPayrunPeriod();
-        if (!allValid) {
-            addToast("Fix the daily record first", "warning");
-            return;
-        }
-
-
         //turn payitems into flat array of ids
         const payitem_ids = options.pay_items.flatMap(payitem => Object.keys(payitem));
-
 
         try {
             const result = await generateRegularPayrun(company.company_id, { payitem_ids });
@@ -127,6 +119,9 @@ const useRegularPayrun = () => {
 
         //validate
         isValidating, setIsValidating,
+        validateEmployeesDailyRecordAgainstPayrunPeriod,
+
+
     };
 };
 

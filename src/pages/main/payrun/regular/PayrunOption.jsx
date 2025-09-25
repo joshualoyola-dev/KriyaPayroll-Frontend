@@ -1,14 +1,25 @@
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { useRegularPayrunContext } from "../../../../contexts/RegularPayrunProvider";
+import { useToastContext } from "../../../../contexts/ToastProvider";
 
 const PayrunOption = () => {
     const { payitems } = usePayitemContext();
-    const { options, handleInputChange, handlePayitemChange, removePayitem, handleGenerate, isValidating } = useRegularPayrunContext();
+    const { options, handleInputChange, handlePayitemChange, removePayitem, handleGenerate, isValidating, validateEmployeesDailyRecordAgainstPayrunPeriod } = useRegularPayrunContext();
 
+    const { addToast } = useToastContext();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
+        //validate
+        const allValid = await validateEmployeesDailyRecordAgainstPayrunPeriod();
+        if (!allValid) {
+            addToast("Fix the daily record first", "warning");
+            return;
+        }
+
+        //generate
         handleGenerate();
     }
 
