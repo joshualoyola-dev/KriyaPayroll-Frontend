@@ -154,9 +154,6 @@ const useRegularPayrun = () => {
         }
     };
 
-
-
-
     return {
         options, setOptions,
         //options controll
@@ -172,7 +169,8 @@ const useRegularPayrun = () => {
         payslips, setPayslips,
         payslipsLoading, setPayslipsLoading,
         isSaving, setIsSaving,
-        handleSaveDraft
+        handleSaveDraft,
+        payrun, setPayrun
     };
 };
 
