@@ -4,6 +4,8 @@ import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { validateDailyRecordOfOneEmployee } from "../services/attendance.service";
 import { convertToISO8601 } from "../utility/datetime.utility";
+import { generateRegularPayrun } from "../services/payrun.service";
+import { useCompanyContext } from "../contexts/CompanyProvider";
 
 const formData = {
     date_from: '',
@@ -22,6 +24,7 @@ const useRegularPayrun = () => {
     const { payitems } = usePayitemContext();
     const { activeEmployees } = useEmployeeContext();
     const { addToast } = useToastContext();
+    const { company } = useCompanyContext();
 
     useEffect(() => {
         console.log("running regular payrun hook");
@@ -99,11 +102,20 @@ const useRegularPayrun = () => {
             return;
         }
 
-        //...
-        alert("All are valid");
 
-    };
+        //turn payitems into flat array of ids
+        const payitem_ids = options.pay_items.flatMap(payitem => Object.keys(payitem));
 
+
+        try {
+            const result = await generateRegularPayrun(company.company_id, { payitem_ids });
+            console.log('result', result);
+
+        } catch (error) {
+            console.log(error);
+            addToast(`Error occured in generating payroll.`, "error");
+        }
+    }
 
 
     return {
