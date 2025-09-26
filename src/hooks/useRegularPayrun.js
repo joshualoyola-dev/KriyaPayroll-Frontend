@@ -15,9 +15,9 @@ import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { validateDailyRecordOfOneEmployee } from "../services/attendance.service";
 import { convertToISO8601 } from "../utility/datetime.utility";
-import { generateRegularPayrun } from "../services/payrun.service";
+import { generateRegularPayrun, saveRegularPayrunDraft } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { sanitizedPayslips } from "../utility/payrun.utility";
 
 const formData = {
@@ -45,6 +45,7 @@ const useRegularPayrun = () => {
     const { company } = useCompanyContext();
 
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -152,6 +153,20 @@ const useRegularPayrun = () => {
             console.log('cleaned payslips: ', cleanedPayslips);
 
             //logic for saving. 
+            const payload = {
+                payslips: cleanedPayslips,
+                payrun_type: 'REGULAR',
+                payrun_start_date: options.date_from,
+                payrun_end_date: options.date_to,
+                payment_date: options.payment_date,
+                payrun_title: `REGULAR PAYRUN - ${Date.now()}`,
+                generated_by: localStorage.getItem('system_user_id'),
+                status: 'DRAFT',
+            };
+            const result = await saveRegularPayrunDraft(company.company_id, payload);
+            console.log('result saving draft', result);
+            addToast("Successfully saved regular payrun draft", "success");
+            navigate('/payrun');
         } catch (error) {
             console.log(error);
             addToast(`Error occurred in saving payroll.`, "error");
