@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
 import { getCompanyPayruns } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
@@ -8,7 +8,7 @@ const usePayrun = () => {
     const [payruns, setPayruns] = useState([]);
     const [isPayrunLoading, setIsPayrunLoading] = useState(false);
 
-    const location = useLocation();
+    const navigate = useNavigate();
 
     const { addToast } = useToastContext();
     const { company } = useCompanyContext();
@@ -31,22 +31,23 @@ const usePayrun = () => {
         }
     };
 
+    const handleClickPayrun = (payrun_id) => {
+        navigate(`/payrun/regular?payrun_id=${payrun_id}`);
+    };
+
     useEffect(() => {
         if (!company) return;
 
         handleFetchPayruns();
     }, [company]);
 
-    // useEffect(() => {
-    //     if (location.pathname === '/payrun') {
-    //         return;
-    //     };
-    // }, [location]);
+
 
     return {
         payruns, setPayruns,
         handleFetchPayruns,
         isPayrunLoading, setIsPayrunLoading,
+        handleClickPayrun,
     };
 };
 

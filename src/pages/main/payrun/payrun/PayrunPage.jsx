@@ -5,7 +5,7 @@ import PayrunCard from "../regular/PayrunCard";
 import DualBallLoading from "../../../../components/DualBallLoading";
 
 const PayrunPage = () => {
-    const { payruns, isPayrunLoading } = usePayrunContext();
+    const { payruns, isPayrunLoading, handleClickPayrun } = usePayrunContext();
     const regularPayruns = payruns.filter(payrun => payrun.payrun_type === 'REGULAR');
     const specialPayruns = payruns.filter(payrun => payrun.payrun_type === 'SPECIAL');
     const lastPayruns = payruns.filter(payrun => payrun.payrun_type === 'LAST');
@@ -24,7 +24,7 @@ const PayrunPage = () => {
                             </span>
                             <div className="space-y-3">
                                 {regularPayruns?.map((payrun, idx) => (
-                                    <PayrunCard key={idx} payrun={payrun} idx={idx} />
+                                    <PayrunCard key={idx} payrun={payrun} idx={idx} oncClickCard={handleClickPayrun} />
                                 ))}
                             </div>
                         </div>
@@ -35,7 +35,7 @@ const PayrunPage = () => {
                             </span>
                             <div className="space-y-3">
                                 {specialPayruns?.map((payrun, idx) => (
-                                    <PayrunCard key={idx} payrun={payrun} idx={idx} />
+                                    <PayrunCard key={idx} payrun={payrun} idx={idx} oncClickCard={handleClickPayrun} />
                                 ))}
                             </div>
                         </div>
@@ -46,7 +46,7 @@ const PayrunPage = () => {
                             </span>
                             <div className="space-y-3">
                                 {lastPayruns?.map((payrun, idx) => (
-                                    <PayrunCard key={idx} payrun={payrun} idx={idx} />
+                                    <PayrunCard key={idx} payrun={payrun} idx={idx} oncClickCard={handleClickPayrun} />
                                 ))}
                             </div>
                         </div>

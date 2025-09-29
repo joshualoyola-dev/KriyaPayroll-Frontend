@@ -1,8 +1,9 @@
 import { convertToISO8601 } from "../../../../utility/datetime.utility";
 
-const PayrunCard = ({ payrun, idx }) => {
+const PayrunCard = ({ payrun, idx, oncClickCard }) => {
     return (
         <div
+            onClick={() => oncClickCard(payrun.payrun_id)}
             key={idx}
             className="flex items-center justify-between p-4 rounded-2xl border border-gray-200 bg-white transition-colors hover:bg-gray-50 hover:cursor-pointer"
         >

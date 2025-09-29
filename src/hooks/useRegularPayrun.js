@@ -15,7 +15,7 @@ import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { validateDailyRecordOfOneEmployee } from "../services/attendance.service";
 import { convertToISO8601 } from "../utility/datetime.utility";
-import { generateRegularPayrun, saveRegularPayrunDraft } from "../services/payrun.service";
+import { generateRegularPayrun, getPayrun, getPayrunPayslipPayables, saveRegularPayrunDraft } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sanitizedPayslips } from "../utility/payrun.utility";
@@ -47,18 +47,28 @@ const useRegularPayrun = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const initializeRegularPayrun = async (payrun_id) => {
+        //trigger the fetch of existing payrun
+        //fetch payrun
+        const resultPayrun = await getPayrun(company.company_id, payrun_id);
+        console.log('fetched payrun: ', resultPayrun);
+        setPayrun(resultPayrun.data.payrun);
+
+        //populate the options
+
+        //populate the payslips. this will cause the save draft to hide. 
+        // and show the save edit or finalize
+        const resultPayables = await getPayrunPayslipPayables(company.company_id, payrun_id);
+        console.log('fetched payslip payables: ', resultPayables);
+        setPayslips(resultPayables.data.payslips);
+    };
+
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const payrun_id = params.get("payrun_id");
 
         if (payrun_id) {
-            //trigger the fetch of existing payrun
-            //fetch payrun
-
-            //populate the options
-
-            //populate the payslips. this will cause the save draft to hide. 
-            // and show the save edit or finalize
+            initializeRegularPayrun(payrun_id);
         }
     }, [location.search]);
 

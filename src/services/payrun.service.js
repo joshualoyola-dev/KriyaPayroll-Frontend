@@ -1,5 +1,13 @@
 import payroll_api from "../configs/payroll_api.config";
 
+export const getPayrun = async (company_id, payrun_id) => {
+    return await payroll_api.get(`/api/v1/payruns/${company_id}/regular/${payrun_id}`);
+};
+
+export const getPayrunPayslipPayables = async (company_id, payrun_id) => {
+    return await payroll_api.get(`/api/v1/payruns/${company_id}/regular/${payrun_id}/payslip-payables`);
+};
+
 export const getCompanyPayruns = async (company_id) => {
     return await payroll_api.get(`/api/v1/payruns/${company_id}`);
 };
