@@ -15,7 +15,7 @@ import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { validateDailyRecordOfOneEmployee } from "../services/attendance.service";
 import { convertToISO8601 } from "../utility/datetime.utility";
-import { generateRegularPayrun, getPayrun, getPayrunPayslipPayables, saveRegularPayrunDraft } from "../services/payrun.service";
+import { generateRegularPayrun, getPayrun, getPayrunPayslipPayables, saveEdit, saveRegularPayrunDraft } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sanitizedPayslips } from "../utility/payrun.utility";
@@ -184,6 +184,27 @@ const useRegularPayrun = () => {
             setIsSaving(false);
         }
     };
+    
+    const handleSaveEdit = async () => {
+        setIsSaving(true);
+
+        try {
+            const cleanedPayslips = sanitizedPayslips(payslips);
+            const payload = {
+                payslips: cleanedPayslips,
+            };
+            const result = await saveEdit(company.company_id, payrun.payrun_id, payload);
+            console.log('result saving edits', result);
+            addToast("Successfully saved regular payrun edits", "success");
+            handleCloseRegularPayrun();
+        } catch (error) {
+            console.log(error);
+            addToast(`Error occurred in saving edits.`, "error");
+        }
+        finally {
+            setIsSaving(false);
+        }
+    };
 
     const handleCloseRegularPayrun = () => {
         setPayrun(null);
@@ -210,6 +231,7 @@ const useRegularPayrun = () => {
         payrun, setPayrun,
 
         handleCloseRegularPayrun,
+        handleSaveEdit,
     };
 };
 

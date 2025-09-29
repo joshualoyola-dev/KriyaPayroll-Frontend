@@ -12,6 +12,7 @@ const PayrunOption = () => {
         validateEmployeesDailyRecordAgainstPayrunPeriod,
         payrun, handleSaveDraft, payslips,
         handleCloseRegularPayrun,
+        handleSaveEdit,
     } = useRegularPayrunContext();
 
     const { addToast } = useToastContext();
@@ -51,7 +52,7 @@ const PayrunOption = () => {
                             Close
                         </button>
                         <button
-                            onClick={() => { }}
+                            onClick={handleSaveEdit}
                             className="px-3 py-1  bg-teal-700 text-white hover:cursor-pointer"
                         >
                             Save edit
