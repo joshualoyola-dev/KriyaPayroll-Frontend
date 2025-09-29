@@ -10,7 +10,8 @@ const PayrunOption = () => {
         handlePayitemChange, removePayitem,
         handleGenerate, isValidating,
         validateEmployeesDailyRecordAgainstPayrunPeriod,
-        payrun, handleSaveDraft, payslips
+        payrun, handleSaveDraft, payslips,
+        handleCloseRegularPayrun,
     } = useRegularPayrunContext();
 
     const { addToast } = useToastContext();
@@ -43,6 +44,12 @@ const PayrunOption = () => {
 
                 {payrun &&
                     <>
+                        <button
+                            onClick={handleCloseRegularPayrun}
+                            className="px-3 py-1  bg-gray-600 text-white hover:cursor-pointer"
+                        >
+                            Close
+                        </button>
                         <button
                             onClick={() => { }}
                             className="px-3 py-1  bg-teal-700 text-white hover:cursor-pointer"

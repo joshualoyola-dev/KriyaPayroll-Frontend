@@ -185,6 +185,12 @@ const useRegularPayrun = () => {
         }
     };
 
+    const handleCloseRegularPayrun = () => {
+        setPayrun(null);
+        setPayslips([]);
+        navigate('/payrun');
+    };
+
     return {
         options, setOptions,
         //options controll
@@ -201,7 +207,9 @@ const useRegularPayrun = () => {
         payslipsLoading, setPayslipsLoading,
         isSaving, setIsSaving,
         handleSaveDraft,
-        payrun, setPayrun
+        payrun, setPayrun,
+
+        handleCloseRegularPayrun,
     };
 };
 

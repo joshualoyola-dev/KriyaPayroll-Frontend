@@ -22,6 +22,7 @@ const PayrunPage = () => {
                                 <BanknotesIcon className="w-5 h-5 text-teal-600" />
                                 <p> Regular Payrun</p>
                             </span>
+
                             <div className="space-y-3">
                                 {regularPayruns?.map((payrun, idx) => (
                                     <PayrunCard key={idx} payrun={payrun} idx={idx} oncClickCard={handleClickPayrun} />
