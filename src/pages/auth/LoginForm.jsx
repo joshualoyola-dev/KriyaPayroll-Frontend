@@ -1,7 +1,7 @@
 import Input from "../../components/Input.component";
 import { useAuthContext } from "../../contexts/AuthProvider";
-import useAuth from "../../hooks/useAuth";
 import { Link } from "react-router-dom";
+import DualBallLoading from "../../assets/dual-ball-loading.svg";
 
 const LoginForm = () => {
     const { formData, setFormData, isLoading, handleLogin } = useAuthContext();
@@ -18,7 +18,9 @@ const LoginForm = () => {
                 label="Email"
                 type="email"
                 value={formData.user_email}
-                onChange={(e) => setFormData({ ...formData, user_email: e.target.value })}
+                onChange={(e) =>
+                    setFormData({ ...formData, user_email: e.target.value })
+                }
                 required
             />
 
@@ -27,13 +29,18 @@ const LoginForm = () => {
                 label="Password"
                 type="password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                }
                 required
             />
 
             {/* Forgot Password */}
             <div className="flex justify-end">
-                <Link to="/auth/forgot-password" className="text-sm text-teal-600 hover:underline">
+                <Link
+                    to="/auth/forgot-password"
+                    className="text-sm text-teal-600 hover:underline"
+                >
                     Forgot password?
                 </Link>
             </div>
@@ -42,9 +49,23 @@ const LoginForm = () => {
             <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-2.5 rounded-lg bg-teal-600 text-white font-medium hover:bg-teal-700 transition"
+                className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-white font-medium transition ${isLoading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-teal-600 hover:bg-teal-700"
+                    }`}
             >
-                {isLoading ? "Loading..." : "Login"}
+                {isLoading ? (
+                    <>
+                        <img
+                            src={DualBallLoading}
+                            alt="Loading..."
+                            className="w-7 h-7"
+                        />
+                        <span>Logging in...</span>
+                    </>
+                ) : (
+                    "Login"
+                )}
             </button>
         </form>
     );

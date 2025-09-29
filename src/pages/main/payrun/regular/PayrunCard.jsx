@@ -12,9 +12,6 @@ const PayrunCard = ({ payrun, idx }) => {
                     {payrun.payrun_title}
                 </h3>
                 <p className="text-sm text-gray-500">
-                    Type: {payrun.payrun_type}
-                </p>
-                <p className="text-sm text-gray-500">
                     Period: {convertToISO8601(payrun.payrun_start_date)} →{" "}
                     {convertToISO8601(payrun.payrun_end_date)}
                 </p>
