@@ -1,7 +1,7 @@
 import { BanknotesIcon } from "@heroicons/react/24/solid";
 import { usePayrunContext } from "../../../../contexts/PayrunProvider";
 import PayrunFilter from "./PayrunFilter";
-import PayrunCard from "../regular/PayrunCard";
+import PayrunCard from "./PayrunCard";
 import DualBallLoading from "../../../../components/DualBallLoading";
 
 const PayrunPage = () => {
