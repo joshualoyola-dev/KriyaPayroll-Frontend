@@ -56,14 +56,15 @@ function App() {
                         <RestdayProvider>
                           <HolidayProvider>
                             <PayitemProvider >
-                              <RegularPayrunProvider>
-                                <RecurringPayProvider >
-                                  <ContributionProvider >
-                                    <HdmfProvider >
-                                      <PhicProvider>
-                                        <WithholdingProvider>
-                                          <SssProvider>
-                                            <PayrunProvider >
+                              <PayrunProvider >
+
+                                <RegularPayrunProvider>
+                                  <RecurringPayProvider >
+                                    <ContributionProvider >
+                                      <HdmfProvider >
+                                        <PhicProvider>
+                                          <WithholdingProvider>
+                                            <SssProvider>
                                               <Routes>
                                                 {/* Public routes */}
                                                 <Route path="/" element={<HomePage />} />
@@ -100,14 +101,15 @@ function App() {
                                                   </Route>
                                                 </Route>
                                               </Routes>
-                                            </PayrunProvider>
-                                          </SssProvider>
-                                        </WithholdingProvider>
-                                      </PhicProvider>
-                                    </HdmfProvider>
-                                  </ContributionProvider>
-                                </RecurringPayProvider>
-                              </RegularPayrunProvider>
+
+                                            </SssProvider>
+                                          </WithholdingProvider>
+                                        </PhicProvider>
+                                      </HdmfProvider>
+                                    </ContributionProvider>
+                                  </RecurringPayProvider>
+                                </RegularPayrunProvider>
+                              </PayrunProvider>
                             </PayitemProvider>
                           </HolidayProvider>
                         </RestdayProvider>
