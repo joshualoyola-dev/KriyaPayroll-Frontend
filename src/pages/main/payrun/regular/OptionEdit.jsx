@@ -1,13 +1,12 @@
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { useRegularPayrunContext } from "../../../../contexts/RegularPayrunProvider";
+import { convertToISO8601 } from "../../../../utility/datetime.utility";
 
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();
     const {
         options, handleInputChange,
-
-
         payrun,
         handleCloseRegularPayrun,
         handleSaveEdit,
@@ -37,12 +36,6 @@ const OptionEdit = () => {
                         </button>
 
                 }
-                <button
-                    onClick={() => { }}
-                    className="px-3 py-1  bg-teal-700 text-white hover:cursor-pointer"
-                >
-                    Finalize
-                </button>
 
                 {statusLoading
                     ? "Loading..."
@@ -70,14 +63,11 @@ const OptionEdit = () => {
                     <label className="block text-xs font-medium text-gray-700">
                         Date From
                     </label>
-                    <input
-                        type="date"
-                        value={options.date_from}
-                        onChange={(e) => handleInputChange('date_from', e.target.value)}
+                    <div
                         className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2"
-                        required
-                        disabled={true}
-                    />
+                    >
+                        {convertToISO8601(payrun.payrun_start_date)}
+                    </div>
                 </div>
 
                 {/* Date To */}
@@ -85,14 +75,11 @@ const OptionEdit = () => {
                     <label className="block text-xs font-medium text-gray-700">
                         Date To
                     </label>
-                    <input
-                        type="date"
-                        value={options.date_to}
-                        onChange={(e) => handleInputChange('date_to', e.target.value)}
+                    <div
                         className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2"
-                        required
-                        disabled={true}
-                    />
+                    >
+                        {convertToISO8601(payrun.payrun_end_date)}
+                    </div>
                 </div>
 
                 {/* Payment Date */}
@@ -100,14 +87,11 @@ const OptionEdit = () => {
                     <label className="block text-xs font-medium text-gray-700">
                         Payment Date
                     </label>
-                    <input
-                        type="date"
-                        value={options.payment_date}
-                        onChange={(e) => handleInputChange('payment_date', e.target.value)}
+                    <div
                         className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2"
-                        required
-                        disabled={true}
-                    />
+                    >
+                        {convertToISO8601(payrun.payment_date)}
+                    </div>
                 </div>
 
 
