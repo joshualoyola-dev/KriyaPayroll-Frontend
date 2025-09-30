@@ -3,18 +3,14 @@ import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { useRegularPayrunContext } from "../../../../contexts/RegularPayrunProvider";
 import { useToastContext } from "../../../../contexts/ToastProvider";
 
-const PayrunOption = () => {
+const OptionGenerate = () => {
     const { payitems } = usePayitemContext();
     const {
         options, handleInputChange,
         handlePayitemChange, removePayitem,
         handleGenerate, isValidating,
         validateEmployeesDailyRecordAgainstPayrunPeriod,
-        payrun, handleSaveDraft, payslips,
-        handleCloseRegularPayrun,
-        handleSaveEdit,
-        handleChangeStatus,
-        statusLoading,
+        handleSaveDraft, payslips,
         isSaving,
     } = useRegularPayrunContext();
 
@@ -37,60 +33,13 @@ const PayrunOption = () => {
     return (
         <div className="relative bg-white p-6 rounded-xl border border-gray-200">
             <div className="absolute top-4 right-4 gap-2">
-                {(!payrun && Object.keys(payslips).length > 0) &&
+                {(Object.keys(payslips).length > 0) &&
                     <button
                         onClick={handleSaveDraft}
                         className="px-3 py-1  bg-teal-700 text-white hover:cursor-pointer"
                     >
-                        Save Draft
+                        {isSaving ? "Loading ..." : "Save Draft"}
                     </button>
-                }
-
-
-
-                {payrun &&
-                    <>
-
-                        <button
-                            onClick={handleCloseRegularPayrun}
-                            className="px-3 py-1  bg-gray-600 text-white hover:cursor-pointer"
-                        >
-                            Close
-                        </button>
-                        {
-                            isSaving
-                                ? "Loading..."
-                                : <button
-                                    onClick={handleSaveEdit}
-                                    className="px-3 py-1  bg-teal-700 text-white hover:cursor-pointer"
-                                >
-                                    Save edit
-                                </button>
-
-                        }
-                        <button
-                            onClick={() => { }}
-                            className="px-3 py-1  bg-teal-700 text-white hover:cursor-pointer"
-                        >
-                            Finalize
-                        </button>
-
-                        {statusLoading
-                            ? "Loading..."
-                            : <select
-                                value={payrun.status}
-                                onChange={(e) => {
-                                    const status = e.target.value;
-                                    handleChangeStatus(status);
-                                }}
-                            >
-                                <option value="DRAFT">Draft</option>
-                                <option value="FOR_APPROVAL">For Approval</option>
-                                <option value="APPROVED">Approved</option>
-                                <option value="REJECTED">Rejected</option>
-                            </select>
-                        }
-                    </>
                 }
             </div>
 
@@ -110,7 +59,7 @@ const PayrunOption = () => {
                         onChange={(e) => handleInputChange('date_from', e.target.value)}
                         className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2"
                         required
-                        disabled={!payrun ? false : true}
+
                     />
                 </div>
 
@@ -125,7 +74,7 @@ const PayrunOption = () => {
                         onChange={(e) => handleInputChange('date_to', e.target.value)}
                         className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2"
                         required
-                        disabled={!payrun ? false : true}
+
                     />
                 </div>
 
@@ -140,7 +89,7 @@ const PayrunOption = () => {
                         onChange={(e) => handleInputChange('payment_date', e.target.value)}
                         className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2"
                         required
-                        disabled={!payrun ? false : true}
+
                     />
                 </div>
 
@@ -178,26 +127,23 @@ const PayrunOption = () => {
                     </div>
                 </div>
 
-                {/* Draft/Generate  */}
-                {
-                    !payrun &&
-                    <div className="space-y-2">
-                        <label className="block text-xs font-medium text-gray-700">
-                            Generate
-                        </label>
-                        <button
-                            type="submit"
-                            // className="w-full px-3 py-2.5  bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm rounded-3xl "
-                            className="inline-flex items-center px-8 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm rounded-3xl "
-                        >
-                            {isValidating ? "Loading ..." : "Generate"}
-                        </button>
-                    </div>
-                }
+                {/* Generate  */}
+                <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">
+                        Generate
+                    </label>
+                    <button
+                        type="submit"
+                        // className="w-full px-3 py-2.5  bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm rounded-3xl "
+                        className="inline-flex items-center px-8 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm rounded-3xl "
+                    >
+                        {isValidating ? "Loading ..." : "Generate"}
+                    </button>
+                </div>
             </form>
 
             {/* Selected Payitems (if any) */}
-            {!payrun &&
+            {
                 options.pay_items.length > 0 && (
                     <div className="mb-6">
                         <p className="text-xs font-medium text-gray-600 mb-2">Selected Pay Items:</p>
@@ -232,4 +178,4 @@ const PayrunOption = () => {
     );
 };
 
-export default PayrunOption;
+export default OptionGenerate;

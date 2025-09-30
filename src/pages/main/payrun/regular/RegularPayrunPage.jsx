@@ -1,5 +1,6 @@
 import { useRegularPayrunContext } from "../../../../contexts/RegularPayrunProvider";
-import PayrunOption from "./PayrunOption";
+import OptionEdit from "./OptionEdit";
+import OptionGenerate from "./OptionGenerate";
 import PayslipTable from "./PayslipTable";
 
 const RegularPayrunPage = () => {
@@ -9,7 +10,8 @@ const RegularPayrunPage = () => {
         <>
             <div className="w-full max-w-full">
                 <div className="pb-4">
-                    <PayrunOption />
+                    {/* <PayrunOption /> */}
+                    {!payrun ? <OptionGenerate /> : <OptionEdit />}
                 </div>
             </div>
             {payslips.length === 0
