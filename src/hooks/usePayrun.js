@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
-import { getCompanyPayruns } from "../services/payrun.service";
+import { deleteOnePayrun, getCompanyPayruns } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 
 const usePayrun = () => {
     const [payruns, setPayruns] = useState([]);
     const [isPayrunLoading, setIsPayrunLoading] = useState(false);
-
+    const [deleteLoading, setDeleteLoading] = useState(false);
     const navigate = useNavigate();
 
     const { addToast } = useToastContext();
@@ -42,12 +42,26 @@ const usePayrun = () => {
     }, [company]);
 
 
+    const handleDeleteOnePayrun = async (payrun_id) => {
+        setDeleteLoading(true);
+        try {
+            await deleteOnePayrun(company.company_id, payrun_id);
+            await handleFetchPayruns();
+            addToast("Successfully deleted payrun", "success");
+        } catch (error) {
+            console.log(error);
+            addToast("Failed to delete payruns", "error");
+        }
+    };
+
 
     return {
         payruns, setPayruns,
         handleFetchPayruns,
         isPayrunLoading, setIsPayrunLoading,
         handleClickPayrun,
+        deleteLoading, setDeleteLoading,
+        handleDeleteOnePayrun,
     };
 };
 

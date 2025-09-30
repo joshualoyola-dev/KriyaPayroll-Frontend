@@ -1,6 +1,7 @@
+import { TrashIcon } from "@heroicons/react/24/outline";
 import { convertToISO8601 } from "../../../../utility/datetime.utility";
 
-const PayrunCard = ({ payrun, idx, oncClickCard }) => {
+const PayrunCard = ({ payrun, idx, oncClickCard, onDelete }) => {
     return (
         <div
             onClick={() => oncClickCard(payrun.payrun_id)}
@@ -35,18 +36,30 @@ const PayrunCard = ({ payrun, idx, oncClickCard }) => {
                 </p>
             </div>
 
-            {/* Right section: payment date */}
-            <div className="text-right">
-                <p className="text-sm text-gray-500">Payment date</p>
-                <p className="text-base font-medium text-gray-700">
-                    {convertToISO8601(payrun.payment_date)}
-                </p>
-                <p className="text-xs text-gray-400">
-                    Created {convertToISO8601(payrun.created_at)}
-                </p>
+            {/* Right section: payment date + delete button */}
+            <div className="flex items-center gap-3 text-right">
+                <div>
+                    <p className="text-sm text-gray-500">Payment date</p>
+                    <p className="text-base font-medium text-gray-700">
+                        {convertToISO8601(payrun.payment_date)}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                        Created {convertToISO8601(payrun.created_at)}
+                    </p>
+                </div>
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation(); // prevent card click
+                        onDelete(payrun.payrun_id);
+                    }}
+                    className="p-2 rounded-full text-red-600 hover:bg-red-50 transition-colors"
+                >
+                    <TrashIcon className="h-5 w-5" />
+                </button>
             </div>
         </div>
     );
 };
 
 export default PayrunCard;
+
