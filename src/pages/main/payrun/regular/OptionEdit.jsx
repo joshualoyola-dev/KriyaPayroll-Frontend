@@ -18,40 +18,42 @@ const OptionEdit = () => {
 
     return (
         <div className="relative bg-white p-6 rounded-xl border border-gray-200">
-            <div className="absolute top-4 right-4 gap-2">
+            <div className="absolute top-4 right-4 flex items-center gap-3">
                 <button
                     onClick={handleCloseRegularPayrun}
-                    className="px-3 py-1  bg-gray-600 text-white hover:cursor-pointer"
+                    className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 bg-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all"
                 >
-                    Close
+                    Cancel
                 </button>
-                {
-                    isSaving
-                        ? "Loading..."
-                        : <button
-                            onClick={handleSaveEdit}
-                            className="px-3 py-1  bg-teal-700 text-white hover:cursor-pointer"
-                        >
-                            Save edit
-                        </button>
 
-                }
+                {isSaving ? (
+                    <span className="text-sm text-gray-500">Saving...</span>
+                ) : (
+                    <button
+                        onClick={handleSaveEdit}
+                        className="px-4 py-2 text-sm font-medium rounded-xl bg-teal-600 text-white hover:bg-teal-700 transition-all"
+                    >
+                        Save
+                    </button>
+                )}
 
-                {statusLoading
-                    ? "Loading..."
-                    : <select
+                {statusLoading ? (
+                    <span className="text-sm text-gray-500">Loading...</span>
+                ) : (
+                    <select
                         value={payrun.status}
                         onChange={(e) => {
                             const status = e.target.value;
                             handleChangeStatus(status);
                         }}
+                        className="px-3 py-2 text-sm rounded-xl border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                     >
                         <option value="DRAFT">Draft</option>
                         <option value="FOR_APPROVAL">For Approval</option>
                         <option value="APPROVED">Approved</option>
                         <option value="REJECTED">Rejected</option>
                     </select>
-                }
+                )}
             </div>
 
             {/* Main  grid */}

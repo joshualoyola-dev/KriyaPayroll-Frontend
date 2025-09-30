@@ -36,7 +36,8 @@ const OptionGenerate = () => {
                 {(Object.keys(payslips).length > 0) &&
                     <button
                         onClick={handleSaveDraft}
-                        className="px-3 py-1  bg-teal-700 text-white hover:cursor-pointer"
+                        disabled={isSaving}
+                        className="px-3 py-1  bg-teal-600 rounded-xl text-sm font-medium text-white hover:cursor-pointer hover:bg-teal-700"
                     >
                         {isSaving ? "Loading ..." : "Save Draft"}
                     </button>
