@@ -498,6 +498,12 @@ const useEmployee = () => {
         }
     }
 
+
+    const mapEmployeeIdToEmployeeName = (employee_id) => {
+        const emp = employees.find(obj => obj['employee_id'] === employee_id);
+        return `${emp.first_name} ${emp.last_name}`
+    };
+
     return {
         employees, setEmployees,
         employee, setEmployee,
@@ -527,9 +533,9 @@ const useEmployee = () => {
         salaryFormData, setSalaryFormData,
         handleAddSalary,
         isAddSalaryLoading, setIsAddSalaryLoading,
-        handleChangeEmploymentStatus
+        handleChangeEmploymentStatus,
 
-
+        mapEmployeeIdToEmployeeName
     };
 };
 

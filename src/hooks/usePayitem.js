@@ -30,6 +30,12 @@ const usePayitem = () => {
         }
     };
 
+    //this serves as a utility
+    const mapPayitemIdToPayitemName = (payitem_id) => {
+        const payitem = payitems.find(obj => obj['payitem_id'] === payitem_id);
+        return payitem.payitem_name;
+    };
+
     useEffect(() => {
         if (!company) return;
         handleFetchPayitems();
@@ -47,7 +53,7 @@ const usePayitem = () => {
         handleFetchPayitems,
         query, setQuery,
         filteredPayitems, setFilteredPayitems,
-
+        mapPayitemIdToPayitemName,
     }
 };
 
