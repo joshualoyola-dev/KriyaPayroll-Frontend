@@ -13,6 +13,9 @@ const PayrunOption = () => {
         payrun, handleSaveDraft, payslips,
         handleCloseRegularPayrun,
         handleSaveEdit,
+        handleChangeStatus,
+        statusLoading,
+        isSaving,
     } = useRegularPayrunContext();
 
     const { addToast } = useToastContext();
@@ -43,27 +46,50 @@ const PayrunOption = () => {
                     </button>
                 }
 
+
+
                 {payrun &&
                     <>
+
                         <button
                             onClick={handleCloseRegularPayrun}
                             className="px-3 py-1  bg-gray-600 text-white hover:cursor-pointer"
                         >
                             Close
                         </button>
-                        <button
-                            onClick={handleSaveEdit}
-                            className="px-3 py-1  bg-teal-700 text-white hover:cursor-pointer"
-                        >
-                            Save edit
-                        </button>
+                        {
+                            isSaving
+                                ? "Loading..."
+                                : <button
+                                    onClick={handleSaveEdit}
+                                    className="px-3 py-1  bg-teal-700 text-white hover:cursor-pointer"
+                                >
+                                    Save edit
+                                </button>
 
+                        }
                         <button
                             onClick={() => { }}
                             className="px-3 py-1  bg-teal-700 text-white hover:cursor-pointer"
                         >
                             Finalize
                         </button>
+
+                        {statusLoading
+                            ? "Loading..."
+                            : <select
+                                value={payrun.status}
+                                onChange={(e) => {
+                                    const status = e.target.value;
+                                    handleChangeStatus(status);
+                                }}
+                            >
+                                <option value="DRAFT">Draft</option>
+                                <option value="FOR_APPROVAL">For Approval</option>
+                                <option value="APPROVED">Approved</option>
+                                <option value="REJECTED">Rejected</option>
+                            </select>
+                        }
                     </>
                 }
             </div>

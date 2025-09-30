@@ -23,3 +23,7 @@ export const saveRegularPayrunDraft = async (company_id, formData) => {
 export const saveEdit = async (company_id, payrun_id, formData) => {
     return await payroll_api.post(`/api/v1/payruns/${company_id}/regular/save-edit/${payrun_id}`, formData);
 };
+
+export const updateStatus = async (company_id, payrun_id, formData) => {
+    return await payroll_api.post(`/api/v1/payruns/${company_id}/regular/change-status/${payrun_id}`, formData);
+};

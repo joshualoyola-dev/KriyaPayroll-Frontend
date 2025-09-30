@@ -15,7 +15,7 @@ import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { validateDailyRecordOfOneEmployee } from "../services/attendance.service";
 import { convertToISO8601 } from "../utility/datetime.utility";
-import { generateRegularPayrun, getPayrun, getPayrunPayslipPayables, saveEdit, saveRegularPayrunDraft } from "../services/payrun.service";
+import { generateRegularPayrun, getPayrun, getPayrunPayslipPayables, saveEdit, saveRegularPayrunDraft, updateStatus } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sanitizedPayslips } from "../utility/payrun.utility";
@@ -38,11 +38,14 @@ const useRegularPayrun = () => {
     const [payslips, setPayslips] = useState([]); //case: 1, 2, 3
     const [payslipsLoading, setPayslipsLoading] = useState(false); //case: 1, 2, 3
     const [isSaving, setIsSaving] = useState(false); //use for both saving draft and save edit
+    const [statusLoading, setStatusLoading] = useState(false);
+
 
     const { payitems } = usePayitemContext();
     const { activeEmployees } = useEmployeeContext();
     const { addToast } = useToastContext();
     const { company } = useCompanyContext();
+
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -184,7 +187,7 @@ const useRegularPayrun = () => {
             setIsSaving(false);
         }
     };
-    
+
     const handleSaveEdit = async () => {
         setIsSaving(true);
 
@@ -196,7 +199,8 @@ const useRegularPayrun = () => {
             const result = await saveEdit(company.company_id, payrun.payrun_id, payload);
             console.log('result saving edits', result);
             addToast("Successfully saved regular payrun edits", "success");
-            handleCloseRegularPayrun();
+            // handleCloseRegularPayrun();
+            await initializeRegularPayrun(payrun.payrun_id);
         } catch (error) {
             console.log(error);
             addToast(`Error occurred in saving edits.`, "error");
@@ -210,6 +214,24 @@ const useRegularPayrun = () => {
         setPayrun(null);
         setPayslips([]);
         navigate('/payrun');
+    };
+
+    const handleChangeStatus = async (status) => {
+        setStatusLoading(true);
+
+        try {
+            const result = await updateStatus(company.company_id, payrun.payrun_id, { status });
+            console.log('update status result: ', result);
+            addToast("Successfully updated status", "success");
+
+            await initializeRegularPayrun(payrun.payrun_id);
+        } catch (error) {
+            console.log(error);
+            addToast("Failed to updated status", "error");
+        }
+        finally {
+            setStatusLoading(false);
+        }
     };
 
     return {
@@ -232,6 +254,8 @@ const useRegularPayrun = () => {
 
         handleCloseRegularPayrun,
         handleSaveEdit,
+        handleChangeStatus,
+        statusLoading, setStatusLoading,
     };
 };
 

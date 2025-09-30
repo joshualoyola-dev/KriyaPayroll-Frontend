@@ -3,7 +3,7 @@ import PayrunOption from "./PayrunOption";
 import PayslipTable from "./PayslipTable";
 
 const RegularPayrunPage = () => {
-    const { payslips, setPayslips } = useRegularPayrunContext();
+    const { payslips, setPayslips, payrun } = useRegularPayrunContext();
 
     return (
         <>
