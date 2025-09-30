@@ -19,6 +19,7 @@ import { generateRegularPayrun, getPayrun, getPayrunPayslipPayables, saveEdit, s
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sanitizedPayslips } from "../utility/payrun.utility";
+import { usePayrunContext } from "../contexts/PayrunProvider";
 
 const formData = {
     date_from: '',
@@ -45,6 +46,7 @@ const useRegularPayrun = () => {
     const { activeEmployees } = useEmployeeContext();
     const { addToast } = useToastContext();
     const { company } = useCompanyContext();
+    const { handleFetchPayruns } = usePayrunContext();
 
 
     const location = useLocation();
@@ -179,7 +181,8 @@ const useRegularPayrun = () => {
             const result = await saveRegularPayrunDraft(company.company_id, payload);
             console.log('result saving draft', result);
             addToast("Successfully saved regular payrun draft", "success");
-            navigate('/payrun');
+            await handleFetchPayruns();
+            handleCloseRegularPayrun();
         } catch (error) {
             console.log(error);
             addToast(`Error occurred in saving payroll.`, "error");
