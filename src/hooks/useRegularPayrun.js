@@ -59,6 +59,8 @@ const useRegularPayrun = () => {
         console.log('fetched payrun: ', resultPayrun);
         setPayrun(resultPayrun.data.payrun);
 
+
+
         //populate the options
 
         //populate the payslips. this will cause the save draft to hide. 
@@ -237,6 +239,29 @@ const useRegularPayrun = () => {
         }
     };
 
+    // const handleAddPayitemToPayslips = (payitem_id) => {
+    //     console.log('payslips data for additinal payitems: ', payslips);
+
+
+    // };
+
+    const handleAddPayitemToPayslips = (payitem_id) => {
+        setPayslips(prevPayslips => {
+            // loop over employees and add payitem if missing
+            const updated = {};
+            for (const [employeeId, payitems] of Object.entries(prevPayslips)) {
+                updated[employeeId] = {
+                    ...payitems,
+                    [payitem_id]: payitems[payitem_id] ?? 0, // add with default 0 if not exists
+                };
+            }
+            console.log('updated payslips: ', updated);
+
+            return updated;
+        });
+    };
+
+
     return {
         options, setOptions,
         //options controll
@@ -259,6 +284,7 @@ const useRegularPayrun = () => {
         handleSaveEdit,
         handleChangeStatus,
         statusLoading, setStatusLoading,
+        handleAddPayitemToPayslips,
     };
 };
 

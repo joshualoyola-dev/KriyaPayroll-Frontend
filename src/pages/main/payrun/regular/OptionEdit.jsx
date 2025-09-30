@@ -12,7 +12,8 @@ const OptionEdit = () => {
         handleSaveEdit,
         handleChangeStatus,
         statusLoading,
-        isSaving,
+        isSaving, handlePayitemChange,
+        handleAddPayitemToPayslips
     } = useRegularPayrunContext();
 
 
@@ -56,6 +57,35 @@ const OptionEdit = () => {
                 )}
             </div>
 
+            <div className="absolute bottom-4 right-4">
+                <select
+                    onChange={(e) => {
+                        if (e.target.value) {
+                            console.log('value of payitem: ', e.target.value);
+
+                            // trigger add into the payslips data
+                            handleAddPayitemToPayslips(e.target.value);
+                        }
+                    }}
+                    className="w-40 px-3 py-2 text-sm border border-gray-300 rounded-xl  bg-white"
+                    defaultValue=""
+                >
+                    <option value="" disabled>
+                        + Add Payitem
+                    </option>
+                    {payitems.map((item) => (
+                        <option
+                            key={item.payitem_id}
+                            value={item.payitem_id}
+                            className="text-gray-700"
+                        >
+                            {item.payitem_name}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+
             {/* Main  grid */}
             <div
                 className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6"
@@ -95,6 +125,8 @@ const OptionEdit = () => {
                         {convertToISO8601(payrun.payment_date)}
                     </div>
                 </div>
+
+
 
 
             </div>
