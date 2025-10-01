@@ -12,7 +12,8 @@ export const ToastProvider = ({ children }) => {
     const [toasts, setToasts] = useState([]);
 
     const addToast = useCallback((message, type = "error") => {
-        const id = Date.now();
+        // const id = Date.now();
+        const id = crypto.randomUUID();
         setToasts((prev) => [...prev, { id, message, type, visible: true }]);
 
         // Auto-hide with fade-out
