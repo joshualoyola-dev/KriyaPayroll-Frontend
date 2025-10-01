@@ -33,14 +33,18 @@ const Sidebar = () => {
             items: [{ label: "Dashboard", path: "/dashboard" }],
         },
         {
-            title: "Payrun",
-            items: [
-                { label: "Payrun", path: "/payrun" },
-                { label: "Regular Payrun", path: "/payrun/regular" },
-                { label: "Last Payrun", path: "/payrun/last" },
-                { label: "Special Payrun", path: "/payrun/special" },
-            ],
+            title: null,
+            items: [{ label: "Payrun", path: "/payrun" }],
         },
+        // {
+        //     title: "Payrun",
+        //     items: [
+        //         { label: "Payrun", path: "/payrun" },
+        //         { label: "Regular Payrun", path: "/payrun/regular" },
+        //         { label: "Last Payrun", path: "/payrun/last" },
+        //         { label: "Special Payrun", path: "/payrun/special" },
+        //     ],
+        // },
         {
             title: null,
             items: [{ label: "Employee", path: "/employee" }],
