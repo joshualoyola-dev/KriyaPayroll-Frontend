@@ -227,9 +227,10 @@ const useRegularPayrun = () => {
         try {
             const result = await updateStatus(company.company_id, payrun.payrun_id, { status });
             console.log('update status result: ', result);
-            addToast("Successfully updated status", "success");
 
+            await handleFetchPayruns();
             await initializeRegularPayrun(payrun.payrun_id);
+            addToast("Successfully updated status", "success");
         } catch (error) {
             console.log(error);
             addToast("Failed to updated status", "error");
@@ -261,6 +262,10 @@ const useRegularPayrun = () => {
         });
     };
 
+    const handleSendPayslips = () => {
+        navigate("/payrun/regular/send-payslip");
+    };
+
 
     return {
         options, setOptions,
@@ -285,6 +290,7 @@ const useRegularPayrun = () => {
         handleChangeStatus,
         statusLoading, setStatusLoading,
         handleAddPayitemToPayslips,
+        handleSendPayslips
     };
 };
 

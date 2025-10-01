@@ -16,6 +16,7 @@ const useTopNav = () => {
         "/payrun/regular": "Regular Payrun",
         "/payrun/last": "Last Payrun",
         "/payrun/special": "Special Payrun",
+        "/payrun/send-payslips": "Send Payslip",
         "/employee": "Employee",
         "/attendance": "Attendance",
         "/attendance/overtime": "Overtime",

@@ -40,6 +40,7 @@ import { AuthProvider } from "./contexts/AuthProvider"
 import { WithholdingProvider } from "./contexts/WithholdingProvider"
 import { SssProvider } from "./contexts/SssProvider"
 import { PayrunProvider } from "./contexts/PayrunProvider"
+import SendPayslipPage from "./pages/main/payrun/payrun/SendPayslipPage"
 
 function App() {
   return (
@@ -68,7 +69,7 @@ function App() {
                                               <Routes>
                                                 {/* Public routes */}
                                                 <Route path="/" element={<HomePage />} />
-                                                {/* Navitate to Dasboard if there's token */}
+                                                {/* Navitate to Dasboard if there'? token */}
                                                 <Route element={<PublicRoute />}>
                                                   <Route path="/auth/login" element={<LoginPage />} />
                                                 </Route>
@@ -82,6 +83,8 @@ function App() {
                                                     <Route path="/payrun/regular" element={< RegularPayrunPage />} />
                                                     <Route path="/payrun/special" element={<SpecialPayrunPage />} />
                                                     <Route path="/payrun/last" element={<LastPayrunPage />} />
+                                                    <Route path="/payrun/send-payslips" element={< SendPayslipPage />} />
+
 
                                                     <Route path="/employee" element={<EmployeePage />} />
 

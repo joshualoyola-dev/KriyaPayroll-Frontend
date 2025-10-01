@@ -5,7 +5,7 @@ import PayrunCard from "./PayrunCard";
 import DualBallLoading from "../../../../components/DualBallLoading";
 
 const PayrunPage = () => {
-    const { payruns, isPayrunLoading, handleClickPayrun, handleDeleteOnePayrun, deleteLoading } = usePayrunContext();
+    const { payruns, isPayrunLoading, handleClickPayrun, handleDeleteOnePayrun, deleteLoading, handleNavigateSendPayslip } = usePayrunContext();
     const regularPayruns = payruns.filter(payrun => payrun.payrun_type === 'REGULAR');
     const specialPayruns = payruns.filter(payrun => payrun.payrun_type === 'SPECIAL');
     const lastPayruns = payruns.filter(payrun => payrun.payrun_type === 'LAST');
@@ -31,6 +31,7 @@ const PayrunPage = () => {
                                         idx={idx}
                                         oncClickCard={handleClickPayrun}
                                         onDelete={handleDeleteOnePayrun}
+                                        onNavigateSendPayslip={handleNavigateSendPayslip}
                                     />
                                 ))}
                             </div>

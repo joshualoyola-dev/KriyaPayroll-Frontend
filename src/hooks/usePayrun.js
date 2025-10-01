@@ -54,6 +54,10 @@ const usePayrun = () => {
         }
     };
 
+    const handleNavigateSendPayslip = (payrun_id) => {
+        navigate(`/payrun/send-payslips?payrun_id=${payrun_id}`);
+    };
+
 
     return {
         payruns, setPayruns,
@@ -62,6 +66,7 @@ const usePayrun = () => {
         handleClickPayrun,
         deleteLoading, setDeleteLoading,
         handleDeleteOnePayrun,
+        handleNavigateSendPayslip
     };
 };
 

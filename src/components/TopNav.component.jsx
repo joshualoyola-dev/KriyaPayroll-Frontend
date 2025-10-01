@@ -39,6 +39,7 @@ const TopNav = () => {
             </nav>
         );
     }
+
     if (!user) {
         return (
             <nav className="w-full pl-6 pr-12 pt-6 pb-3 flex justify-between h-[10vh]">
