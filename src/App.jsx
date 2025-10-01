@@ -41,6 +41,7 @@ import { WithholdingProvider } from "./contexts/WithholdingProvider"
 import { SssProvider } from "./contexts/SssProvider"
 import { PayrunProvider } from "./contexts/PayrunProvider"
 import SendPayslipPage from "./pages/main/payrun/payrun/SendPayslipPage"
+import { PayslipProvider } from "./contexts/PayslipProvider"
 
 function App() {
   return (
@@ -66,44 +67,48 @@ function App() {
                                         <PhicProvider>
                                           <WithholdingProvider>
                                             <SssProvider>
-                                              <Routes>
-                                                {/* Public routes */}
-                                                <Route path="/" element={<HomePage />} />
-                                                {/* Navitate to Dasboard if there'? token */}
-                                                <Route element={<PublicRoute />}>
-                                                  <Route path="/auth/login" element={<LoginPage />} />
-                                                </Route>
 
-                                                {/* Protected routes with MainLayout */}
-                                                <Route element={<MainLayout />}>
-                                                  <Route element={<ProtectedRoute />} >
-                                                    <Route path="/dashboard" element={<DashboardPage />} />
-
-                                                    <Route path="/payrun" element={<PayrunPage />} />
-                                                    <Route path="/payrun/regular" element={< RegularPayrunPage />} />
-                                                    <Route path="/payrun/special" element={<SpecialPayrunPage />} />
-                                                    <Route path="/payrun/last" element={<LastPayrunPage />} />
-                                                    <Route path="/payrun/send-payslips" element={< SendPayslipPage />} />
-
-
-                                                    <Route path="/employee" element={<EmployeePage />} />
-
-                                                    <Route path="/attendance" element={<AttendancePage />} />
-                                                    <Route path="/attendance/absence" element={<AbsencePage />} />
-                                                    <Route path="/attendance/leave" element={<LeavePage />} />
-                                                    <Route path="/attendance/overtime" element={<OvertimePage />} />
-                                                    <Route path="/attendance/restday" element={<RestdayPage />} />
-                                                    <Route path="/attendance/holiday" element={<HolidayPage />} />
-
-
-                                                    <Route path="/configuration/payitem" element={<PayitemPage />} />
-                                                    <Route path="/configuration/company-configuration" element={<CompanyConfigsPage />} />
-                                                    <Route path="/configuration/recurring-pay" element={<RecurringPayPage />} />
-                                                    <Route path="/configuration/contribution" element={<ContributionPage />} />
-
+                                              <PayslipProvider >
+                                                <Routes>
+                                                  {/* Public routes */}
+                                                  <Route path="/" element={<HomePage />} />
+                                                  {/* Navitate to Dasboard if there'? token */}
+                                                  <Route element={<PublicRoute />}>
+                                                    <Route path="/auth/login" element={<LoginPage />} />
                                                   </Route>
-                                                </Route>
-                                              </Routes>
+
+                                                  {/* Protected routes with MainLayout */}
+                                                  <Route element={<MainLayout />}>
+                                                    <Route element={<ProtectedRoute />} >
+                                                      <Route path="/dashboard" element={<DashboardPage />} />
+
+                                                      <Route path="/payrun" element={<PayrunPage />} />
+                                                      <Route path="/payrun/regular" element={< RegularPayrunPage />} />
+                                                      <Route path="/payrun/special" element={<SpecialPayrunPage />} />
+                                                      <Route path="/payrun/last" element={<LastPayrunPage />} />
+                                                      <Route path="/payrun/send-payslips" element={< SendPayslipPage />} />
+
+
+                                                      <Route path="/employee" element={<EmployeePage />} />
+
+                                                      <Route path="/attendance" element={<AttendancePage />} />
+                                                      <Route path="/attendance/absence" element={<AbsencePage />} />
+                                                      <Route path="/attendance/leave" element={<LeavePage />} />
+                                                      <Route path="/attendance/overtime" element={<OvertimePage />} />
+                                                      <Route path="/attendance/restday" element={<RestdayPage />} />
+                                                      <Route path="/attendance/holiday" element={<HolidayPage />} />
+
+
+                                                      <Route path="/configuration/payitem" element={<PayitemPage />} />
+                                                      <Route path="/configuration/company-configuration" element={<CompanyConfigsPage />} />
+                                                      <Route path="/configuration/recurring-pay" element={<RecurringPayPage />} />
+                                                      <Route path="/configuration/contribution" element={<ContributionPage />} />
+
+                                                    </Route>
+                                                  </Route>
+                                                </Routes>
+
+                                              </PayslipProvider>
 
                                             </SssProvider>
                                           </WithholdingProvider>

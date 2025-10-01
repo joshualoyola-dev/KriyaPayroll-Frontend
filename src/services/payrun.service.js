@@ -31,3 +31,15 @@ export const updateStatus = async (company_id, payrun_id, formData) => {
 export const deleteOnePayrun = async (company_id, payrun_id) => {
     return await payroll_api.delete(`/api/v1/payruns/${company_id}/regular/${payrun_id}`);
 };
+
+export const getPayslipsDraft = async (payrun_id) => {
+    return await payroll_api.get(`/api/v1/payruns/${payrun_id}/payslips/draft`);
+};
+
+export const getPayslips = async (payrun_id) => {
+    return await payroll_api.get(`/api/v1/payruns/${payrun_id}/payslips/approved`);
+};
+
+export const sendOnePayslip = async (employee_id, payrun_id, payslip_id) => {
+    return await payroll_api.post(`/api/v1/payruns/${payrun_id}/payslips/${payslip_id}/send-to/${employee_id}`);
+};
