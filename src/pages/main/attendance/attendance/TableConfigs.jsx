@@ -14,12 +14,15 @@ export const column = [
     {
         accessorKey: "time_in",
         header: "Time In",
-        cell: (info) => convertToISO8601(info.getValue()),
+        // cell: (info) => convertToISO8601(info.getValue()),
+        cell: (info) => info.getValue(),
+
     },
     {
         accessorKey: "time_out",
         header: "Time Out",
-        cell: (info) => convertToISO8601(info.getValue()),
+        // cell: (info) => convertToISO8601(info.getValue()),
+        cell: (info) => info.getValue(),
     },
     {
         accessorKey: "hours_rendered", //regular shift plus overtimes
