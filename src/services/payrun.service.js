@@ -40,6 +40,6 @@ export const getPayslips = async (payrun_id) => {
     return await payroll_api.get(`/api/v1/payruns/${payrun_id}/payslips/approved`);
 };
 
-export const sendOnePayslip = async (employee_id, payrun_id, payslip_id) => {
-    return await payroll_api.post(`/api/v1/payruns/${payrun_id}/payslips/${payslip_id}/send-to/${employee_id}`);
+export const sendOnePayslip = async (company_id, employee_id, payrun_id, payslip_id) => {
+    return await payroll_api.post(`/api/v1/payruns/${company_id}/${payrun_id}/payslips/${payslip_id}/send-to/${employee_id}`);
 };
