@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
-import { getPayslipsDraft, sendOnePayslip } from "../services/payrun.service";
+import { getPayslips, sendOnePayslip } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 
 const usePayslip = () => {
@@ -17,7 +17,7 @@ const usePayslip = () => {
     const handleFetchPayslips = async (payrun_id) => {
         setIsPayslipsLoading(true);
         try {
-            const result = await getPayslipsDraft(payrun_id);
+            const result = await getPayslips(payrun_id);
             console.log('payslips content for sending: ', result);
             setPayslips(result.data.payslips);
         } catch (error) {
@@ -36,7 +36,7 @@ const usePayslip = () => {
 
             for (const payslip of payslips) {
                 try {
-                    await sendOnePayslip(company.company_id, payslip.employee_id, payslip.payrun_id, payslip.payslip_draft_id);
+                    await sendOnePayslip(company.company_id, payslip.employee_id, payslip.payrun_id, payslip.payslip_id);
                     addToast(`Successfully sent payslip to employee ${payslip.employee_id}`, "success");
                 } catch (error) {
                     console.log(error);
