@@ -1,7 +1,9 @@
+import UnderDevelopment from "../../../../components/UnderDevelopment";
+
 const SpecialPayrunPage = () => {
     return (
         <div>
-            This is special payrun page
+            <UnderDevelopment title={`Under Development`} label={`This supports generating payslip for selected employee`} />
         </div>
     )
 };

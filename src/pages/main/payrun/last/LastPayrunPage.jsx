@@ -1,7 +1,9 @@
+import UnderDevelopment from "../../../../components/UnderDevelopment";
+
 const LastPayrunPage = () => {
     return (
         <div>
-            This is  last payrun page
+            <UnderDevelopment title={`Under Development`} label={`This supports generating last payslip`} />
         </div>
     )
 };
