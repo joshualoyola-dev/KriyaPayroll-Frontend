@@ -1,18 +1,36 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
-import { getPayslips, sendOnePayslip } from "../services/payrun.service";
+import { getPayrun, getPayslips, sendOnePayslip } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 
 const usePayslip = () => {
+    const [payrun, setPayrun] = useState();
     const [payslips, setPayslips] = useState([]);
     const [isPayslipsLoading, setIsPayslipsLoading] = useState(false);
     const [isSending, setIsSending] = useState(false);
+    const [isPayrunLoading, setIsPayrunLoading] = useState(false);
 
     const location = useLocation();
     const navigate = useNavigate();
     const { addToast } = useToastContext();
     const { company } = useCompanyContext();
+
+    const handleFetchPayrun = async (company_id, payrun_id) => {
+        setIsPayrunLoading(true);
+        try {
+            const result = await getPayrun(company_id, payrun_id);
+            console.log('payrun from sending payslip: ', result);
+
+            setPayrun(result.data.payrun);
+        } catch (error) {
+            console.log(error);
+            addToast("Failed to fetch payrun information", "error");
+        }
+        finally {
+            setIsPayrunLoading(false);
+        }
+    };
 
     const handleFetchPayslips = async (payrun_id) => {
         setIsPayslipsLoading(true);
@@ -68,9 +86,12 @@ const usePayslip = () => {
 
         if (payrun_id) {
             handleFetchPayslips(payrun_id);
+            handleFetchPayrun(company.company_id, payrun_id);
+
         }
 
     }, [location.search]);
+
 
 
 
@@ -78,7 +99,9 @@ const usePayslip = () => {
         isSending, setIsSending,
         isPayslipsLoading, setIsPayslipsLoading,
         payslips, setPayslips,
-        handleSendFinalPayslip
+        handleSendFinalPayslip,
+        payrun, setPayrun,
+        isPayrunLoading, setIsPayrunLoading,
     }
 };
 
