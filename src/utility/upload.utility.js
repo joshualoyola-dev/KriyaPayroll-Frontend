@@ -9,6 +9,26 @@ export const normalizeHeader = (header) => {
         .replace(/[^\w]/g, '');
 };
 
+export const parseExcelDate = (value) => {
+    if (typeof value === "number") {
+        // Convert Excel serial to JS Date
+        const excelDate = XLSX.SSF.parse_date_code(value);
+        if (excelDate) {
+            // Ensure only Y-M-D, no time portion
+            return new Date(Date.UTC(excelDate.y, excelDate.m - 1, excelDate.d));
+        }
+    } else if (typeof value === "string" && value.trim()) {
+        // Match YYYY-MM-DD exactly
+        const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+        if (match) {
+            const [, y, m, d] = match.map(Number);
+            return new Date(Date.UTC(y, m - 1, d));
+        }
+    }
+    return null;
+};
+
+
 // Helper function to parse Excel date/time values
 export const parseExcelDateTime = (value) => {
     if (typeof value === "number") {
