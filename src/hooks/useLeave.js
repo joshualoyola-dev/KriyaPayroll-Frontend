@@ -3,7 +3,7 @@ import { useToastContext } from "../contexts/ToastProvider";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { deleteOneLeave, fetchLeaves, addOneLeave } from "../services/leave.service";
 import * as XLSX from 'xlsx';
-import { formatDateToISO18601, normalizeHeader, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
+import { formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
 import useDebounce from "./useDebounce";
 
 const formData = {
@@ -197,7 +197,7 @@ const useLeave = () => {
                     }
                     // Handle leave_date (date field - YYYY-MM-DD)
                     else if (matchingField === "leave_date") {
-                        const parsedDate = parseExcelDateTime(value);
+                        const parsedDate = parseExcelDate(value);
                         mappedRow[matchingField] = formatDateToISO18601(parsedDate);
                     }
                     // Handle leave type enum

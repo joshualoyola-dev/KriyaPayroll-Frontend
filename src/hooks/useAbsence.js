@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { addOneAbsence, deleteOneAbsence, fetchAbsences } from "../services/absence.service";
-import { formatDateToISO18601, normalizeHeader, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
+import { formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
 import useDebounce from "./useDebounce";
 
 const formData = {
@@ -189,7 +189,7 @@ const useAbsence = () => {
                     }
                     // Handle absence_date (date field - YYYY-MM-DD)
                     else if (matchingField === "absence_date") {
-                        const parsedDate = parseExcelDateTime(value);
+                        const parsedDate = parseExcelDate(value);
                         mappedRow[matchingField] = formatDateToISO18601(parsedDate);
                     }
                     // Handle absence type enum

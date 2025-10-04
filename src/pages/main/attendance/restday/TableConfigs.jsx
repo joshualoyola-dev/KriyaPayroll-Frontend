@@ -1,4 +1,4 @@
-import { convertToISO8601 } from "../../../../utility/datetime.utility";
+import { convertToDatetimeString, convertToISO8601 } from "../../../../utility/datetime.utility";
 
 export const column = [
     {
@@ -14,12 +14,12 @@ export const column = [
     {
         accessorKey: "time_in",
         header: "Time In",
-        cell: (info) => convertToISO8601(info.getValue()),
+        cell: (info) => convertToDatetimeString(info.getValue()),
     },
     {
         accessorKey: "time_out",
         header: "Time Out",
-        cell: (info) => convertToISO8601(info.getValue()),
+        cell: (info) => convertToDatetimeString(info.getValue()),
     },
     {
         accessorKey: "hours_rendered", //regular shift plus overtimes

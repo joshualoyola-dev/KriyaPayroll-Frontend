@@ -3,7 +3,7 @@ import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { addOneOvertime, deleteOneOvertime, fetchOvertimes } from "../services/overtime.service";
 import * as XLSX from 'xlsx';
-import { formatDateToISO18601, normalizeHeader, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
+import { formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
 import useDebounce from "./useDebounce";
 
 const formData = {
@@ -211,7 +211,7 @@ const useOvertime = () => {
                     }
                     // Handle overtime_date (date field - YYYY-MM-DD)
                     else if (matchingField === "overtime_date") {
-                        const parsedDate = parseExcelDateTime(value);
+                        const parsedDate = parseExcelDate(value);
                         mappedRow[matchingField] = formatDateToISO18601(parsedDate);
                     }
                     // Handle decimal/number fields
