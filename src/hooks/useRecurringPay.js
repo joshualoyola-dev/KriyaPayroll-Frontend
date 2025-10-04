@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { addOneRecurringPay, deleteOneRecurringPay, getRecurringPays } from "../services/recurring-pay.service";
-import { formatDateToISO18601, normalizeHeader, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
+import { formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
 import useDebounce from "./useDebounce";
 
 const formData = {
@@ -193,7 +193,7 @@ const useRecurringPay = () => {
                     }
                     // Handle date_start and date_end (date field - YYYY-MM-DD)
                     else if (matchingField === "date_start" || matchingField === "date_end") {
-                        const parsedDate = parseExcelDateTime(value);
+                        const parsedDate = parseExcelDate(value);
                         mappedRow[matchingField] = formatDateToISO18601(parsedDate);
                     }
                     // Handle decimal/number fields
