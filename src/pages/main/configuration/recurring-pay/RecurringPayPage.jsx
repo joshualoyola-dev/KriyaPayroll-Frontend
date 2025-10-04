@@ -2,9 +2,11 @@ import AddModal from "../../../../components/AddModal";
 import DailyRecordFilter from "../../../../components/DailyRecordFilter";
 import DualBallLoading from "../../../../components/DualBallLoading";
 import TanStackTable from "../../../../components/TanStackTable"; // Added missing import
+import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
+import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { useRecurringPayContext } from "../../../../contexts/RecurringPayProvider";
 import RecurringPayForm from "./RecurringPayForm";
-import { column } from "./TableConfigs";
+import { getRecurringPayColumns } from "./TableConfigs";
 
 const RecurringPayPage = () => {
     const {
@@ -21,6 +23,10 @@ const RecurringPayPage = () => {
         filters,
         handleResetFilter, handleFilterChange,
     } = useRecurringPayContext();
+    const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
+    const { mapPayitemIdToPayitemName } = usePayitemContext();
+    const columns = getRecurringPayColumns(mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName);
+
 
     return (
         <>
@@ -39,7 +45,7 @@ const RecurringPayPage = () => {
                             ? <DualBallLoading />
                             : <TanStackTable
                                 data={recurringPays}
-                                columns={column}
+                                columns={columns}
                                 onRowClick={handleRowClick}
                                 onDelete={handleDeleteOneRecurringPay}
                             />

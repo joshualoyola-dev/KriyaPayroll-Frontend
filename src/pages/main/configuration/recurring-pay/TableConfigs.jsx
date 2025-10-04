@@ -1,15 +1,15 @@
 import { convertToISO8601 } from "../../../../utility/datetime.utility";
 
-export const column = [
+export const getRecurringPayColumns = (mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName) => [
     {
         accessorKey: "employee_id",
-        header: "Employee ID",
-        cell: (info) => info.getValue(),
+        header: "Employee",
+        cell: (info) => mapEmployeeIdToEmployeeName(info.getValue()),
     },
     {
         accessorKey: "payitem_id",
         header: "Payitem",
-        cell: (info) => info.getValue(),
+        cell: (info) => mapPayitemIdToPayitemName(info.getValue()),
     },
     {
         accessorKey: "amount",
@@ -26,5 +26,4 @@ export const column = [
         header: "End",
         cell: (info) => convertToISO8601(info.getValue()),
     },
-
 ];
