@@ -1,7 +1,9 @@
 import { UserIcon } from "@heroicons/react/24/solid";
 import { convertToISO8601 } from "../../../../utility/datetime.utility";
+import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
 
 const AttendanceList = ({ attendances }) => {
+    const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
     return (
         <div className="w-full space-y-3">
             {attendances.map((att, idx) => (
@@ -15,7 +17,7 @@ const AttendanceList = ({ attendances }) => {
                         </div>
                         <div className="min-w-0">
                             <p className="text-sm font-semibold text-gray-900 truncate">
-                                {att.employee_id}
+                                {mapEmployeeIdToEmployeeName(att.employee_id)}
                             </p>
                             <p className="text-xs text-gray-500 mt-0.5">
                                 {convertToISO8601(att.attendance_date)}
