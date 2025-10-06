@@ -1,24 +1,8 @@
-// import { PencilIcon } from "@heroicons/react/24/solid";
-// import { useCompanyContext } from "../../../../contexts/CompanyProvider";
-
-// const CompanyConfigsPage = () => {
-//     const { workingDays, payrollFrequency } = useCompanyContext();
-
-//     return (
-//         <div>
-//             working days:   {workingDays}
-//         </div>
-//     )
-// };
-
-// export default CompanyConfigsPage;
-
-
 import { PencilIcon } from "@heroicons/react/24/solid";
 import { useCompanyContext } from "../../../../contexts/CompanyProvider";
 
 const CompanyConfigsPage = () => {
-    const { workingDays, payrollFrequency } = useCompanyContext();
+    const { workingDays, payrollFrequency, ndRate, restdayRate, regularOTRate } = useCompanyContext();
 
     const configs = [
         {
@@ -31,6 +15,21 @@ const CompanyConfigsPage = () => {
             value: payrollFrequency,
             description: "How often payroll is processed.",
         },
+        {
+            name: "Regular Overtime Rate",
+            value: regularOTRate,
+            description: "Rate of regular overtime. Must be atleast 125% of hourly rate.",
+        },
+        {
+            name: "Restday Rate",
+            value: restdayRate,
+            description: "Rate of pay on restday. Must be atleast 130%",
+        },
+        {
+            name: "Night Differential Rate",
+            value: ndRate,
+            description: "Rate of Nigh differential, i.e., hours between 10pm-6am. Must be 10% of hourly rate",
+        },
     ];
 
     return (
@@ -41,16 +40,16 @@ const CompanyConfigsPage = () => {
                     className="bg-white rounded-2xl p-6 flex flex-col justify-between"
                 >
                     <div>
-                        <h2 className="text-lg font-semibold text-gray-800 flex items-center justify-between">
+                        <h2 className="text-sm font-bold text-gray-800 flex items-center justify-between">
                             {config.name}
                             <button className="text-gray-500 hover:text-gray-700">
                                 <PencilIcon className="w-4 h-4" />
                             </button>
                         </h2>
-                        <p className="text-2xl font-bold text-gray-900 mt-2">
+                        <p className="text-sm font-semibold text-gray-900 mt-2">
                             {config.value}
                         </p>
-                        <p className="text-sm text-gray-500 mt-1">{config.description}</p>
+                        <p className="text-xs text-gray-500 mt-1">{config.description}</p>
                     </div>
                 </div>
             ))}

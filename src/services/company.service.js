@@ -45,3 +45,29 @@ export const fetchCompanyWorkingDays = async (company_id) => {
 export const fetchCompanyPayrollFrequency = async (company_id) => {
     return await payroll_api.get(`/api/v1/companies/${company_id}/configuration/payroll-frequency`);
 };
+
+
+export const fetchCompanyNDRate = async (company_id) => {
+    return await payroll_api.get(`/api/v1/companies/${company_id}/configuration/nd-rate`);
+};
+
+export const fetchCompanyRegularOTRate = async (company_id) => {
+    return await payroll_api.get(`/api/v1/companies/${company_id}/configuration/regular-ot-rate`);
+};
+
+export const fetchCompanyRestdayRate = async (company_id) => {
+    return await payroll_api.get(`/api/v1/companies/${company_id}/configuration/rest-day-rate`);
+};
+
+
+export const createCompanyNDRate = async (company_id, nd_rate) => {
+    return await payroll_api.post(`/api/v1/companies/${company_id}/configuration/nd-rate`, { nd_rate });
+};
+
+export const createCompanyRegularOTRate = async (company_id, regular_ot_rate) => {
+    return await payroll_api.post(`/api/v1/companies/${company_id}/configuration/regular-ot-rate`, { regular_ot_rate });
+};
+
+export const createCompanyRestdayRate = async (company_id, restday_rate) => {
+    return await payroll_api.post(`/api/v1/companies/${company_id}/configuration/rest-day-rate`, { restday_rate });
+};

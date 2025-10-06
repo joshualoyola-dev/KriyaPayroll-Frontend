@@ -1,10 +1,16 @@
 import { useEffect, useState, useCallback } from "react";
 import {
     createCompany,
+    createCompanyNDRate,
     createCompanyPayrollFrequency,
+    createCompanyRegularOTRate,
+    createCompanyRestdayRate,
     createCompanyWorkingDays,
     createUserToManageCompany,
+    fetchCompanyNDRate,
     fetchCompanyPayrollFrequency,
+    fetchCompanyRegularOTRate,
+    fetchCompanyRestdayRate,
     fetchCompanyWorkingDays,
     getCompaniesService,
     getCompanyFullDetail,
@@ -56,6 +62,9 @@ const useCompany = () => {
     //configurations
     const [workingDays, setWorkingDays] = useState();
     const [payrollFrequency, setPayrollFrequency] = useState();
+    const [ndRate, setNdRate] = useState();
+    const [regularOTRate, setRegularOTRate] = useState();
+    const [restdayRate, setRestdayRate] = useState();
 
     const { addToast } = useToastContext();
     const { token } = useAuthContext();
@@ -124,9 +133,18 @@ const useCompany = () => {
             console.log('working days: ', result1);
             const result2 = await fetchCompanyPayrollFrequency(company.company_id);
             console.log('payroll freq: ', result2);
+            const result3 = await fetchCompanyNDRate(company.company_id);
+            console.log('nd: ', result3);
+            const result4 = await fetchCompanyRegularOTRate(company.company_id);
+            console.log('regular ot rate: ', result4);
+            const result5 = await fetchCompanyRestdayRate(company.company_id);
+            console.log('restday rate: ', result5);
 
             setWorkingDays(result1.data.number_of_days);
             setPayrollFrequency(result2.data.frequency);
+            setNdRate(result3.data.nd_rate);
+            setRegularOTRate(result4.data.regular_ot_rate);
+            setRestdayRate(result5.data.restday_rate);
         } catch (error) {
             console.log(error);
             addToast("Failed to fetch company configurations", "error");
@@ -204,6 +222,10 @@ const useCompany = () => {
                 await createCompanyPayrollFrequency(companyFormData.company_id, 2);
 
                 await createCompanyWorkingDays(companyFormData.company_id, 22);
+
+                await createCompanyNDRate(companyFormData.company_id, 0.10);
+                await createCompanyRegularOTRate(companyFormData.company_id, 1.25);
+                await createCompanyRestdayRate(companyFormData.company_id, 1.30);
 
                 // 4. Construct new company
                 const newCompany = {
@@ -328,6 +350,9 @@ const useCompany = () => {
         companyFullDetail, isCompanyFullDetailLoading,
         workingDays, setWorkingDays,
         payrollFrequency, setPayrollFrequency,
+        ndRate, setNdRate,
+        regularOTRate, setRegularOTRate,
+        restdayRate, setRestdayRate,
     };
 };
 
