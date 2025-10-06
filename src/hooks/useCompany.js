@@ -125,8 +125,8 @@ const useCompany = () => {
             const result2 = await fetchCompanyPayrollFrequency(company.company_id);
             console.log('payroll freq: ', result2);
 
-            setWorkingDays(result1.data.days.number_of_days);
-            setPayrollFrequency(result2.data.frequency.frequency);
+            setWorkingDays(result1.data.number_of_days);
+            setPayrollFrequency(result2.data.frequency);
         } catch (error) {
             console.log(error);
             addToast("Failed to fetch company configurations", "error");
