@@ -26,8 +26,8 @@ const formData = {
     date_to: '',
     payment_date: '',
     pay_items: [
-        { 'pay-item-01': "Tax Withheld" },
-        { 'pay-item-02': "Basic Pay" },
+        { 'payitem-id-01': "Tax Withheld" },
+        { 'payitem-id-02': "Basic Pay" },
     ], //payitem_id : pay_item_name in the column
 };
 

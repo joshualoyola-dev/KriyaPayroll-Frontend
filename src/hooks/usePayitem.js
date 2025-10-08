@@ -32,7 +32,12 @@ const usePayitem = () => {
 
     //this serves as a utility
     const mapPayitemIdToPayitemName = (payitem_id) => {
+        console.log('payitem passed: ', payitem_id);
+
         const payitem = payitems.find(obj => obj['payitem_id'] === payitem_id);
+        if (!payitem) console.log('no payitem found');
+        console.log('payitem', payitem);
+
         return payitem.payitem_name;
     };
 

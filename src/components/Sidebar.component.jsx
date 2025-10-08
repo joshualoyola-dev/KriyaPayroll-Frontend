@@ -69,6 +69,10 @@ const Sidebar = () => {
                 { label: "Contributions", path: "/configuration/contribution" },
             ],
         },
+        {
+            title: null,
+            items: [{ label: "Data export", path: "/data-export" }],
+        },
     ];
 
     return (
