@@ -8,16 +8,15 @@ const RegularPayrunPage = () => {
 
     return (
         <>
-            <div className="w-full max-w-full">
-                <div className="pb-4">
-                    {/* <PayrunOption /> */}
-                    {!payrun ? <OptionGenerate /> : <OptionEdit />}
-                </div>
+            <div className="pb-4">
+                {!payrun ? <OptionGenerate /> : <OptionEdit />}
             </div>
-            {payslips.length === 0
-                ? <div></div>
-                : <PayslipTable data={payslips} setData={setPayslips} />
-            }
+            <div className="overflow-x-auto">
+                {payslips.length === 0
+                    ? <div></div>
+                    : <PayslipTable data={payslips} setData={setPayslips} />
+                }
+            </div>
         </>
     );
 };
