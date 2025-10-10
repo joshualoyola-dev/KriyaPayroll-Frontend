@@ -31,26 +31,29 @@ const PayslipTable = ({ data, setData }) => {
             <table className="min-w-full border-collapse border border-gray-300 text-sm">
                 <thead className="bg-gray-100">
                     <tr>
-                        <th className="border border-gray-300 px-4 py-2 text-left font-medium">
+                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-0 top-0  z-30 bg-gray-100 shadow-sm">
                             Employee
                         </th>
-                        <th className="border border-gray-300 px-4 py-2 text-left font-medium">
+                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm">
                             Employee Id
                         </th>
                         {payitem_ids.map((payitem_id) => (
                             <th
                                 key={payitem_id}
-                                className="border border-gray-300 px-4 py-2 text-left font-medium"
+                                className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm"
                             >
-                                {mapPayitemIdToPayitemName(payitem_id)}
+                                { mapPayitemIdToPayitemName(payitem_id) }
                             </th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {employee_ids.map((employee_id) => (
+                    {employee_ids.map((employee_id, index) => (
                         <tr key={employee_id} className="odd:bg-white even:bg-gray-50">
-                            <td className="border border-gray-300 px-4 py-2">{mapEmployeeIdToEmployeeName(employee_id)}</td>
+                            <td className={`border border-gray-300 px-4 py-2 sticky left-0 z-20 
+                                 ${ index % 2 === 0 ? "bg-white" : "bg-gray-50" }`}> 
+                                    {mapEmployeeIdToEmployeeName(employee_id)}
+                            </td>
 
                             <td className="border border-gray-300 px-4 py-2">{employee_id}</td>
                             {payitem_ids.map((payitem_id) => (
