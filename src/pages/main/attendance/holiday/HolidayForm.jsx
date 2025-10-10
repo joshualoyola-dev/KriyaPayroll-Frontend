@@ -73,8 +73,7 @@ const HolidayForm = () => {
                         onChange={(e) => handleFormChange('holiday_rate', e.target.value)}
                         placeholder="0.00"
                         step="0.01"
-                        min="0"
-                        max="2"
+                        min="1"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                         required
                     />
