@@ -1,4 +1,4 @@
-import { convertToISO8601 } from "../../../../utility/datetime.utility";
+import { convertToDatetimeString, convertToISO8601 } from "../../../../utility/datetime.utility";
 
 export const column = [
     {
@@ -10,6 +10,11 @@ export const column = [
         accessorKey: "overtime_date",
         header: "Overtime Date",
         cell: (info) => convertToISO8601(info.getValue()),
+    },
+    {
+        accessorKey: "overtime_time_started",
+        header: "Time Started",
+        cell: (info) => convertToDatetimeString(info.getValue()),
     },
     {
         accessorKey: "overtime_type",
