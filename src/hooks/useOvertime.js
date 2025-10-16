@@ -3,12 +3,13 @@ import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { addOneOvertime, deleteOneOvertime, fetchOvertimes } from "../services/overtime.service";
 import * as XLSX from 'xlsx';
-import { formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
+import { formatDateTime, formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
 import useDebounce from "./useDebounce";
 
 const formData = {
     employee_id: '',
     overtime_date: '',
+    overtime_time_started: '',
     overtime_type: 'REGULAR_DAY',
     overtime_hours_rendered: '',
     overtime_night_differential: '',
@@ -213,6 +214,10 @@ const useOvertime = () => {
                     else if (matchingField === "overtime_date") {
                         const parsedDate = parseExcelDate(value);
                         mappedRow[matchingField] = formatDateToISO18601(parsedDate);
+                    }
+                    else if (matchingField === "overtime_time_started") {
+                        const parsedDateTime = parseExcelDateTime(value);
+                        mappedRow[matchingField] = formatDateTime(parsedDateTime);
                     }
                     // Handle decimal/number fields
                     else if ([
