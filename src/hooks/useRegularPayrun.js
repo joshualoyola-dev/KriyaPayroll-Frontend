@@ -15,7 +15,7 @@ import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { validateDailyRecordOfOneEmployee } from "../services/attendance.service";
 import { convertToISO8601 } from "../utility/datetime.utility";
-import { generateRegularPayrun, getPayrun, getPayrunPayslipPayables, saveEdit, saveEditAndCalculateTaxWitheld, saveRegularPayrunDraft, updateStatus } from "../services/payrun.service";
+import { generateRegularPayrun, getPayrun, getPayrunPayslipPayables, saveEdit, saveRegularPayrunDraft, updateStatus } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sanitizedPayslips } from "../utility/payrun.utility";
@@ -224,7 +224,7 @@ const useRegularPayrun = () => {
             const payload = {
                 payslips: cleanedPayslips,
             };
-            const result = await saveEditAndCalculateTaxWitheld(company.company_id, payrun.payrun_id, payload);
+            const result = await saveEdit(company.company_id, payrun.payrun_id, payload, true);
             console.log('result calculating tax withheld', result);
             addToast("Successfully calculated tax withheld", "success");
             // handleCloseRegularPayrun();
