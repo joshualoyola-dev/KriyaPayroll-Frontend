@@ -176,7 +176,7 @@ const useRegularPayrun = () => {
                 payrun_start_date: options.date_from,
                 payrun_end_date: options.date_to,
                 payment_date: options.payment_date,
-                payrun_title: `REGULAR PAYRUN - ${Date.now()}`,
+                payrun_title: `REGULAR PAYRUN: ${options.date_from} - ${options.date_to}`,
                 generated_by: localStorage.getItem('system_user_id'),
                 status: 'DRAFT',
             };
