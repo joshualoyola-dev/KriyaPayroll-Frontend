@@ -176,7 +176,7 @@ const useRegularPayrun = () => {
                 payrun_start_date: options.date_from,
                 payrun_end_date: options.date_to,
                 payment_date: options.payment_date,
-                payrun_title: `REGULAR PAYRUN - ${Date.now()}`,
+                payrun_title: `REGULAR PAYRUN: ${options.date_from} - ${options.date_to}`,
                 generated_by: localStorage.getItem('system_user_id'),
                 status: 'DRAFT',
             };
@@ -209,6 +209,29 @@ const useRegularPayrun = () => {
         } catch (error) {
             console.log(error);
             addToast(`Error occurred in saving edits.`, "error");
+        }
+        finally {
+            setIsSaving(false);
+        }
+    };
+
+
+    const handleSaveAndCalculateTaxWitheld = async () => {
+        setIsSaving(true);
+
+        try {
+            const cleanedPayslips = sanitizedPayslips(payslips);
+            const payload = {
+                payslips: cleanedPayslips,
+            };
+            const result = await saveEdit(company.company_id, payrun.payrun_id, payload, true);
+            console.log('result calculating tax withheld', result);
+            addToast("Successfully calculated tax withheld", "success");
+            // handleCloseRegularPayrun();
+            await initializeRegularPayrun(payrun.payrun_id);
+        } catch (error) {
+            console.log(error);
+            addToast(`Error occurred in calculating tax withhelds.`, "error");
         }
         finally {
             setIsSaving(false);
@@ -290,7 +313,8 @@ const useRegularPayrun = () => {
         handleChangeStatus,
         statusLoading, setStatusLoading,
         handleAddPayitemToPayslips,
-        handleSendPayslips
+        handleSendPayslips,
+        handleSaveAndCalculateTaxWitheld
     };
 };
 
