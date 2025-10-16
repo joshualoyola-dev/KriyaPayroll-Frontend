@@ -32,16 +32,18 @@ const OptionGenerate = () => {
 
     return (
         <div className="relative bg-white p-6 rounded-xl border border-gray-200">
-            <div className="absolute top-4 right-4 gap-2">
-                {(Object.keys(payslips).length > 0) &&
+            {/* Top controls section - with proper spacing */}
+            <div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900">Payrun Details</h3>
+                {(Object.keys(payslips).length > 0) && (
                     <button
                         onClick={handleSaveDraft}
                         disabled={isSaving}
-                        className="px-3 py-1  bg-teal-600 rounded-xl text-sm font-medium text-white hover:cursor-pointer hover:bg-teal-700"
+                        className="px-4 py-2 text-sm font-medium rounded-xl bg-teal-600 text-white hover:bg-teal-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-all"
                     >
-                        {isSaving ? "Loading ..." : "Save Draft"}
+                        {isSaving ? "Saving..." : "Save Draft"}
                     </button>
-                }
+                )}
             </div>
 
             {/* Main form grid */}
@@ -58,9 +60,8 @@ const OptionGenerate = () => {
                         type="date"
                         value={options.date_from}
                         onChange={(e) => handleInputChange('date_from', e.target.value)}
-                        className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2"
+                        className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                         required
-
                     />
                 </div>
 
@@ -73,9 +74,8 @@ const OptionGenerate = () => {
                         type="date"
                         value={options.date_to}
                         onChange={(e) => handleInputChange('date_to', e.target.value)}
-                        className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2"
+                        className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                         required
-
                     />
                 </div>
 
@@ -88,9 +88,8 @@ const OptionGenerate = () => {
                         type="date"
                         value={options.payment_date}
                         onChange={(e) => handleInputChange('payment_date', e.target.value)}
-                        className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2"
+                        className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                         required
-
                     />
                 </div>
 
@@ -107,7 +106,7 @@ const OptionGenerate = () => {
                                     e.target.value = ''; // Reset select after selection
                                 }
                             }}
-                            className="w-full px-3 py-2.5 pr-10 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none cursor-pointer text-gray-500"
+                            className="w-full px-3 py-2.5 pr-10 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white appearance-none cursor-pointer text-gray-500"
                             defaultValue=""
                         >
                             <option value="" disabled>Select Payitems</option>
@@ -128,54 +127,50 @@ const OptionGenerate = () => {
                     </div>
                 </div>
 
-                {/* Generate  */}
+                {/* Generate Button */}
                 <div className="space-y-2">
                     <label className="block text-xs font-medium text-gray-700">
                         Generate
                     </label>
                     <button
                         type="submit"
-                        // className="w-full px-3 py-2.5  bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm rounded-3xl "
-                        className="inline-flex items-center px-8 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm rounded-3xl "
+                        disabled={isValidating}
+                        className="w-full px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm rounded-3xl disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-all"
                     >
-                        {isValidating ? "Loading ..." : "Generate"}
+                        {isValidating ? "Loading..." : "Generate"}
                     </button>
                 </div>
             </form>
 
-            {/* Selected Payitems (if any) */}
-            {
-                options.pay_items.length > 0 && (
-                    <div className="mb-6">
-                        <p className="text-xs font-medium text-gray-600 mb-2">Selected Pay Items:</p>
-                        <div className="flex flex-wrap gap-2">
-                            {options.pay_items.map((item, idx) => {
-                                const payitemId = Object.keys(item)[0];
-                                const payitemName = item[payitemId];
-                                return (
-                                    <div
-                                        key={idx}
-                                        className="inline-flex items-center px-3 py-1.5 rounded-full text-xs text-teal-600 border border-blue-200"
+            {/* Selected Payitems */}
+            {options.pay_items.length > 0 && (
+                <div className="pt-4 border-t border-gray-200">
+                    <p className="text-xs font-medium text-gray-700 mb-3">Selected Pay Items:</p>
+                    <div className="flex flex-wrap gap-2">
+                        {options.pay_items.map((item, idx) => {
+                            const payitemId = Object.keys(item)[0];
+                            const payitemName = item[payitemId];
+                            return (
+                                <div
+                                    key={idx}
+                                    className="inline-flex items-center px-3 py-1.5 rounded-full text-xs text-teal-700 bg-teal-50 border border-teal-200"
+                                >
+                                    <span className="font-medium">{payitemName}</span>
+                                    <button
+                                        onClick={() => removePayitem(payitemId)}
+                                        className="ml-2 text-teal-600 hover:text-teal-800 focus:outline-none text-lg leading-none font-semibold"
+                                        type="button"
+                                        aria-label={`Remove ${payitemName}`}
                                     >
-                                        <span>{payitemName}</span>
-                                        <button
-                                            onClick={() => removePayitem(payitemId)}
-                                            className="ml-2 text-teal-500 hover:text-teal-700 focus:outline-none text-lg leading-none"
-                                            type="button"
-                                            aria-label={`Remove ${payitemName}`}
-                                        >
-                                            ×
-                                        </button>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                        ×
+                                    </button>
+                                </div>
+                            );
+                        })}
                     </div>
-                )
-            }
-
-
-        </div >
+                </div>
+            )}
+        </div>
     );
 };
 
