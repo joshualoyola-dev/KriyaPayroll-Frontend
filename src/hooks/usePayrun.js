@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
-import { deleteOnePayrun, getCompanyPayruns, getPayrunPayslipPayables, getPayslips } from "../services/payrun.service";
+import { deleteOnePayrun, getCompanyPayruns, getPayrun, getPayrunPayslipPayables, getPayslips } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { downloadExcelMatrix } from "../utility/excel.utility";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
@@ -66,7 +66,9 @@ const usePayrun = () => {
     const handleDownloadPayslipsExcel = async (payrun_id) => {
         try {
             const result = await getPayrunPayslipPayables(company.company_id, payrun_id);
-            downloadExcelMatrix(result.data.payslips, mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName, 'Payslips', 'Payslips');
+            const resultPayrun = await getPayrun(company.company_id, payrun_id);
+            const fileName = resultPayrun.data.payrun.payrun_title ?? 'Payslips';
+            downloadExcelMatrix(result.data.payslips, mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName, fileName, 'Payslips');
         } catch (error) {
             console.log('downloading payslips error ', error);
             addToast("Failed to download payslips", "error");
