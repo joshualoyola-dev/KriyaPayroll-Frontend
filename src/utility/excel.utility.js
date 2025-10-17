@@ -11,7 +11,9 @@ import { saveAs } from 'file-saver';
 export const downloadExcelMatrix = (
     data,
     mapEmployeeIdToEmployeeName,
-    mapPayitemIdToPayitemName
+    mapPayitemIdToPayitemName,
+    filename,
+    sheetName,
 ) => {
     const allInnerKeys = Array.from(
         new Set(Object.values(data).flatMap(inner => Object.keys(inner)))
@@ -36,10 +38,10 @@ export const downloadExcelMatrix = (
 
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Year-to-Date');
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 
     //  Download as Excel
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(blob, 'year-to-date.xlsx');
+    saveAs(blob, `${filename}.xlsx`);
 };
