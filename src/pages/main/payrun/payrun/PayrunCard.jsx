@@ -1,10 +1,9 @@
 import { FolderArrowDownIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { convertToISO8601 } from "../../../../utility/datetime.utility";
 import { PaperAirplaneIcon } from "@heroicons/react/16/solid";
-import { useNavigate } from "react-router-dom";
 
 
-const PayrunCard = ({ payrun, idx, oncClickCard, onDelete, onNavigateSendPayslip }) => {
+const PayrunCard = ({ payrun, idx, oncClickCard, onDelete, onNavigateSendPayslip, onDownloadPayslips }) => {
 
     return (
         <div
@@ -61,6 +60,10 @@ const PayrunCard = ({ payrun, idx, oncClickCard, onDelete, onNavigateSendPayslip
                     <TrashIcon className="h-5 w-5" />
                 </button>
                 <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDownloadPayslips(payrun.payrun_id);
+                    }}
                     className="p-2 rounded-full text-teal-600 hover:bg-teal-50 transition-colors"
                 >
                     <FolderArrowDownIcon className="h-5 w-5 " />
