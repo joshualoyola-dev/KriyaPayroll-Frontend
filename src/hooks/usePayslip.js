@@ -31,7 +31,7 @@ const usePayslip = () => {
             setIsPayrunLoading(false);
         }
     };
-
+    
     const handleFetchPayslips = async (payrun_id) => {
         setIsPayslipsLoading(true);
         try {
