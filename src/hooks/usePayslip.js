@@ -3,6 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
 import { getPayrun, getPayslips, sendOnePayslip } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
+import { downloadExcelMatrix, downloadExcelPayrunSummary } from "../utility/excel.utility";
+import { useEmployeeContext } from "../contexts/EmployeeProvider";
+import { usePayitemContext } from "../contexts/PayitemProvider";
 
 const usePayslip = () => {
     const [payrun, setPayrun] = useState();
@@ -15,6 +18,8 @@ const usePayslip = () => {
     const navigate = useNavigate();
     const { addToast } = useToastContext();
     const { company } = useCompanyContext();
+    const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
+    const { mapPayitemIdToPayitemName } = usePayitemContext();
 
     const handleFetchPayrun = async (company_id, payrun_id) => {
         setIsPayrunLoading(true);
@@ -93,7 +98,26 @@ const usePayslip = () => {
     }, [location.search]);
 
 
+    const handleDownloadPayslips = async () => {
+        try {
+            console.log('payslips before download: ', payslips);
+            //transform payslips
+            const cleanedPayslips = payslips.map(payslip => ({
+                employee_id: payslip.employee_id,
+                total_deductions: payslip.total_deductions,
+                total_earnings: payslip.total_earnings,
+                total_taxes: payslip.total_taxes,
+                net_salary: payslip.net_salary,
+            }));
 
+            console.log('cleaned payslips: ', cleanedPayslips);
+            downloadExcelPayrunSummary(cleanedPayslips, mapEmployeeIdToEmployeeName, 'Payrun Summary', 'Payrun-summary');
+
+        } catch (error) {
+            console.log(error);
+            addToast("Failed to download payslips", "error");
+        }
+    };
 
     return {
         isSending, setIsSending,
@@ -102,6 +126,7 @@ const usePayslip = () => {
         handleSendFinalPayslip,
         payrun, setPayrun,
         isPayrunLoading, setIsPayrunLoading,
+        handleDownloadPayslips
     }
 };
 

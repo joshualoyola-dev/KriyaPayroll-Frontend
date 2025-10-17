@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
-import { deleteOnePayrun, getCompanyPayruns } from "../services/payrun.service";
+import { deleteOnePayrun, getCompanyPayruns, getPayrun, getPayrunPayslipPayables, getPayslips } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
+import { downloadExcelMatrix } from "../utility/excel.utility";
+import { useEmployeeContext } from "../contexts/EmployeeProvider";
+import { usePayitemContext } from "../contexts/PayitemProvider";
 
 const usePayrun = () => {
     const [payruns, setPayruns] = useState([]);
@@ -12,6 +15,8 @@ const usePayrun = () => {
 
     const { addToast } = useToastContext();
     const { company } = useCompanyContext();
+    const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
+    const { mapPayitemIdToPayitemName } = usePayitemContext();
 
     const handleFetchPayruns = async () => {
         setIsPayrunLoading(true);
@@ -58,6 +63,18 @@ const usePayrun = () => {
         navigate(`/payrun/send-payslips?payrun_id=${payrun_id}`);
     };
 
+    const handleDownloadPayslipsExcel = async (payrun_id) => {
+        try {
+            const result = await getPayrunPayslipPayables(company.company_id, payrun_id);
+            const resultPayrun = await getPayrun(company.company_id, payrun_id);
+            const fileName = resultPayrun.data.payrun.payrun_title ?? 'Payslips';
+            downloadExcelMatrix(result.data.payslips, mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName, fileName, 'Payslips');
+        } catch (error) {
+            console.log('downloading payslips error ', error);
+            addToast("Failed to download payslips", "error");
+        }
+    };
+
 
     return {
         payruns, setPayruns,
@@ -66,7 +83,8 @@ const usePayrun = () => {
         handleClickPayrun,
         deleteLoading, setDeleteLoading,
         handleDeleteOnePayrun,
-        handleNavigateSendPayslip
+        handleNavigateSendPayslip,
+        handleDownloadPayslipsExcel,
     };
 };
 

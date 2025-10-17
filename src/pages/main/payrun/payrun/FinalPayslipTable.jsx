@@ -1,7 +1,7 @@
 import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
 
 const FinalPayslipTable = ({ payslips = [] }) => {
-    const headers = ["Name", "Taxes", "Deductions", "Earnings"];
+    const headers = ["Name", "Taxes", "Deductions", "Earnings", "Net Pay"];
     const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
 
     return (
@@ -31,6 +31,7 @@ const FinalPayslipTable = ({ payslips = [] }) => {
                                 <td className="px-4 py-3">{payslip.total_taxes}</td>
                                 <td className="px-4 py-3">{payslip.total_deductions}</td>
                                 <td className="px-4 py-3">{payslip.total_earnings}</td>
+                                <td className="px-4 py-3">{payslip.net_salary}</td>
                             </tr>
                         ))
                     ) : (

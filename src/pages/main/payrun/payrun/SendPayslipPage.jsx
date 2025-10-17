@@ -4,7 +4,7 @@ import FinalPayslipTable from "./FinalPayslipTable";
 
 
 const SendPayslipPage = () => {
-    const { payrun, isPayrunLoading, payslips, isSending, isPayslipsLoading, handleSendFinalPayslip } = usePayslipContext();
+    const { payrun, isPayrunLoading, payslips, isSending, isPayslipsLoading, handleSendFinalPayslip, handleDownloadPayslips } = usePayslipContext();
     return (
         <div>
             <div className="flex justify-between pb-3">
@@ -26,12 +26,19 @@ const SendPayslipPage = () => {
                         <p className="text-gray-500 text-sm">No Payrun Found</p>
                     )}
                 </div>
-                <button
-                    onClick={handleSendFinalPayslip}
-                    className="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-medium"
-                >
-                    {isSending ? "Loading..." : "Send Payslip"}
-                </button>
+                <div className="flex gap-x-3">
+                    <button
+                        onClick={handleDownloadPayslips}
+                        className="px-3 py-1 border text-gray-600 border-gray-600 hover:bg-teal-600 hover:border-teal-600 hover:cursor-pointer hover:text-white rounded-xl text-sm font-medium">
+                        Download
+                    </button>
+                    <button
+                        onClick={handleSendFinalPayslip}
+                        className="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-medium"
+                    >
+                        {isSending ? "Loading..." : "Send Payslip"}
+                    </button>
+                </div>
             </div>
 
             {isPayslipsLoading
