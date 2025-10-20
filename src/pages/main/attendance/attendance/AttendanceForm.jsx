@@ -15,7 +15,7 @@ const AttendanceForm = () => {
             <div className="overflow-x-auto">
                 <div className="min-w-max">
                     {/* Header Row */}
-                    <div className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_80px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
+                    <div className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_80px_120px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
                         <div></div>
                         <div>Employee Id *</div>
                         <div>Attendance Date *</div>
@@ -26,7 +26,8 @@ const AttendanceForm = () => {
                         {/* <div>Hours Logged</div> */}
                         <div>Undertime</div>
                         <div>Tardiness</div>
-                        <div>Night Differential</div>
+                        <div>ND Same Day</div>
+                        <div>ND Next Day</div>
                         <div>Shift Type</div>
                         <div></div>
                     </div>
@@ -34,7 +35,7 @@ const AttendanceForm = () => {
                     {/* Employee Rows */}
                     <div className="space-y-0">
                         {attendanceFormData.map((att, index) => (
-                            <div key={att.id} className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_80px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                            <div key={att.id} className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_80px_120px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
                                 {/* Row Number */}
                                 <div className="flex items-center justify-center text-sm text-gray-500 font-medium">
                                     {index + 1}
@@ -125,13 +126,23 @@ const AttendanceForm = () => {
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
 
-                                {/* night_differential */}
+                                {/*Same day night_differential */}
                                 <input
                                     type="number"
                                     step="0.01"
                                     min="0"
-                                    value={att.night_differential || ''}
-                                    onChange={(e) => handleFieldChange(att.id, 'night_differential', e.target.value)}
+                                    value={att.nd_sameday || ''}
+                                    onChange={(e) => handleFieldChange(att.id, 'nd_sameday', e.target.value)}
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+
+                                {/*Next day night_differential */}
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={att.nd_nextday || ''}
+                                    onChange={(e) => handleFieldChange(att.id, 'nd_nextday', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
 
