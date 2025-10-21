@@ -18,8 +18,10 @@ const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSala
         employement_status,
         work_email,
         personal_email,
-        employee_infos,
-        employee_salaries
+        employee_salaries,
+        date_hired,
+        date_end,
+        EmployeeShift
     } = employee;
 
     const fullName = [first_name, middle_name, last_name].filter(Boolean).join(" ");
@@ -65,41 +67,70 @@ const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSala
                     </select>
                 </div>
 
+                <div className="max-w-md mx-auto mt-4">
+                    {/* Contact Info */}
+                    <h3 className="text-sm font-semibold text-gray-800 mb-2 border-b pb-1">Contact</h3>
+                    <table className="w-full border border-gray-300 text-sm mb-4">
+                        <tbody>
+                            <tr className="border-b border-gray-200">
+                                <td className="font-medium text-gray-700 px-3 py-2 w-1/3">Work</td>
+                                <td className="text-gray-600 px-3 py-2 break-all">{work_email}</td>
+                            </tr>
+                            <tr>
+                                <td className="font-medium text-gray-700 px-3 py-2">Personal</td>
+                                <td className="text-gray-600 px-3 py-2 break-all">{personal_email}</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
+                    {/* Employment Info */}
+                    <h3 className="text-sm font-semibold text-gray-800 mb-2 border-b pb-1">Employment</h3>
+                    <table className="w-full border border-gray-300 text-sm mb-4">
+                        <tbody>
+                            <tr className="border-b border-gray-200">
+                                <td className="font-medium text-gray-700 px-3 py-2 w-1/3">Date Hired</td>
+                                <td className="text-gray-600 px-3 py-2">
+                                    {format(new Date(date_hired), "MMM dd, yyyy")}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="font-medium text-gray-700 px-3 py-2">Date End</td>
+                                <td className="text-gray-600 px-3 py-2">
+                                    {format(new Date(date_end), "MMM dd, yyyy")}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                {/* Contact Info */}
-                <div className="space-y-1">
-                    <h3 className="text-sm font-semibold text-gray-700">Contact</h3>
-                    <p className="text-gray-600 text-sm break-all">Work: {work_email}</p>
-                    <p className="text-gray-600 text-sm break-all">Personal: {personal_email}</p>
+                    {/* Shift Info */}
+                    <h3 className="text-sm font-semibold text-gray-800 mb-2 border-b pb-1">Shift</h3>
+                    <table className="w-full border border-gray-300 text-sm">
+                        <tbody>
+                            <tr className="border-b border-gray-200">
+                                <td className="font-medium text-ms text-gray-700 px-3 py-2 w-1/3">Shift Start</td>
+                                <td className="text-gray-600 px-3 py-2">{EmployeeShift.shift_start}</td>
+                            </tr>
+                            <tr className="border-b border-gray-200">
+                                <td className="font-medium text-gray-700 px-3 py-2">Shift End</td>
+                                <td className="text-gray-600 px-3 py-2">{EmployeeShift.shift_end}</td>
+                            </tr>
+                            <tr className="border-b border-gray-200">
+                                <td className="font-medium text-gray-700 px-3 py-2">Break Start</td>
+                                <td className="text-gray-600 px-3 py-2">{EmployeeShift.break_start}</td>
+                            </tr>
+                            <tr className="border-b border-gray-200">
+                                <td className="font-medium text-gray-700 px-3 py-2">Break End</td>
+                                <td className="text-gray-600 px-3 py-2">{EmployeeShift.break_end}</td>
+                            </tr>
+                            <tr>
+                                <td className="font-medium text-gray-700 px-3 py-2">Shift Hours</td>
+                                <td className="text-gray-600 px-3 py-2">{EmployeeShift.shift_hours}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                {/* Employment Info */}
-                <div className="space-y-1">
-                    <h3 className="text-sm font-semibold text-gray-700">Employment</h3>
-                    <p className="text-gray-600 text-sm">
-                        Date Hired:{" "}
-                        {employee_infos?.date_hired
-                            ? format(new Date(employee_infos.date_hired), "MMM dd, yyyy")
-                            : "N/A"
-                        }
-                    </p>
-                    {employee_infos?.date_end && (
-                        <p className="text-gray-600 text-sm">
-                            Date End: {format(new Date(employee_infos.date_end), "MMM dd, yyyy")}
-                        </p>
-                    )}
-                    <p className="text-gray-600 text-sm">
-                        Civil Status: {employee_infos?.civil_status || "N/A"}
-                    </p>
-                    <p className="text-gray-600 text-sm">Sex: {employee_infos?.sex || "N/A"}</p>
-                    <p className="text-gray-600 text-sm break-words">
-                        Current Address: {employee_infos?.current_address || "N/A"}
-                    </p>
-                    <p className="text-gray-600 text-sm break-words">
-                        Permanent Address: {employee_infos?.permanent_address || "N/A"}
-                    </p>
-                </div>
+
 
                 {/* Salary History */}
                 {showAddSalaryForm ? (

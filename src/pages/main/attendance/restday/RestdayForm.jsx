@@ -26,7 +26,7 @@ const RestdayForm = () => {
                         <div>Hours Worked</div>
                         <div>Undertime</div>
                         <div>Tardiness</div>
-                        <div>Night Differential</div>
+                        <div>ND</div>
                         <div>Shift Type</div>
                         <div></div>
                     </div>
@@ -124,6 +124,7 @@ const RestdayForm = () => {
                                     onChange={(e) => handleFieldChange(rd.id, 'night_differential', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
+
 
                                 {/* Shift type */}
                                 <select

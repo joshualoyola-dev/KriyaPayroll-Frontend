@@ -122,7 +122,7 @@ const useRestday = () => {
                         'hours_logged',
                         'undertime',
                         'tardiness',
-                        'night_differential'
+                        'night_differential',
                     ];
 
                     numberFields.forEach(field => {
@@ -229,7 +229,7 @@ const useRestday = () => {
                         "hours_logged",
                         "undertime",
                         "tardiness",
-                        "night_differential"
+                        "night_differential",
                     ].includes(matchingField)) {
                         const numValue = Number(value);
                         mappedRow[matchingField] = isNaN(numValue) ? '' : numValue.toString();

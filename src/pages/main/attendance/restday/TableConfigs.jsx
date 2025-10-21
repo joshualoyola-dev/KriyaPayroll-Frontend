@@ -43,7 +43,7 @@ export const column = [
     },
     {
         accessorKey: "night_differential", //hours fall between 10:pm to 6:am
-        header: "Night Differential",
+        header: "ND",
         cell: (info) => info.getValue(),
     },
     {
