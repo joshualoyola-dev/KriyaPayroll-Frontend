@@ -32,7 +32,7 @@ const AddEmployeeForm = () => {
                     {/* Header Row */}
                     <div className="grid grid-cols-[40px_150px_150px_150px_150px_200px_200px_150px_150px_120px_200px_200px_120px_120px_120px_100px_120px_120px_150px_80px_80px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
                         <div></div>
-
+                        <div>Employee ID *</div>
                         <div>First Name *</div>
                         <div>Middle Name</div>
                         <div>Last Name *</div>
