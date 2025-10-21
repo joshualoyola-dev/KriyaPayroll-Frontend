@@ -18,8 +18,10 @@ const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSala
         employement_status,
         work_email,
         personal_email,
-        employee_infos,
-        employee_salaries
+        employee_salaries,
+        date_hired,
+        date_end,
+        shift
     } = employee;
 
     const fullName = [first_name, middle_name, last_name].filter(Boolean).join(" ");
@@ -78,27 +80,20 @@ const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSala
                 <div className="space-y-1">
                     <h3 className="text-sm font-semibold text-gray-700">Employment</h3>
                     <p className="text-gray-600 text-sm">
-                        Date Hired:{" "}
-                        {employee_infos?.date_hired
-                            ? format(new Date(employee_infos.date_hired), "MMM dd, yyyy")
-                            : "N/A"
-                        }
+                        Date Hired:{" "} {format(new Date(date_hired), "MMM dd, yyyy")}
                     </p>
-                    {employee_infos?.date_end && (
-                        <p className="text-gray-600 text-sm">
-                            Date End: {format(new Date(employee_infos.date_end), "MMM dd, yyyy")}
-                        </p>
-                    )}
                     <p className="text-gray-600 text-sm">
-                        Civil Status: {employee_infos?.civil_status || "N/A"}
+                        Date End: {format(new Date(date_end), "MMM dd, yyyy")}
                     </p>
-                    <p className="text-gray-600 text-sm">Sex: {employee_infos?.sex || "N/A"}</p>
-                    <p className="text-gray-600 text-sm break-words">
-                        Current Address: {employee_infos?.current_address || "N/A"}
-                    </p>
-                    <p className="text-gray-600 text-sm break-words">
-                        Permanent Address: {employee_infos?.permanent_address || "N/A"}
-                    </p>
+                </div>
+
+                <div className="space-y-1">
+                    <h3 className="text-sm font-semibold text-gray-700">Employment</h3>
+                    <p className="text-gray-600 text-sm">Shift Start: {shift.shift_start}</p>
+                    <p className="text-gray-600 text-sm">Shift End: {shift.shift_end}</p>
+                    <p className="text-gray-600 text-sm">Break Start: {shift.break_start}</p>
+                    <p className="text-gray-600 text-sm">Break End: {shift.break_end}</p>
+                    <p className="text-gray-600 text-sm">Shift Hours: {shift.shift_hours}</p>
                 </div>
 
                 {/* Salary History */}
