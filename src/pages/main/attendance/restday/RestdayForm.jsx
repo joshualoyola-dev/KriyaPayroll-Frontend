@@ -16,7 +16,7 @@ const RestdayForm = () => {
             <div className="overflow-x-auto">
                 <div className="min-w-max">
                     {/* Header Row */}
-                    <div className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_80px_120px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
+                    <div className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_80px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
                         <div></div>
                         <div>Employee Id *</div>
                         <div>Restday Date *</div>
@@ -26,8 +26,7 @@ const RestdayForm = () => {
                         <div>Hours Worked</div>
                         <div>Undertime</div>
                         <div>Tardiness</div>
-                        <div>ND Same Day</div>
-                        <div>ND Next Day</div>
+                        <div>ND</div>
                         <div>Shift Type</div>
                         <div></div>
                     </div>
@@ -35,7 +34,7 @@ const RestdayForm = () => {
                     {/* Employee Rows */}
                     <div className="space-y-0">
                         {restdayFormData.map((rd, index) => (
-                            <div key={rd.id} className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_80px_120px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                            <div key={rd.id} className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_80px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
                                 {/* Row Number */}
                                 <div className="flex items-center justify-center text-sm text-gray-500 font-medium">
                                     {index + 1}
@@ -116,25 +115,16 @@ const RestdayForm = () => {
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
 
-                                {/* same day night_differential */}
+                                {/* night_differential */}
                                 <input
                                     type="number"
                                     step="0.01"
                                     min="0"
-                                    value={rd.nd_sameday || ''}
-                                    onChange={(e) => handleFieldChange(rd.id, 'nd_sameday', e.target.value)}
+                                    value={rd.night_differential || ''}
+                                    onChange={(e) => handleFieldChange(rd.id, 'night_differential', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
 
-                                {/* next day night_differential */}
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    value={rd.nd_nextday || ''}
-                                    onChange={(e) => handleFieldChange(rd.id, 'nd_nextday', e.target.value)}
-                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
 
                                 {/* Shift type */}
                                 <select

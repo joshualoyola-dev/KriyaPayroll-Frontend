@@ -42,13 +42,8 @@ export const column = [
         cell: (info) => info.getValue(),
     },
     {
-        accessorKey: "nd_sameday", //hours fall between 10:pm to 6:am
-        header: "ND Same day",
-        cell: (info) => info.getValue(),
-    },
-    {
-        accessorKey: "nd_nextday", //hours fall between 10:pm to 6:am
-        header: "ND Next Day",
+        accessorKey: "night_differential", //hours fall between 10:pm to 6:am
+        header: "ND",
         cell: (info) => info.getValue(),
     },
     {

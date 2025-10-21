@@ -15,8 +15,7 @@ const formData = {
     hours_logged: '',
     undertime: '',
     tardiness: '',
-    nd_sameday: '',
-    nd_nextday: '',
+    night_differential: '',
     shift_type: 'REGULAR',
 };
 
@@ -123,8 +122,7 @@ const useRestday = () => {
                         'hours_logged',
                         'undertime',
                         'tardiness',
-                        'nd_sameday',
-                        'nd_nextday'
+                        'night_differential',
                     ];
 
                     numberFields.forEach(field => {
@@ -231,8 +229,7 @@ const useRestday = () => {
                         "hours_logged",
                         "undertime",
                         "tardiness",
-                        "nd_sameday",
-                        "nd_nextday"
+                        "night_differential",
                     ].includes(matchingField)) {
                         const numValue = Number(value);
                         mappedRow[matchingField] = isNaN(numValue) ? '' : numValue.toString();
