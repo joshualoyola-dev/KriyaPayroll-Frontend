@@ -5,6 +5,7 @@ import { addEmployeeSalary, createEmployee, fetchEmployeeById, fetchEmployeesByC
 import { useToastContext } from "../contexts/ToastProvider";
 import useDebounce from "./useDebounce";
 import * as XLSX from 'xlsx';
+import { convertExcelTimeToHHMM } from "../utility/excel.utility";
 
 const formData = {
     employee_id: '',
@@ -16,16 +17,21 @@ const formData = {
     job_title: '',
     department: '',
     employement_status: true, // boolean instead of string
-    permanent_address: '',
-    current_address: '',
-    civil_status: '',
+
     date_hired: null, // Changed: Use null instead of empty string for consistent date handling
     date_end: null, // nullable
-    sex: '',
+
+    shift_start: '', //YY:MM
+    shift_end: '', //YY:MM
+    break_start: '', //YY:MM
+    break_end: '', //YY:MM
+    shift_hours: '', //number
+
     base_pay: null, // nullable number
     date: null, // nullable date - for salary start date
     change_type: '',
     is_active: true,
+
 };
 
 // Helper function to format date to ISO format (YYYY-MM-DD)
@@ -57,15 +63,18 @@ const validateEmployeeData = (employee) => {
     if (!employee.work_email?.trim()) errors.push("Work email is required");
     if (!employee.job_title?.trim()) errors.push("Job title is required");
     if (!employee.department?.trim()) errors.push("Department is required");
-    if (!employee.permanent_address?.trim()) errors.push("Permanent address is required");
-    if (!employee.current_address?.trim()) errors.push("Current address is required");
-    if (!employee.civil_status?.trim()) errors.push("Civil status is required");
-    if (!employee.sex?.trim()) errors.push("Sex is required");
-    if (!employee.change_type?.trim()) errors.push("Change type is required");
 
     // Check required date fields
     if (!employee.date_hired) errors.push("Date hired is required");
     if (!employee.date) errors.push("Base pay start date is required");
+    if (!employee.change_type?.trim()) errors.push("Change type is required");
+
+
+    //shifts 
+    if (!employee.shift_start?.trim()) errors.push("Shift start time is required");
+    if (!employee.shift_end?.trim()) errors.push("Shift end time is required");
+    if (!employee.shift_hours || employee.shift_hours <= 0) errors.push("Shift hours is required and must be greater than 0");
+
 
     // Check required numeric fields
     if (!employee.base_pay || employee.base_pay <= 0) errors.push("Base pay is required and must be greater than 0");
@@ -277,13 +286,14 @@ const useEmployee = () => {
         return value;
     };
 
-    // Helper function to map file data to form structure
+    // Updated mapFileDataToForm function with time handling
     const mapFileDataToForm = (data) => {
         return data.map((row, index) => {
             const mappedRow = { ...formData, id: Date.now() + index };
 
             // Get valid form keys
             const formKeys = Object.keys(formData);
+            const timeFields = ['shift_start', 'shift_end', 'break_start', 'break_end'];
 
             Object.entries(row).forEach(([key, value]) => {
                 const normalizedKey = normalizeHeader(key);
@@ -294,9 +304,17 @@ const useEmployee = () => {
                 );
 
                 if (matchingField && value !== null && value !== undefined && value !== "") {
+                    // Handle time fields (convert Excel decimals to HH:MM)
+                    if (timeFields.includes(matchingField)) {
+                        mappedRow[matchingField] = convertExcelTimeToHHMM(value);
+                    }
                     // Handle base_pay (must be number)
-                    if (matchingField === "base_pay") {
+                    else if (matchingField === "base_pay") {
                         mappedRow[matchingField] = Number(value) || null;
+                    }
+                    // Handle shift_hours (must be number)
+                    else if (matchingField === "shift_hours") {
+                        mappedRow[matchingField] = Number(value) || '';
                     }
                     // Handle date fields (must be string `YYYY-MM-DD` for <input type="date">)
                     else if (

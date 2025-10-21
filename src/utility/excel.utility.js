@@ -88,3 +88,35 @@ export const downloadExcelPayrunSummary = (
         console.error("Error generating Excel file:", error);
     }
 };
+
+
+// Helper function to convert Excel decimal time to HH:MM format
+export const convertExcelTimeToHHMM = (value) => {
+    if (!value && value !== 0) return '';
+
+    let decimalTime;
+
+    // If it's a string in HH:MM format already, validate and return
+    if (typeof value === 'string') {
+        const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+        if (timeRegex.test(value.trim())) {
+            return value.trim();
+        }
+        // Try to parse as decimal string
+        decimalTime = parseFloat(value);
+        if (isNaN(decimalTime)) return '';
+    } else if (typeof value === 'number') {
+        decimalTime = value;
+    } else {
+        return '';
+    }
+
+    // Excel stores time as decimal (0-1) where 0 = 00:00, 1 = 24:00
+    // Multiply by 24 to get hours
+    const totalMinutes = Math.round(decimalTime * 24 * 60);
+    const hours = Math.floor(totalMinutes / 60) % 24;
+    const minutes = totalMinutes % 60;
+
+    // Format as HH:MM
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+};

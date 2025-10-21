@@ -30,9 +30,9 @@ const AddEmployeeForm = () => {
             <div className="overflow-x-auto">
                 <div className="min-w-max">
                     {/* Header Row */}
-                    <div className="grid grid-cols-[40px_150px_150px_150px_150px_200px_200px_150px_150px_120px_200px_200px_120px_120px_120px_100px_120px_120px_150px_80px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
+                    <div className="grid grid-cols-[40px_150px_150px_150px_150px_200px_200px_150px_150px_120px_200px_200px_120px_120px_120px_100px_120px_120px_150px_80px_80px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
                         <div></div>
-                        <div>Employee Id</div>
+                        <div>Employee ID *</div>
                         <div>First Name *</div>
                         <div>Middle Name</div>
                         <div>Last Name *</div>
@@ -41,12 +41,13 @@ const AddEmployeeForm = () => {
                         <div>Job Title *</div>
                         <div>Department *</div>
                         <div>Employment Status *</div>
-                        <div>Permanent Address *</div>
-                        <div>Current Address *</div>
-                        <div>Civil Status *</div>
                         <div>Date Hired *</div>
                         <div>Date End</div>
-                        <div>Sex *</div>
+                        <div>Shift Start</div>
+                        <div>Shift End</div>
+                        <div>Break Start</div>
+                        <div>Break End</div>
+                        <div>Shift Hours</div>
                         <div>Base Pay *</div>
                         <div>Base Pay Start Date *</div>
                         <div>Change Type *</div>
@@ -56,7 +57,7 @@ const AddEmployeeForm = () => {
                     {/* Employee Rows */}
                     <div className="space-y-0">
                         {employeesFormData.map((employee, index) => (
-                            <div key={employee.id} className="grid grid-cols-[40px_150px_150px_150px_150px_200px_200px_150px_150px_120px_200px_200px_120px_120px_120px_100px_120px_120px_150px_80px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                            <div key={employee.id} className="grid grid-cols-[40px_150px_150px_150px_150px_200px_200px_150px_150px_120px_200px_200px_120px_120px_120px_100px_120px_120px_150px_80px_80px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
                                 {/* Row Number */}
                                 <div className="flex items-center justify-center text-sm text-gray-500 font-medium">
                                     {index + 1}
@@ -158,40 +159,6 @@ const AddEmployeeForm = () => {
                                     <option value="inactive">Inactive</option>
                                 </select>
 
-                                {/* Permanent Address */}
-                                <input
-                                    type="text"
-                                    value={employee.permanent_address}
-                                    onChange={(e) => handleFieldChange(employee.id, 'permanent_address', e.target.value)}
-                                    placeholder="Permanent Address"
-                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    required
-                                />
-
-                                {/* Current Address */}
-                                <input
-                                    type="text"
-                                    value={employee.current_address}
-                                    onChange={(e) => handleFieldChange(employee.id, 'current_address', e.target.value)}
-                                    placeholder="Current Address"
-                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    required
-                                />
-
-                                {/* Civil Status - Dropdown */}
-                                <select
-                                    value={employee.civil_status}
-                                    onChange={(e) => handleFieldChange(employee.id, 'civil_status', e.target.value)}
-                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                                    required
-                                >
-                                    <option value="">Select Status</option>
-                                    <option value="single">Single</option>
-                                    <option value="married">Married</option>
-                                    <option value="divorced">Divorced</option>
-                                    <option value="widowed">Widowed</option>
-                                </select>
-
                                 {/* Date Hired - Date input */}
                                 <input
                                     type="date"
@@ -209,17 +176,65 @@ const AddEmployeeForm = () => {
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
 
-                                {/* Sex - Dropdown */}
-                                <select
-                                    value={employee.sex}
-                                    onChange={(e) => handleFieldChange(employee.id, 'sex', e.target.value)}
-                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                                {/* shift_start */}
+                                <input
+                                    type="text"
+                                    value={employee.shift_start}
+                                    onChange={(e) => handleFieldChange(employee.id, 'shift_start', e.target.value)}
+                                    placeholder="Shift start"
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    maxLength={100}
                                     required
-                                >
-                                    <option value="">Select</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                </select>
+                                />
+
+                                {/* shift_end */}
+                                <input
+                                    type="text"
+                                    value={employee.shift_end}
+                                    onChange={(e) => handleFieldChange(employee.id, 'shift_end', e.target.value)}
+                                    placeholder="Shift End"
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    maxLength={100}
+                                    required
+                                />
+
+
+                                {/* break_start */}
+                                <input
+                                    type="text"
+                                    value={employee.break_start}
+                                    onChange={(e) => handleFieldChange(employee.id, 'break_start', e.target.value)}
+                                    placeholder="Break Start"
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    maxLength={100}
+                                    required
+                                />
+
+                                {/* break_end */}
+                                <input
+                                    type="text"
+                                    value={employee.break_end}
+                                    onChange={(e) => handleFieldChange(employee.id, 'break_end', e.target.value)}
+                                    placeholder="Break End"
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    maxLength={100}
+                                    required
+                                />
+
+
+
+                                {/* shift_hours */}
+                                <input
+                                    type="number"
+                                    value={employee.shift_hours || ''}
+                                    onChange={(e) => handleFieldChange(employee.id, 'shift_hours', e.target.value ? Number(e.target.value) : null)}
+                                    placeholder="8"
+                                    step="1"
+                                    min="8"
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
+                                />
+
 
                                 {/* Base Pay */}
                                 <input

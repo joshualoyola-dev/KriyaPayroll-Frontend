@@ -14,11 +14,9 @@ const formData = {
     time_out: '',
     hours_rendered: '',
     hours_worked: '',
-    hours_logged: '',
     undertime: '',
     tardiness: '',
-    nd_sameday: '',
-    nd_nextday: '',
+    night_differential: '',
     shift_type: 'REGULAR',
 };
 
@@ -122,11 +120,9 @@ const useAttendance = () => {
                     else if ([
                         "hours_rendered",
                         "hours_worked",
-                        "hours_logged",
                         "undertime",
                         "tardiness",
-                        "nd_sameday",
-                        "nd_nextday",
+                        "night_differential",
                     ].includes(matchingField)) {
                         const numValue = Number(value);
                         mappedRow[matchingField] = isNaN(numValue) ? '' : numValue.toString();
@@ -249,11 +245,9 @@ const useAttendance = () => {
                     const numberFields = [
                         'hours_rendered',
                         'hours_worked',
-                        'hours_logged',
                         'undertime',
                         'tardiness',
-                        'nd_sameday',
-                        'nd_nextday',
+                        'night_differential',
                     ];
 
                     numberFields.forEach(field => {

@@ -86,7 +86,7 @@ const compactEmployeeColumns = [
         header: "Base Pay",
         cell: (info) => {
             const value = info.getValue();
-            return value ? `$${parseFloat(value).toLocaleString()}` : 'N/A';
+            return value ? `₱${parseFloat(value).toLocaleString()}` : 'N/A';
         },
     },
 ];
