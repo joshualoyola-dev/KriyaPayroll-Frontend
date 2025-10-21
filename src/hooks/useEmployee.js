@@ -5,6 +5,7 @@ import { addEmployeeSalary, createEmployee, fetchEmployeeById, fetchEmployeesByC
 import { useToastContext } from "../contexts/ToastProvider";
 import useDebounce from "./useDebounce";
 import * as XLSX from 'xlsx';
+import { convertExcelTimeToHHMM } from "../utility/excel.utility";
 
 const formData = {
     employee_id: '',
@@ -285,13 +286,14 @@ const useEmployee = () => {
         return value;
     };
 
-    // Helper function to map file data to form structure
+    // Updated mapFileDataToForm function with time handling
     const mapFileDataToForm = (data) => {
         return data.map((row, index) => {
             const mappedRow = { ...formData, id: Date.now() + index };
 
             // Get valid form keys
             const formKeys = Object.keys(formData);
+            const timeFields = ['shift_start', 'shift_end', 'break_start', 'break_end'];
 
             Object.entries(row).forEach(([key, value]) => {
                 const normalizedKey = normalizeHeader(key);
@@ -302,8 +304,12 @@ const useEmployee = () => {
                 );
 
                 if (matchingField && value !== null && value !== undefined && value !== "") {
+                    // Handle time fields (convert Excel decimals to HH:MM)
+                    if (timeFields.includes(matchingField)) {
+                        mappedRow[matchingField] = convertExcelTimeToHHMM(value);
+                    }
                     // Handle base_pay (must be number)
-                    if (matchingField === "base_pay") {
+                    else if (matchingField === "base_pay") {
                         mappedRow[matchingField] = Number(value) || null;
                     }
                     // Handle shift_hours (must be number)
