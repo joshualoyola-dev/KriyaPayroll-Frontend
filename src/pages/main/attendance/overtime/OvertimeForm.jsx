@@ -1,6 +1,5 @@
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useOvertimeContext } from "../../../../contexts/OvertimeProvider";
-import { toDatetimeLocalString, toSqlDateTimeString } from "../../../../utility/datetime.utility";
 const OvertimeForm = () => {
     // const { handleAddRow, handleResetForm, handleFieldChange, handleAddAttendances, attendanceFormData, handleRemoveRow, isAddAttendanceLoading } = useAttendanceContext();
     const { handleRemoveRow, handleAddRow, handleResetForm, handleFieldChange, handleAddOvertime, overtimeFormData, isAddOvertimeLoading } = useOvertimeContext();
@@ -16,14 +15,17 @@ const OvertimeForm = () => {
             <div className="overflow-x-auto">
                 <div className="min-w-max">
                     {/* Header Row */}
-                    <div className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
+                    <div className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_120px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
                         <div></div>
                         <div>Employee Id *</div>
                         <div>Overtime Date *</div>
-                        <div>Time Started *</div>
-                        <div>Overtime Type</div>
                         <div>OT Hours Rendered</div>
-                        <div>OT ND</div>
+                        <div>OT Same Day</div>
+                        <div>OT Next Day</div>
+                        <div>ND OT</div>
+                        <div>ND OT same day</div>
+                        <div>ND OT next day</div>
+                        <div>Overtime Type</div>
                         <div>Overtime Status</div>
                         <div></div>
                     </div>
@@ -31,7 +33,7 @@ const OvertimeForm = () => {
                     {/* Employee Rows */}
                     <div className="space-y-0">
                         {overtimeFormData.map((ot, index) => (
-                            <div key={ot.id} className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                            <div key={ot.id} className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_120px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
                                 {/* Row Number */}
                                 <div className="flex items-center justify-center text-sm text-gray-500 font-medium">
                                     {index + 1}
@@ -56,11 +58,65 @@ const OvertimeForm = () => {
                                     required
                                 />
 
-                                {/* Overtime Time Started */}
+                                {/* OT Hour Rendered */}
                                 <input
-                                    type="datetime-local"
-                                    value={toDatetimeLocalString(ot.overtime_time_started)}
-                                    onChange={(e) => handleFieldChange(ot.id, 'overtime_time_started', toSqlDateTimeString(e.target.value))}
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={ot.ot_hours || ''}
+                                    onChange={(e) => handleFieldChange(ot.id, 'ot_hours', e.target.value)}
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+
+                                {/* OT Hour Rendered Same day */}
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={ot.ot_hsameday || ''}
+                                    onChange={(e) => handleFieldChange(ot.id, 'ot_hsameday', e.target.value)}
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+
+                                {/* OT Hour Rendered next day */}
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={ot.ot_hnextday || ''}
+                                    onChange={(e) => handleFieldChange(ot.id, 'ot_hnextday', e.target.value)}
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+
+
+                                {/* OT ND */}
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={ot.nd_ot_hours || ''}
+                                    onChange={(e) => handleFieldChange(ot.id, 'nd_ot_hours', e.target.value)}
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+
+                                {/* OT ND same day*/}
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={ot.ndot_hsameday || ''}
+                                    onChange={(e) => handleFieldChange(ot.id, 'ndot_hsameday', e.target.value)}
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+
+
+                                {/* OT ND next day*/}
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={ot.ndot_hnextday || ''}
+                                    onChange={(e) => handleFieldChange(ot.id, 'ndot_hnextday', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
 
@@ -78,26 +134,6 @@ const OvertimeForm = () => {
                                     <option value="REST_DAY_REGULAR_HOLIDAY">Rest Day & Regular Holiday</option>
                                 </select>
 
-                                {/* OT Hour Rendered */}
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    value={ot.overtime_hours_rendered || ''}
-                                    onChange={(e) => handleFieldChange(ot.id, 'overtime_hours_rendered', e.target.value)}
-                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-
-                                {/* OT ND */}
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    value={ot.overtime_night_differential || ''}
-                                    onChange={(e) => handleFieldChange(ot.id, 'overtime_night_differential', e.target.value)}
-                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-
                                 {/* Overtiem Status */}
                                 <select
                                     value={ot.overtime_status || 'PENDING'}
@@ -109,7 +145,6 @@ const OvertimeForm = () => {
                                     <option value="REJECTED">Rejected</option>
 
                                 </select>
-
 
                                 {/* Remove Button */}
                                 <div className="flex items-center justify-center">
