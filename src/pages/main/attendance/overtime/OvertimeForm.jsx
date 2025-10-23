@@ -15,7 +15,7 @@ const OvertimeForm = () => {
             <div className="overflow-x-auto">
                 <div className="min-w-max">
                     {/* Header Row */}
-                    <div className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_120px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
+                    <div className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_120px_120px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
                         <div></div>
                         <div>Employee Id *</div>
                         <div>Overtime Date *</div>
@@ -33,7 +33,7 @@ const OvertimeForm = () => {
                     {/* Employee Rows */}
                     <div className="space-y-0">
                         {overtimeFormData.map((ot, index) => (
-                            <div key={ot.id} className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_120px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                            <div key={ot.id} className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_120px_120px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
                                 {/* Row Number */}
                                 <div className="flex items-center justify-center text-sm text-gray-500 font-medium">
                                     {index + 1}

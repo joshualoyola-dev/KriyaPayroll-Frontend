@@ -12,18 +12,18 @@ export const column = [
         cell: (info) => convertToISO8601(info.getValue()),
     },
     {
-        accessorKey: "OT Hours",
-        header: "ot_hours",
+        accessorKey: "ot_hours",
+        header: "OT Hours",
         cell: (info) => info.getValue(),
     },
     {
-        accessorKey: "OT Same Day",
-        header: "ot_hsameday",
+        accessorKey: "ot_hsameday",
+        header: "OT Hours Sameday",
         cell: (info) => info.getValue(),
     },
     {
-        accessorKey: "OT Next Day",
-        header: "ot_hnextday",
+        accessorKey: "ot_hnextday",
+        header: "OT Next Day",
         cell: (info) => info.getValue(),
     },
     {
