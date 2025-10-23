@@ -12,11 +12,14 @@ const formData = {
     attendance_date: '',
     time_in: '',
     time_out: '',
-    hours_rendered: '',
     hours_worked: '',
+    hworked_sameday: '',
+    hworked_nextday: '',
     undertime: '',
     tardiness: '',
     night_differential: '',
+    nd_sameday: '',
+    nd_nextday: '',
     shift_type: 'REGULAR',
 };
 
@@ -118,11 +121,14 @@ const useAttendance = () => {
                     }
                     // Handle decimal/number fields
                     else if ([
-                        "hours_rendered",
                         "hours_worked",
+                        "hworked_sameday",
+                        "hworked_nextday",
                         "undertime",
                         "tardiness",
                         "night_differential",
+                        "nd_sameday",
+                        "nd_nextday",
                     ].includes(matchingField)) {
                         const numValue = Number(value);
                         mappedRow[matchingField] = isNaN(numValue) ? '' : numValue.toString();
@@ -243,11 +249,14 @@ const useAttendance = () => {
 
                     // Convert string numbers to actual numbers for backend
                     const numberFields = [
-                        'hours_rendered',
                         'hours_worked',
+                        "hworked_sameday",
+                        "hworked_nextday",
                         'undertime',
                         'tardiness',
                         'night_differential',
+                        "nd_sameday",
+                        "nd_nextday",
                     ];
 
                     numberFields.forEach(field => {
