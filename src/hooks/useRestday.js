@@ -10,12 +10,14 @@ const formData = {
     restday_date: '',
     time_in: '',
     time_out: '',
-    hours_rendered: '',
     hours_worked: '',
-    hours_logged: '',
+    hworked_sameday: '',
+    hworked_nextday: '',
     undertime: '',
     tardiness: '',
     night_differential: '',
+    nd_sameday: '',
+    nd_nextday: '',
     shift_type: 'REGULAR',
 };
 
@@ -117,12 +119,14 @@ const useRestday = () => {
 
                     //string to numbers
                     const numberFields = [
-                        'hours_rendered',
                         'hours_worked',
-                        'hours_logged',
+                        'hworked_sameday',
+                        'hworked_nextday',
                         'undertime',
                         'tardiness',
                         'night_differential',
+                        'nd_sameday',
+                        'nd_nextday',
                     ];
 
                     numberFields.forEach(field => {
@@ -224,12 +228,14 @@ const useRestday = () => {
                     }
                     // Handle decimal/number fields
                     else if ([
-                        "hours_rendered",
                         "hours_worked",
-                        "hours_logged",
+                        'hworked_sameday',
+                        'hworked_nextday',
                         "undertime",
                         "tardiness",
                         "night_differential",
+                        'nd_sameday',
+                        'nd_nextday',
                     ].includes(matchingField)) {
                         const numValue = Number(value);
                         mappedRow[matchingField] = isNaN(numValue) ? '' : numValue.toString();
