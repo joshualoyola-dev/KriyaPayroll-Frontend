@@ -10,7 +10,7 @@ const OptionGenerate = () => {
         handlePayitemChange, removePayitem,
         handleGenerate, isValidating,
         validateEmployeesDailyRecordAgainstPayrunPeriod,
-        handleSaveDraft, payslips,
+        handleSaveDraft, payslips, payslipsLoading,
         isSaving,
     } = useRegularPayrunContext();
 
@@ -134,10 +134,10 @@ const OptionGenerate = () => {
                     </label>
                     <button
                         type="submit"
-                        disabled={isValidating}
+                        disabled={isValidating || payslipsLoading}
                         className="w-full px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm rounded-3xl disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-all"
                     >
-                        {isValidating ? "Loading..." : "Generate"}
+                        {isValidating || payslipsLoading ? "Loading..." : "Generate"}
                     </button>
                 </div>
             </form>

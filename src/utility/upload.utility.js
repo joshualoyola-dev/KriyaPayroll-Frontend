@@ -93,7 +93,8 @@ export const parseExcelFile = (file) => {
                 const rows = jsonData.slice(1).map(row => {
                     const obj = {};
                     headers.forEach((header, index) => {
-                        obj[header] = row[index] || '';
+                        // obj[header] = row[index] || '';
+                        obj[header] = row[index] !== undefined && row[index] !== null ? row[index] : '';
                     });
                     return obj;
                 });

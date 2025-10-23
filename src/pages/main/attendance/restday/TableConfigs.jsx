@@ -22,13 +22,18 @@ export const column = [
         cell: (info) => convertToDatetimeString(info.getValue()),
     },
     {
-        accessorKey: "hours_rendered", //regular shift plus overtimes
-        header: "Hours Rendered",
+        accessorKey: "hours_worked",
+        header: "Hours Worked",
         cell: (info) => info.getValue(),
     },
     {
-        accessorKey: "hours_worked", //regular shift
-        header: "Hours Worked",
+        accessorKey: "hworked_sameday",
+        header: "HWorked Sameday",
+        cell: (info) => info.getValue(),
+    },
+    {
+        accessorKey: "hworked_nextday",
+        header: "HWorked Nextday",
         cell: (info) => info.getValue(),
     },
     {
@@ -44,6 +49,16 @@ export const column = [
     {
         accessorKey: "night_differential", //hours fall between 10:pm to 6:am
         header: "ND",
+        cell: (info) => info.getValue(),
+    },
+    {
+        accessorKey: "nd_sameday",
+        header: "ND Sameday",
+        cell: (info) => info.getValue(),
+    },
+    {
+        accessorKey: "nd_nextday",
+        header: "ND Nextday",
         cell: (info) => info.getValue(),
     },
     {

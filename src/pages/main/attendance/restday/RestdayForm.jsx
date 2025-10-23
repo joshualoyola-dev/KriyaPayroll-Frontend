@@ -16,17 +16,20 @@ const RestdayForm = () => {
             <div className="overflow-x-auto">
                 <div className="min-w-max">
                     {/* Header Row */}
-                    <div className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_80px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
+                    <div className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_120px_120px_120px_120px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
                         <div></div>
                         <div>Employee Id *</div>
                         <div>Restday Date *</div>
                         <div>Time In</div>
                         <div>Time Out</div>
-                        <div>Hours Rendered</div>
                         <div>Hours Worked</div>
+                        <div>HWorked Sameday</div>
+                        <div>HWorked Nextday</div>
                         <div>Undertime</div>
                         <div>Tardiness</div>
                         <div>ND</div>
+                        <div>ND Sameday</div>
+                        <div>ND Nextday</div>
                         <div>Shift Type</div>
                         <div></div>
                     </div>
@@ -34,7 +37,7 @@ const RestdayForm = () => {
                     {/* Employee Rows */}
                     <div className="space-y-0">
                         {restdayFormData.map((rd, index) => (
-                            <div key={rd.id} className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_80px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                            <div key={rd.id} className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_120px_120px_120px_120px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
                                 {/* Row Number */}
                                 <div className="flex items-center justify-center text-sm text-gray-500 font-medium">
                                     {index + 1}
@@ -75,16 +78,6 @@ const RestdayForm = () => {
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
 
-                                {/* Hours rendered*/}
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    value={rd.hours_rendered || ''}
-                                    onChange={(e) => handleFieldChange(rd.id, 'hours_rendered', e.target.value)}
-                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-
                                 {/* Hours worked */}
                                 <input
                                     type="number"
@@ -92,6 +85,26 @@ const RestdayForm = () => {
                                     min="0"
                                     value={rd.hours_worked || ''}
                                     onChange={(e) => handleFieldChange(rd.id, 'hours_worked', e.target.value)}
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+
+                                {/* Hours worked on same day */}
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={rd.hworked_sameday || ''}
+                                    onChange={(e) => handleFieldChange(rd.id, 'hworked_sameday', e.target.value)}
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+
+                                {/* Hours worked on next day */}
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={rd.hworked_nextday || ''}
+                                    onChange={(e) => handleFieldChange(rd.id, 'hworked_nextday', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
 
@@ -125,6 +138,24 @@ const RestdayForm = () => {
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
 
+                                {/*night_differential on same day */}
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={rd.nd_sameday || ''}
+                                    onChange={(e) => handleFieldChange(rd.id, 'nd_sameday', e.target.value)}
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                                {/*night_differential on next day */}
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={rd.nd_nextday || ''}
+                                    onChange={(e) => handleFieldChange(rd.id, 'nd_nextday', e.target.value)}
+                                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
 
                                 {/* Shift type */}
                                 <select
