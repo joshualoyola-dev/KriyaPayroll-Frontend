@@ -64,17 +64,17 @@ const RestdayForm = () => {
 
                                 {/* Time In */}
                                 <input
-                                    type="datetime-local"
-                                    value={toDatetimeLocalString(rd.time_in)}
-                                    onChange={(e) => handleFieldChange(rd.id, 'time_in', toSqlDateTimeString(e.target.value))}
+                                    type="text"
+                                    value={rd.time_in || ''}
+                                    onChange={(e) => handleFieldChange(rd.id, 'time_in', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
 
                                 {/* Time Out */}
                                 <input
-                                    type="datetime-local"
-                                    value={toDatetimeLocalString(rd.time_out)}
-                                    onChange={(e) => handleFieldChange(rd.id, 'time_out', toSqlDateTimeString(e.target.value))}
+                                    type="text"
+                                    value={rd.time_out || ''}
+                                    onChange={(e) => handleFieldChange(rd.id, 'time_out', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
 
