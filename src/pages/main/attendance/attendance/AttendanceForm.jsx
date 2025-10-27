@@ -63,7 +63,7 @@ const AttendanceForm = () => {
 
                                 {/* Time In */}
                                 <input
-                                    type="datetime-local"
+                                    type="text"
                                     value={att.time_in || ''}
                                     onChange={(e) => handleFieldChange(att.id, 'time_in', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -71,7 +71,7 @@ const AttendanceForm = () => {
 
                                 {/* Time Out */}
                                 <input
-                                    type="datetime-local"
+                                    type="text"
                                     value={att.time_out || ''}
                                     onChange={(e) => handleFieldChange(att.id, 'time_out', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
