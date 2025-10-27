@@ -4,7 +4,7 @@ import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { addOneAttendance, deleteAttendance, fetchAttendances } from "../services/attendance.service";
 import * as XLSX from 'xlsx';
-import { formatDateTime, formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
+import { formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelFile } from "../utility/upload.utility";
 import useDebounce from "./useDebounce";
 
 const formData = {
@@ -113,11 +113,6 @@ const useAttendance = () => {
                     else if (matchingField === "attendance_date") {
                         const parsedDate = parseExcelDate(value);
                         mappedRow[matchingField] = formatDateToISO18601(parsedDate);
-                    }
-                    // Handle time_in and time_out (datetime fields - YYYY-MM-DD HH:MM:SS)
-                    else if (["time_in", "time_out"].includes(matchingField)) {
-                        const parsedDateTime = parseExcelDateTime(value);
-                        mappedRow[matchingField] = formatDateTime(parsedDateTime);
                     }
                     // Handle decimal/number fields
                     else if ([
