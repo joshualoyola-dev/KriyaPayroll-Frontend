@@ -1,6 +1,5 @@
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useAttendanceContext } from "../../../../contexts/AttendanceProvider";
-import { toDatetimeLocalString, toSqlDateTimeString } from "../../../../utility/datetime.utility";
 const AttendanceForm = () => {
     const { handleAddRow, handleResetForm, handleFieldChange, handleAddAttendances, attendanceFormData, handleRemoveRow, isAddAttendanceLoading } = useAttendanceContext();
 
@@ -15,7 +14,7 @@ const AttendanceForm = () => {
             <div className="overflow-x-auto">
                 <div className="min-w-max">
                     {/* Header Row */}
-                    <div className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_120px_120px_120px_120px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
+                    <div className="grid grid-cols-[40px_150px_150px_120px_120px_120px_120px_120px_120px_120px_140px_120px_120px_120px_120px_120px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
                         <div></div>
                         <div>Employee Id *</div>
                         <div>Attendance Date *</div>
@@ -36,7 +35,7 @@ const AttendanceForm = () => {
                     {/* Employee Rows */}
                     <div className="space-y-0">
                         {attendanceFormData.map((att, index) => (
-                            <div key={att.id} className="grid grid-cols-[40px_150px_150px_200px_200px_120px_120px_120px_120px_120px_140px_120px_120px_120px_120px_120px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                            <div key={att.id} className="grid grid-cols-[40px_150px_150px_120px_120px_120px_120px_120px_120px_120px_140px_120px_120px_120px_120px_120px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
                                 {/* Row Number */}
                                 <div className="flex items-center justify-center text-sm text-gray-500 font-medium">
                                     {index + 1}
@@ -63,17 +62,17 @@ const AttendanceForm = () => {
 
                                 {/* Time In */}
                                 <input
-                                    type="datetime-local"
-                                    value={toDatetimeLocalString(att.time_in)}
-                                    onChange={(e) => handleFieldChange(att.id, 'time_in', toSqlDateTimeString(e.target.value))}
+                                    type="text"
+                                    value={att.time_in || ''}
+                                    onChange={(e) => handleFieldChange(att.id, 'time_in', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
 
                                 {/* Time Out */}
                                 <input
-                                    type="datetime-local"
-                                    value={toDatetimeLocalString(att.time_out)}
-                                    onChange={(e) => handleFieldChange(att.id, 'time_out', toSqlDateTimeString(e.target.value))}
+                                    type="text"
+                                    value={att.time_out || ''}
+                                    onChange={(e) => handleFieldChange(att.id, 'time_out', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
 
