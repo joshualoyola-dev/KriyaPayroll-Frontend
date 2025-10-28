@@ -63,7 +63,8 @@ const useAttendance = () => {
                 debouncedQuery_to || null
             );
 
-            setAttendances(result.data.attendances);
+            setAttendances(result.data.attendances.records);
+            addToast(`Added ${result.data.attendances.total}`, "success");
         } catch (error) {
             console.error(error);
             addToast("Failed to fetch attendances", "error");
