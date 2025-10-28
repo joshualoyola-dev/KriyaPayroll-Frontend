@@ -66,6 +66,7 @@ const AttendanceForm = () => {
                                     value={att.time_in || ''}
                                     onChange={(e) => handleFieldChange(att.id, 'time_in', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
                                 {/* Time Out */}
@@ -74,6 +75,7 @@ const AttendanceForm = () => {
                                     value={att.time_out || ''}
                                     onChange={(e) => handleFieldChange(att.id, 'time_out', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
                                 {/* Hours worked */}
@@ -84,6 +86,7 @@ const AttendanceForm = () => {
                                     value={att.hours_worked || ''}
                                     onChange={(e) => handleFieldChange(att.id, 'hours_worked', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
                                 {/* Hours worked on same day */}
@@ -94,6 +97,7 @@ const AttendanceForm = () => {
                                     value={att.hworked_sameday || ''}
                                     onChange={(e) => handleFieldChange(att.id, 'hworked_sameday', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
                                 {/* Hours worked on next day */}
@@ -104,6 +108,7 @@ const AttendanceForm = () => {
                                     value={att.hworked_nextday || ''}
                                     onChange={(e) => handleFieldChange(att.id, 'hworked_nextday', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
                                 {/* Undertime */}
@@ -114,6 +119,7 @@ const AttendanceForm = () => {
                                     value={att.undertime || ''}
                                     onChange={(e) => handleFieldChange(att.id, 'undertime', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
                                 {/* tardiness */}
@@ -124,6 +130,7 @@ const AttendanceForm = () => {
                                     value={att.tardiness || ''}
                                     onChange={(e) => handleFieldChange(att.id, 'tardiness', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
                                 {/*night_differential */}
@@ -134,6 +141,7 @@ const AttendanceForm = () => {
                                     value={att.night_differential || ''}
                                     onChange={(e) => handleFieldChange(att.id, 'night_differential', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
                                 {/*night_differential on same day */}
@@ -144,6 +152,7 @@ const AttendanceForm = () => {
                                     value={att.nd_sameday || ''}
                                     onChange={(e) => handleFieldChange(att.id, 'nd_sameday', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
                                 {/*night_differential on next day */}
                                 <input
@@ -153,6 +162,7 @@ const AttendanceForm = () => {
                                     value={att.nd_nextday || ''}
                                     onChange={(e) => handleFieldChange(att.id, 'nd_nextday', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
                                 {/* Shift type */}
@@ -160,6 +170,7 @@ const AttendanceForm = () => {
                                     value={att.shift_type || 'REGULAR'}
                                     onChange={(e) => handleFieldChange(att.id, 'shift_type', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                                    required
                                 >
                                     <option value="REGULAR">Regular</option>
                                     <option value="SLIDE">Slide</option>
