@@ -234,64 +234,55 @@ const useAttendance = () => {
                 return;
             }
 
-            const failedAttendances = [];
+            // Number fields to transform
+            const numberFields = [
+                'hours_worked',
+                'hworked_sameday',
+                'hworked_nextday',
+                'undertime',
+                'tardiness',
+                'night_differential',
+                'nd_sameday',
+                'nd_nextday',
+            ];
 
-            for (const att of validAttendances) {
+            // Clean and transform all data before the loop
+            const cleanedAttendances = validAttendances.map(att => {
+                const cleaned = { ...att };
+                delete cleaned.id; // Remove UI-only id field
+
+                // Convert string numbers to actual numbers
+                numberFields.forEach(field => {
+                    const value = cleaned[field];
+
+                    if (value === '' || value === null || value === undefined) {
+                        cleaned[field] = null;
+                    } else {
+                        const numValue = Number(value);
+                        cleaned[field] = isNaN(numValue) ? null : numValue;
+                    }
+                });
+
+                return cleaned;
+            });
+
+            // Process cleaned data
+            for (const cleanedAtt of cleanedAttendances) {
                 try {
-                    // Clean up and format the data before sending
-                    const cleanedAtt = { ...att };
-                    delete cleanedAtt.id; // Remove the UI-only id field
-
-                    // Convert string numbers to actual numbers for backend
-                    const numberFields = [
-                        'hours_worked',
-                        "hworked_sameday",
-                        "hworked_nextday",
-                        'undertime',
-                        'tardiness',
-                        'night_differential',
-                        "nd_sameday",
-                        "nd_nextday",
-                    ];
-
-                    numberFields.forEach(field => {
-                        if (cleanedAtt[field] !== '' && cleanedAtt[field] !== null && cleanedAtt[field] !== undefined) {
-                            const numValue = Number(cleanedAtt[field]);
-                            cleanedAtt[field] = isNaN(numValue) ? null : numValue;
-                        } else {
-                            cleanedAtt[field] = null;
-                        }
-                    });
-
-                    // Handle empty datetime fields
-                    if (!cleanedAtt.time_in || cleanedAtt.time_in === '') {
-                        cleanedAtt.time_in = null;
-                    }
-                    if (!cleanedAtt.time_out || cleanedAtt.time_out === '') {
-                        cleanedAtt.time_out = null;
-                    }
-
                     await addOneAttendance(company.company_id, cleanedAtt);
-                    addToast(`Successfully added attendance for employee: ${att.employee_id}`, "success");
+                    addToast(`Successfully added attendance for employee: ${cleanedAtt.employee_id}`, "success");
                 } catch (error) {
                     console.error('Error adding attendance:', error);
-                    addToast(`Error adding attendance for employee: ${att.employee_id}`, "error");
-                    failedAttendances.push(att);
+                    addToast(`Error adding attendance for employee: ${cleanedAtt.employee_id}`, "error");
                 }
             }
 
-            // Update the form with only failed attendances
-            if (failedAttendances.length > 0) {
-                setAttendanceFormData(failedAttendances);
-                await handleFetchAttendances(); // Refresh the list to show successful additions
-            } else {
-                // Reset form if all succeeded
-                handleResetForm();
-                await handleFetchAttendances(); // Refresh the list
-                //close modal
-                handleShowAttendanceModal();
-            }
-
+            // Reset form if all succeeded
+            handleResetForm();
+            // Refresh the list
+            await handleFetchAttendances();
+            // Close modal
+            handleShowAttendanceModal();
         } catch (error) {
             console.error('Error adding attendances:', error);
             addToast("Failed to add attendances", "error");
