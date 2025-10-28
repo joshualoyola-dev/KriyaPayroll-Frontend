@@ -20,11 +20,11 @@ const OptionGenerate = () => {
         e.preventDefault();
 
         //validate
-        const allValid = await validateEmployeesDailyRecordAgainstPayrunPeriod();
-        if (!allValid) {
-            addToast("Fix the daily record first", "warning");
-            return;
-        }
+        // const allValid = await validateEmployeesDailyRecordAgainstPayrunPeriod();
+        // if (!allValid) {
+        //     addToast("Fix the daily record first", "warning");
+        //     return;
+        // }
 
         //generate
         handleGenerate();
