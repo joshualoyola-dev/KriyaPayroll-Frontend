@@ -15,9 +15,10 @@ export const fetchAttendances = async (company_id, employee_id = null, from = nu
     return await payroll_api.get(`/api/v1/daily-records/companies/${company_id}/attendances?${query}`);
 };
 
-export const addOneAttendance = async (company_id, formData) => {
+export const addAttendances = async (company_id, formData) => {
     return await payroll_api.post(`/api/v1/daily-records/companies/${company_id}/attendances`, formData);
 }
+
 
 export const updateAttendance = async (company_id, employee_attendance_id, formData) => {
     return await payroll_api.patch(`/api/v1/daily-records/companies/${company_id}/attendances/${employee_attendance_id}`, formData);

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
-import { addOneAttendance, deleteAttendance, fetchAttendances } from "../services/attendance.service";
+import { addAttendances, deleteAttendance, fetchAttendances } from "../services/attendance.service";
 import * as XLSX from 'xlsx';
 import { formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelFile } from "../utility/upload.utility";
 import useDebounce from "./useDebounce";
@@ -267,14 +267,12 @@ const useAttendance = () => {
             });
 
             // Process cleaned data
-            for (const cleanedAtt of cleanedAttendances) {
-                try {
-                    await addOneAttendance(company.company_id, cleanedAtt);
-                    addToast(`Successfully added attendance for employee: ${cleanedAtt.employee_id}`, "success");
-                } catch (error) {
-                    console.error('Error adding attendance:', error);
-                    addToast(`Error adding attendance for employee: ${cleanedAtt.employee_id}`, "error");
-                }
+            try {s
+                await addAttendances(company.company_id, cleanedAttendances);
+                addToast(`Successfully added attendances`, "success");
+            } catch (error) {
+                console.error('Error adding attendance:', error);
+                addToast(`Error addding attendances`, "error");
             }
 
             // Reset form if all succeeded
