@@ -267,7 +267,7 @@ const useAttendance = () => {
             });
 
             // Process cleaned data
-            try {s
+            try {
                 await addAttendances(company.company_id, cleanedAttendances);
                 addToast(`Successfully added attendances`, "success");
             } catch (error) {
