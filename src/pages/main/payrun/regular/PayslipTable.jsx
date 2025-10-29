@@ -33,14 +33,14 @@ const PayslipTable = ({ data, setData }) => {
     };
 
     return (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-screen overflow-y-auto">
             <table className="min-w-full border-collapse border border-gray-300 text-sm">
                 <thead className="bg-gray-100">
                     <tr>
-                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-0 top-0  z-30 bg-gray-100 shadow-sm">
+                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-0 top-0 z-30 bg-gray-100 shadow-sm">
                             Employee
                         </th>
-                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm">
+                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-24 top-0 z-30 bg-gray-100 shadow-sm">
                             Employee Id
                         </th>
                         {payitem_ids.map((payitem_id) => (
@@ -61,7 +61,10 @@ const PayslipTable = ({ data, setData }) => {
                                 {mapEmployeeIdToEmployeeName(employee_id)}
                             </td>
 
-                            <td className="border border-gray-300 px-4 py-2">{employee_id}</td>
+                            <td className={`border border-gray-300 px-4 py-2 sticky left-24 z-20
+                                 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
+                                {employee_id}
+                            </td>
                             {payitem_ids.map((payitem_id) => (
                                 <td key={payitem_id} className="border border-gray-300 px-2 py-1">
                                     <input
@@ -71,7 +74,7 @@ const PayslipTable = ({ data, setData }) => {
                                         onChange={(e) =>
                                             handleChange(employee_id, payitem_id, e.target.value)
                                         }
-                                        className="w-full roundedpx-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
+                                        className="w-full rounded px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
                                     />
                                 </td>
                             ))}
