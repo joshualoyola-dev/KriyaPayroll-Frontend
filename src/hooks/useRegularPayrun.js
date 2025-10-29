@@ -33,10 +33,10 @@ const formData = {
 
 const useRegularPayrun = () => {
     const [payrun, setPayrun] = useState();
-
     const [options, setOptions] = useState({ ...formData }); //case 1, 2, 3
     const [isValidating, setIsValidating] = useState(false); //case 1,
     const [payslips, setPayslips] = useState([]); //case: 1, 2, 3
+    const [oldPayslips, setOldPayslips] = useState([]);
     const [payslipsLoading, setPayslipsLoading] = useState(false); //case: 1, 2, 3
     const [isSaving, setIsSaving] = useState(false); //use for both saving draft and save edit
     const [statusLoading, setStatusLoading] = useState(false);
@@ -68,6 +68,7 @@ const useRegularPayrun = () => {
         const resultPayables = await getPayrunPayslipPayables(company.company_id, payrun_id);
         console.log('fetched payslip payables: ', resultPayables);
         setPayslips(resultPayables.data.payslips);
+        setOldPayslips(resultPayables.data.payslips);
     };
 
     useEffect(() => {
@@ -196,9 +197,11 @@ const useRegularPayrun = () => {
         setIsSaving(true);
 
         try {
-            const cleanedPayslips = sanitizedPayslips(payslips);
+            const cleanedEditedPayslips = sanitizedPayslips(payslips);
+            const cleanedOldPayslips = sanitizedPayslips(oldPayslips);
             const payload = {
-                payslips: cleanedPayslips,
+                edited_payslips: cleanedEditedPayslips,
+                old_payslips: cleanedOldPayslips
             };
             const result = await saveEdit(company.company_id, payrun.payrun_id, payload);
             console.log('result saving edits', result);
@@ -219,9 +222,11 @@ const useRegularPayrun = () => {
         setIsSaving(true);
 
         try {
-            const cleanedPayslips = sanitizedPayslips(payslips);
+            const cleanedEditedPayslips = sanitizedPayslips(payslips);
+            const cleanedOldPayslips = sanitizedPayslips(oldPayslips);
             const payload = {
-                payslips: cleanedPayslips,
+                edited_payslips: cleanedEditedPayslips,
+                old_payslips: cleanedOldPayslips
             };
             const result = await saveEdit(company.company_id, payrun.payrun_id, payload, true);
             console.log('result calculating tax withheld', result);

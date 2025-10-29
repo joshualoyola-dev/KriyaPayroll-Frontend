@@ -1,5 +1,6 @@
 // export default EmployeePage;
 import AddModal from "../../../components/AddModal";
+import LoadingBackground from "../../../components/LoadingBackground";
 import Search from "../../../components/Search";
 import { useEmployeeContext } from "../../../contexts/EmployeeProvider";
 import AddEmployeeForm from "./AddEmployeeForm";
@@ -7,7 +8,7 @@ import EmployeeCard from "./EmployeeCard";
 import EmployeeTable from "./EmployeeTable";
 
 const EmployeePage = () => {
-    const { query, setQuery, employee, setEmployee, handleShowAddModal, showAddModal, showAddSalaryForm, setShowAddSalaryForm, handleChangeEmploymentStatus, uploadEmployeeFile, isUploading, isEmployeesLoading } = useEmployeeContext();
+    const { query, setQuery, employee, setEmployee, handleShowAddModal, showAddModal, showAddSalaryForm, setShowAddSalaryForm, handleChangeEmploymentStatus, uploadEmployeeFile, isUploading, isEmployeesLoading, isEmployeeLoading } = useEmployeeContext();
 
     return (
         <>
@@ -23,10 +24,14 @@ const EmployeePage = () => {
                 </div>
 
                 <div className="flex gap-4">
-                    <div className={`transition-all duration-300 ${employee ? 'w-2/3' : 'w-full'}`}>
-                        {/* Table container - adjusts width based on whether card is open */}
-                        <EmployeeTable isCardOpen={!!employee} />
-                    </div>
+                    {
+                        isEmployeesLoading
+                            ? <LoadingBackground />
+                            : <div className={`transition-all duration-300 ${employee ? 'w-2/3' : 'w-full'}`}>
+                                {/* Table container - adjusts width based on whether card is open */}
+                                <EmployeeTable isCardOpen={!!employee} />
+                            </div>
+                    }
                     {/* Employee Card - slides in from right when opened */}
                     {employee && (
                         <div className="w-1/3 min-w-[350px]">
@@ -53,7 +58,9 @@ const EmployeePage = () => {
                     <AddEmployeeForm />
                 </AddModal>
             }
-
+            {
+                isEmployeeLoading && <LoadingBackground />
+            }
         </>
     );
 };
