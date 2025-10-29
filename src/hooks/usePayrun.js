@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
-import { deleteOnePayrun, getCompanyPayruns, getPayrun, getPayrunPayslipPayables, getPayslips } from "../services/payrun.service";
+import { deleteOnePayrun, getCompanyPayruns, getPayrun, getPayrunPayslipPayables, getPayslips, getPayslipsDraft } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
-import { downloadExcelMatrix } from "../utility/excel.utility";
+import { downloadExcelMatrix, downloadPayablesAndTotals } from "../utility/excel.utility";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { usePayitemContext } from "../contexts/PayitemProvider";
 
@@ -67,14 +67,21 @@ const usePayrun = () => {
         try {
             const result = await getPayrunPayslipPayables(company.company_id, payrun_id);
             const resultPayrun = await getPayrun(company.company_id, payrun_id);
+
+            let resultPayslips;
+            if (resultPayrun.data.payrun.status === 'APPROVED') {
+                resultPayslips = await getPayslips(payrun_id);
+            } else {
+                resultPayslips = await getPayslipsDraft(payrun_id);
+            }
+
             const fileName = resultPayrun.data.payrun.payrun_title ?? 'Payslips';
-            downloadExcelMatrix(result.data.payslips, mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName, fileName, 'Payslips');
+            downloadPayablesAndTotals(result.data.payslips, mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName, fileName, 'Payslips', resultPayslips.data.payslips);
         } catch (error) {
             console.log('downloading payslips error ', error);
             addToast("Failed to download payslips", "error");
         }
     };
-
 
     return {
         payruns, setPayruns,
