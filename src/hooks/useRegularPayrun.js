@@ -33,7 +33,6 @@ const formData = {
 
 const useRegularPayrun = () => {
     const [payrun, setPayrun] = useState();
-
     const [options, setOptions] = useState({ ...formData }); //case 1, 2, 3
     const [isValidating, setIsValidating] = useState(false); //case 1,
     const [payslips, setPayslips] = useState([]); //case: 1, 2, 3

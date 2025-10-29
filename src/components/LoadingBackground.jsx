@@ -1,6 +1,6 @@
 import DualBallLoadingSVG from "../assets/dual-ball-loading.svg";
 
-const LoadingWholeScreen = () => {
+const LoadingBackground = () => {
     return (
         <div className="fixed inset-0  flex items-center justify-center z-50">
             <img
@@ -12,4 +12,4 @@ const LoadingWholeScreen = () => {
     );
 };
 
-export default LoadingWholeScreen;
+export default LoadingBackground;

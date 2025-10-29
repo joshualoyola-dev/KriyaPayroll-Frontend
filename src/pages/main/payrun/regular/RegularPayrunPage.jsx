@@ -1,10 +1,11 @@
+import LoadingBackground from "../../../../components/LoadingBackground";
 import { useRegularPayrunContext } from "../../../../contexts/RegularPayrunProvider";
 import OptionEdit from "./OptionEdit";
 import OptionGenerate from "./OptionGenerate";
 import PayslipTable from "./PayslipTable";
 
 const RegularPayrunPage = () => {
-    const { payslips, setPayslips, payrun } = useRegularPayrunContext();
+    const { payslips, setPayslips, payrun, payslipsLoading } = useRegularPayrunContext();
 
     return (
         <>
@@ -17,6 +18,7 @@ const RegularPayrunPage = () => {
                     : <PayslipTable data={payslips} setData={setPayslips} />
                 }
             </div>
+            {payslipsLoading && <LoadingBackground />}
         </>
     );
 };
