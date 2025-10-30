@@ -17,7 +17,7 @@ const LeavePage = () => {
         isUploading,
         filters,
         handleResetFilter, handleFilterChange,
-        isLeavesLoading,
+        isLeavesLoading, limit, setLimit
     } = useLeaveContext();
 
     return (
@@ -40,6 +40,8 @@ const LeavePage = () => {
                                 columns={column}
                                 onRowClick={handleRowClick}
                                 onDelete={handleDeleteOneLeave}
+                                limit={limit}
+                                setLimit={setLimit}
                             />
                     }
 

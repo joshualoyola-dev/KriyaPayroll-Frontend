@@ -18,6 +18,7 @@ const AbsencePage = () => {
         filters,
         handleResetFilter, handleFilterChange,
         isAbsencesLoading,
+        limit, setLimit
     } = useAbsenceContext();
 
     return (
@@ -40,6 +41,8 @@ const AbsencePage = () => {
                                 columns={column}
                                 onRowClick={handleRowClick}
                                 onDelete={handleDeleteAbsence}
+                                limit={limit}
+                                setLimit={setLimit}
                             />
                     }
                 </div>

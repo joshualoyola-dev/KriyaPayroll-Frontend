@@ -1,6 +1,6 @@
 import payroll_api from "../configs/payroll_api.config";
 
-export const fetchOvertimes = async (company_id, employee_id = null, from = null, to = null) => {
+export const fetchOvertimes = async (company_id, employee_id = null, from = null, to = null, limit) => {
     let query = '';
     if (employee_id) {
         query = `${query}&employee_id=${employee_id}`;
@@ -12,7 +12,7 @@ export const fetchOvertimes = async (company_id, employee_id = null, from = null
         query = `${query}&to=${to}`;
     }
 
-    return await payroll_api.get(`/api/v1/daily-records/companies/${company_id}/overtimes?${query}`);
+    return await payroll_api.get(`/api/v1/daily-records/companies/${company_id}/overtimes?${query}page=${1}&limit=${Number(limit)}`);
 };
 
 export const addOneOvertime = async (company_id, formData) => {

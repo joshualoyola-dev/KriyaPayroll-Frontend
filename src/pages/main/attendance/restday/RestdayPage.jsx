@@ -21,7 +21,9 @@ const RestdayPage = () => {
         handleResetFilter, handleFilterChange,
 
         //filter
-        isRestdaysLoading
+        isRestdaysLoading,
+
+        limit, setLimit
     } = useRestdayContext();
 
     return (
@@ -44,6 +46,8 @@ const RestdayPage = () => {
                                 columns={column}
                                 onRowClick={handleRowClick}
                                 onDelete={handleDeleteOneRestday}
+                                limit={limit}
+                                setLimit={setLimit}
                             />
                     }
 

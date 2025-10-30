@@ -41,6 +41,7 @@ const useAttendance = () => {
     const [attendanceFormData, setAttendanceFormData] = useState([{
         id: Date.now(), ...formData
     }]);
+    const [limit, setLimit] = useState(20);
 
     const { employee } = useEmployeeContext();
     const { company } = useCompanyContext();
@@ -60,10 +61,11 @@ const useAttendance = () => {
                 company.company_id,
                 debouncedQuery_employee_id || null,
                 debouncedQuery_from || null,
-                debouncedQuery_to || null
+                debouncedQuery_to || null,
+                limit,
             );
 
-            setAttendances(result.data.attendances.records);
+            setAttendances(result.data.attendances);
         } catch (error) {
             console.error(error);
             addToast("Failed to fetch attendances", "error");
@@ -76,7 +78,7 @@ const useAttendance = () => {
         if (!company) return;
 
         handleFetchAttendances();
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from]);
+    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]);
 
     const handleRowClick = (data, row) => {
         console.log('clicked: ', data);
@@ -316,7 +318,6 @@ const useAttendance = () => {
             [field]: value
         }));
     };
-
     return {
         attendances, setAttendances,
         attendance, setAttendance,
@@ -342,6 +343,9 @@ const useAttendance = () => {
         //filter
         filters, setFilters,
         handleResetFilter, handleFilterChange,
+
+        //pagination
+        limit, setLimit
     };
 };
 

@@ -37,6 +37,8 @@ const useOvertime = () => {
         ...formData
     }]);
     const [filters, setFilters] = useState({ ...filterFields });
+    const [limit, setLimit] = useState(20);
+
 
     const debouncedQuery_employee_id = useDebounce(filters.employee_id, 800);
     const debouncedQuery_to = useDebounce(filters.to, 800);
@@ -58,7 +60,8 @@ const useOvertime = () => {
                 company.company_id,
                 debouncedQuery_employee_id || null,
                 debouncedQuery_from || null,
-                debouncedQuery_to || null
+                debouncedQuery_to || null,
+                limit,
             );
             setOvertimes(result.data.overtimes);
         } catch (error) {
@@ -74,7 +77,7 @@ const useOvertime = () => {
         if (!company) return;
 
         handleFetchOvertimes();
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from]); // Fixed: Added dependency array
+    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]); // Fixed: Added dependency array
 
     // Modal related function
     const handleShowOvertimeModal = () => {
@@ -375,6 +378,9 @@ const useOvertime = () => {
         //filter
         filters, setFilters,
         handleResetFilter, handleFilterChange,
+
+        //pagination
+        limit, setLimit
     };
 };
 

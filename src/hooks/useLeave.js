@@ -33,6 +33,7 @@ const useLeave = () => {
         ...formData
     }]);
     const [filters, setFilters] = useState({ ...filterFields });
+    const [limit, setLimit] = useState(20);
 
     const debouncedQuery_employee_id = useDebounce(filters.employee_id, 800);
     const debouncedQuery_to = useDebounce(filters.to, 800);
@@ -51,7 +52,8 @@ const useLeave = () => {
                 company.company_id,
                 debouncedQuery_employee_id || null,
                 debouncedQuery_from || null,
-                debouncedQuery_to || null
+                debouncedQuery_to || null,
+                limit
             );
 
             setLeaves(result.data.leaves);
@@ -67,7 +69,7 @@ const useLeave = () => {
         if (!company) return;
 
         handleFetchLeaves();
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from]);
+    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]);
 
     // Modal related function
     const handleShowLeaveModal = () => {
@@ -341,6 +343,9 @@ const useLeave = () => {
         //filter
         filters, setFilters,
         handleResetFilter, handleFilterChange,
+
+        //pagination
+        limit, setLimit
     };
 };
 
