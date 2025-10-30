@@ -14,6 +14,7 @@ const OvertimePage = () => {
         filters,
         handleResetFilter, handleFilterChange,
         isOvertimesLoading,
+        limit, setLimit
     } = useOvertimeContext();
     return (
 
@@ -36,6 +37,8 @@ const OvertimePage = () => {
                                 columns={column}
                                 onRowClick={handleRowClick}
                                 onDelete={handleDeleteOneOvertime}
+                                limit={limit}
+                                setLimit={setLimit}
                             />
                     }
                 </div>

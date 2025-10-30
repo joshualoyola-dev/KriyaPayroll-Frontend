@@ -30,6 +30,7 @@ const useAbsence = () => {
         { id: Date.now(), ...formData }
     ]);
     const [filters, setFilters] = useState({ ...filterFields });
+    const [limit, setLimit] = useState(20);
 
 
     const debouncedQuery_employee_id = useDebounce(filters.employee_id, 800);
@@ -47,7 +48,8 @@ const useAbsence = () => {
                 company.company_id,
                 debouncedQuery_employee_id || null,
                 debouncedQuery_from || null,
-                debouncedQuery_to || null
+                debouncedQuery_to || null,
+                limit,
             );
             setAbsences(result.data.absences);
         } catch (error) {
@@ -62,7 +64,7 @@ const useAbsence = () => {
     useEffect(() => {
         if (!company) return;
         handleFetchAbsences();
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from]);
+    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]);
 
     const handleShowAbsenceModal = () => {
         setShowAbsenceModal(!showAbsenceModal);
@@ -329,6 +331,9 @@ const useAbsence = () => {
         //filter
         filters, setFilters,
         handleResetFilter, handleFilterChange,
+
+        //pagination
+        limit, setLimit
     };
 };
 

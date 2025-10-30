@@ -2,9 +2,10 @@ import { useReactTable, getCoreRowModel, flexRender, getSortedRowModel, getPagin
 import { useState } from "react";
 import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, EllipsisVerticalIcon, TrashIcon, PencilIcon } from "@heroicons/react/24/outline";
 
-const TanStackTable = ({ data, columns, onRowClick, onDelete }) => {
+const TanStackTable = ({ data, columns, onRowClick, onDelete, limit, setLimit }) => {
     const [sorting, setSorting] = useState([]);
     const [openDropdown, setOpenDropdown] = useState(null);
+
 
     // Add actions column to the existing columns
     const columnsWithActions = [
@@ -100,8 +101,26 @@ const TanStackTable = ({ data, columns, onRowClick, onDelete }) => {
     return (
         <div className="space-y-4 w-full">
             {/* Results Count */}
-            <div className="text-sm text-gray-500">
-                Showing {table.getRowModel().rows.length} records
+            <div className="flex justify-end">
+                <div className="flex items-center space-x-2">
+                    <label htmlFor="limit-select" className="text-sm text-gray-700">
+                        Show row:
+                    </label>
+                    <select
+                        id="limit-select"
+                        value={limit}
+                        onChange={(e) => {
+                            setLimit(Number(e.target.value));
+                        }}
+                        className="px-3 py-1 text-sm border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                        <option value={20}>20</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                        <option value={200}>300</option>
+                        <option value={500}>500</option>
+                    </select>
+                </div>
             </div>
 
             {/* Table Container */}

@@ -39,6 +39,7 @@ const useRestday = () => {
         id: Date.now(), ...formData
     }]);
     const [filters, setFilters] = useState({ ...filterFields });
+    const [limit, setLimit] = useState(20);
 
 
     const debouncedQuery_employee_id = useDebounce(filters.employee_id, 800);
@@ -57,7 +58,8 @@ const useRestday = () => {
                 company.company_id,
                 debouncedQuery_employee_id || null,
                 debouncedQuery_from || null,
-                debouncedQuery_to || null
+                debouncedQuery_to || null,
+                limit
             );
             setRestdays(result.data.restdays);
         } catch (error) {
@@ -72,7 +74,7 @@ const useRestday = () => {
     useEffect(() => {
         if (!company) return;
         handleFetchRestdays();
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from]); // Added dependency array
+    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]); // Added dependency array
 
     const handleAddRow = () => {
         const newRow = { ...formData, id: Date.now() };
@@ -341,6 +343,9 @@ const useRestday = () => {
         //filter
         filters, setFilters,
         handleResetFilter, handleFilterChange,
+
+        //pagination
+        limit, setLimit
     };
 };
 

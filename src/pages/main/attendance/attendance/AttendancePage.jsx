@@ -9,7 +9,8 @@ import { column } from "./TableConfigs";
 const AttendancePage = () => {
     const { attendances, isAttendancesLoading, handleRowClick, handleShowAttendanceModal,
         showAttendanceModal, isUploading, uploadAttendanceFile, handleDeleteOneAttendance,
-        filters, handleResetFilter, handleFilterChange, } = useAttendanceContext();
+        filters, handleResetFilter, handleFilterChange,
+        limit, setLimit } = useAttendanceContext();
 
     return (
         <>
@@ -31,6 +32,8 @@ const AttendancePage = () => {
                                 columns={column}
                                 onRowClick={handleRowClick}
                                 onDelete={handleDeleteOneAttendance}
+                                limit={limit}
+                                setLimit={setLimit}
                             />
                     }
                 </div>
