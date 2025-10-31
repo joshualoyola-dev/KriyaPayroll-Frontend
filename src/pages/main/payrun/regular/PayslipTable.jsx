@@ -21,8 +21,11 @@ const PayslipTable = ({ data, setData }) => {
     const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
 
     const handleChange = (employee_id, payitem_id, value) => {
-        // Only allow numbers (empty string is allowed too)
-        const numericValue = value.replace(/(?!^)-|[^0-9-]/g, "");
+        // Allow numbers, one decimal point, and an optional leading minus sign
+        const numericValue = value
+            .replace(/(?!^)-|[^0-9.-]/g, "")
+            .replace(/(\..*)\./g, "$1");
+
         setData((prev) => ({
             ...prev,
             [employee_id]: {
