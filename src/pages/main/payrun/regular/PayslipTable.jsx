@@ -68,14 +68,13 @@ const PayslipTable = ({ data, setData }) => {
                             {payitem_ids.map((payitem_id) => (
                                 <td key={payitem_id} className="border border-gray-300 px-2 py-1 min-w-[120px]">
                                     <input
-                                        type="number"
+                                        type="text"
                                         inputMode="numeric"
                                         value={data[employee_id][payitem_id] ?? ""}
-                                        onChange={(e) =>
-                                            handleChange(employee_id, payitem_id, e.target.value)
-                                        }
+                                        onChange={(e) => handleChange(employee_id, payitem_id, e.target.value)}
                                         className="w-full rounded px-2 py-1 text-sm"
                                     />
+
                                 </td>
                             ))}
                         </tr>
