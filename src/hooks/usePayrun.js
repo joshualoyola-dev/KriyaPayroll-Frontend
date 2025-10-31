@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
 import { deleteOnePayrun, getCompanyPayruns, getPayrun, getPayrunPayslipPayables, getPayslips, getPayslipsDraft } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
-import { downloadExcelMatrix, downloadPayablesAndTotals } from "../utility/excel.utility";
+import { downloadPayablesAndTotals } from "../utility/excel.utility";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { usePayitemContext } from "../contexts/PayitemProvider";
 
@@ -11,6 +11,7 @@ const usePayrun = () => {
     const [payruns, setPayruns] = useState([]);
     const [isPayrunLoading, setIsPayrunLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
+    const [isDownloading, setIsDownloading] = useState(false);
     const navigate = useNavigate();
 
     const { addToast } = useToastContext();
@@ -64,6 +65,7 @@ const usePayrun = () => {
     };
 
     const handleDownloadPayslipsExcel = async (payrun_id) => {
+        setIsDownloading(true);
         try {
             const result = await getPayrunPayslipPayables(company.company_id, payrun_id);
             const resultPayrun = await getPayrun(company.company_id, payrun_id);
@@ -81,6 +83,9 @@ const usePayrun = () => {
             console.log('downloading payslips error ', error);
             addToast("Failed to download payslips", "error");
         }
+        finally {
+            setIsDownloading(false);
+        }
     };
 
     return {
@@ -92,6 +97,7 @@ const usePayrun = () => {
         handleDeleteOnePayrun,
         handleNavigateSendPayslip,
         handleDownloadPayslipsExcel,
+        isDownloading, setIsDownloading
     };
 };
 
