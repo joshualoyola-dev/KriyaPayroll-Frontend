@@ -22,7 +22,7 @@ const PayslipTable = ({ data, setData }) => {
 
     const handleChange = (employee_id, payitem_id, value) => {
         // Only allow numbers (empty string is allowed too)
-        const numericValue = value.replace(/[^0-9]/g, "");
+        const numericValue = value.replace(/(?!^)-|[^0-9-]/g, "");
         setData((prev) => ({
             ...prev,
             [employee_id]: {
