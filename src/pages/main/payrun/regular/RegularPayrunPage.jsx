@@ -5,7 +5,7 @@ import OptionGenerate from "./OptionGenerate";
 import PayslipTable from "./PayslipTable";
 
 const RegularPayrunPage = () => {
-    const { payslips, setPayslips, payrun, payslipsLoading } = useRegularPayrunContext();
+    const { payslips, setPayslips, payrun, payslipsLoading, isSaving, statusLoading, isInitializing } = useRegularPayrunContext();
 
     return (
         <>
@@ -18,7 +18,7 @@ const RegularPayrunPage = () => {
                     : <PayslipTable data={payslips} setData={setPayslips} />
                 }
             </div>
-            {payslipsLoading && <LoadingBackground />}
+            {(payslipsLoading || isSaving || statusLoading || isInitializing) && <LoadingBackground />}
         </>
     );
 };

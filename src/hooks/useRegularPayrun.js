@@ -40,6 +40,7 @@ const useRegularPayrun = () => {
     const [payslipsLoading, setPayslipsLoading] = useState(false); //case: 1, 2, 3
     const [isSaving, setIsSaving] = useState(false); //use for both saving draft and save edit
     const [statusLoading, setStatusLoading] = useState(false);
+    const [isInitializing, setIsInitializing] = useState(false);
 
 
     const { payitems } = usePayitemContext();
@@ -53,22 +54,31 @@ const useRegularPayrun = () => {
     const navigate = useNavigate();
 
     const initializeRegularPayrun = async (payrun_id) => {
-        //trigger the fetch of existing payrun
-        //fetch payrun
-        const resultPayrun = await getPayrun(company.company_id, payrun_id);
-        console.log('fetched payrun: ', resultPayrun);
-        setPayrun(resultPayrun.data.payrun);
+        setIsInitializing(true);
+        try {
+            //trigger the fetch of existing payrun
+            //fetch payrun
+            const resultPayrun = await getPayrun(company.company_id, payrun_id);
+            console.log('fetched payrun: ', resultPayrun);
+            setPayrun(resultPayrun.data.payrun);
 
 
 
-        //populate the options
+            //populate the options
 
-        //populate the payslips. this will cause the save draft to hide. 
-        // and show the save edit or finalize
-        const resultPayables = await getPayrunPayslipPayables(company.company_id, payrun_id);
-        console.log('fetched payslip payables: ', resultPayables);
-        setPayslips(resultPayables.data.payslips);
-        setOldPayslips(resultPayables.data.payslips);
+            //populate the payslips. this will cause the save draft to hide. 
+            // and show the save edit or finalize
+            const resultPayables = await getPayrunPayslipPayables(company.company_id, payrun_id);
+            console.log('fetched payslip payables: ', resultPayables);
+            setPayslips(resultPayables.data.payslips);
+            setOldPayslips(resultPayables.data.payslips);
+        } catch (error) {
+            console.log(error);
+            addToast("Failed to initialize the payrun", "error");
+        }
+        finally {
+            setIsInitializing(false);
+        }
     };
 
     useEffect(() => {
@@ -318,7 +328,10 @@ const useRegularPayrun = () => {
         statusLoading, setStatusLoading,
         handleAddPayitemToPayslips,
         handleSendPayslips,
-        handleSaveAndCalculateTaxWitheld
+        handleSaveAndCalculateTaxWitheld,
+
+        //initialize
+        isInitializing, setIsInitializing
     };
 };
 
