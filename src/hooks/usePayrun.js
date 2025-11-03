@@ -58,6 +58,9 @@ const usePayrun = () => {
             console.log(error);
             addToast("Failed to delete payruns", "error");
         }
+        finally {
+            setDeleteLoading(false);
+        }
     };
 
     const handleNavigateSendPayslip = (payrun_id) => {
