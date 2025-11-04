@@ -47,3 +47,7 @@ export const getPayslips = async (payrun_id) => {
 export const sendOnePayslip = async (company_id, employee_id, payrun_id, payslip_id) => {
     return await payroll_api.post(`/api/v1/payruns/${company_id}/${payrun_id}/payslips/${payslip_id}/send-to/${employee_id}`);
 };
+
+export const sendMultiplePayslip = async (company_id, payrun_id, payload) => {
+    return await payroll_api.post(`/api/v1/payruns/${company_id}/${payrun_id}/payslips/send`, payload);
+};

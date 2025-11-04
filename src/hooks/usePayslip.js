@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
-import { getPayrun, getPayslips, sendOnePayslip } from "../services/payrun.service";
+import { getPayrun, getPayslips, sendMultiplePayslip } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
-import { downloadExcelMatrix, downloadExcelPayrunSummary } from "../utility/excel.utility";
+import { downloadExcelPayrunSummary } from "../utility/excel.utility";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { usePayitemContext } from "../contexts/PayitemProvider";
 
@@ -52,37 +52,66 @@ const usePayslip = () => {
         }
     }
 
+    // const handleSendFinalPayslip = async () => {
+    //     setIsSending(true);
+    //     try {
+    //         const failedPayslips = [];
+    //         try {
+    //             const employee_ids = payslips.map(ps => ps.employee_id);
+    //             const payload = {
+    //                 employee_ids,
+    //             };
+    //             await sendMultiplePayslip(company.company_id, payrun.payrun_id, payload);
+    //             addToast(`Successfully sent payslip to employees`, "success");
+    //         } catch (error) {
+    //             console.log(error);
+    //             addToast(`failed to send payslip to employees`, "error");
+    //             // failedPayslips.push(payslip);
+    //         }
+    //         if (failedPayslips.length > 0) {
+    //             setPayslips(failedPayslips);
+    //             addToast("Check the following payslips and resolve errors", "warning");
+    //         }
+    //         else {
+    //             addToast("Successfully sent all payslips", "success");
+    //             navigate('/payrun');
+    //         }
+    //     } catch (error) {
+    //         console.log(error);
+    //         addToast("An error occured", "error");
+    //     }
+    //     finally {
+    //         setIsSending(false);
+    //     }
+
+    // };
+
+
     const handleSendFinalPayslip = async () => {
         setIsSending(true);
         try {
             const failedPayslips = [];
 
-            for (const payslip of payslips) {
-                try {
-                    await sendOnePayslip(company.company_id, payslip.employee_id, payslip.payrun_id, payslip.payslip_id);
-                    addToast(`Successfully sent payslip to employee ${payslip.employee_id}`, "success");
-                } catch (error) {
-                    console.log(error);
-                    addToast(`failed to send payslip to employee ${payslip.employee_id}`, "error");
-                    failedPayslips.push(payslip);
-                }
-            }
+            const employee_ids = payslips.map(ps => ps.employee_id);
+            const payload = { employee_ids };
+
+            await sendMultiplePayslip(company.company_id, payrun.payrun_id, payload);
+            addToast(`Successfully sent payslip to employees`, "success");
+
             if (failedPayslips.length > 0) {
                 setPayslips(failedPayslips);
                 addToast("Check the following payslips and resolve errors", "warning");
-            }
-            else {
+            } else {
                 addToast("Successfully sent all payslips", "success");
-                navigate('/payrun');
+                // Small delay so toast shows before navigating
+                setTimeout(() => navigate('/payrun'), 500);
             }
         } catch (error) {
-            console.log(error);
-            addToast("An error occured", "error");
-        }
-        finally {
+            console.error(error);
+            addToast("An error occurred", "error");
+        } finally {
             setIsSending(false);
         }
-
     };
 
     useEffect(() => {
