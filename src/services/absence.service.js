@@ -12,7 +12,7 @@ export const fetchAbsences = async (company_id, employee_id = null, from = null,
         query = `${query}&to=${to}`;
     }
 
-    return await payroll_api.get(`/api/v1/daily-records/companies/${company_id}/absences?${query}page=${1}&limit=${Number(limit)}`);
+    return await payroll_api.get(`/api/v1/daily-records/companies/${company_id}/absences?${query}&page=${1}&limit=${Number(limit)}`);
 };
 
 export const addOneAbsence = async (company_id, formData) => {
