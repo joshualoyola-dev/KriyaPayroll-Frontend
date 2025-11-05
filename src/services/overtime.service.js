@@ -12,7 +12,7 @@ export const fetchOvertimes = async (company_id, employee_id = null, from = null
         query = `${query}&to=${to}`;
     }
 
-    return await payroll_api.get(`/api/v1/daily-records/companies/${company_id}/overtimes?${query}page=${1}&limit=${Number(limit)}`);
+    return await payroll_api.get(`/api/v1/daily-records/companies/${company_id}/overtimes?${query}&page=${1}&limit=${Number(limit)}`);
 };
 
 export const addOneOvertime = async (company_id, formData) => {

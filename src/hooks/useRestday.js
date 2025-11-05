@@ -41,14 +41,12 @@ const useRestday = () => {
     const [filters, setFilters] = useState({ ...filterFields });
     const [limit, setLimit] = useState(20);
 
-
     const debouncedQuery_employee_id = useDebounce(filters.employee_id, 800);
     const debouncedQuery_to = useDebounce(filters.to, 800);
     const debouncedQuery_from = useDebounce(filters.from, 800);
 
     const { company } = useCompanyContext();
     const { addToast } = useToastContext();
-
 
     const handleFetchRestdays = async () => {
         setIsRestdaysLoading(true);
