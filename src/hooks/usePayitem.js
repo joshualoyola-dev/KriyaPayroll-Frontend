@@ -28,7 +28,7 @@ const usePayitem = () => {
             addToast("Failed to fetch payitems", "error");
         }
         finally {
-            setPayitemsLoading(true);
+            setPayitemsLoading(false);
         }
     };
 
@@ -46,7 +46,7 @@ const usePayitem = () => {
     useEffect(() => {
         if (!company) return;
 
-        if (location.pathname === '/configuration/company-configuration') {
+        if (location.pathname === '/configuration/payitem') {
             handleFetchPayitems();
         }
     }, [company, location.pathname]);

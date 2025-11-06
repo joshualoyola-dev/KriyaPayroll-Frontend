@@ -48,7 +48,7 @@ const usePayrun = () => {
         if (location.pathname === '/payrun') {
             handleFetchPayruns();
         }
-    }, [company]);
+    }, [company, location.pathname]);
 
 
     const handleDeleteOnePayrun = async (payrun_id) => {
