@@ -1,8 +1,9 @@
+import LoadingBackground from "../../../../components/LoadingBackground";
 import { useSssContext } from "../../../../contexts/SssProvider";
 import ContributionTable from "./ContributionTable";
 
 const SSSSection = () => {
-    const { ssss, handleUpdateSss } = useSssContext();
+    const { ssss, handleUpdateSss, ssssLoading } = useSssContext();
 
 
 
@@ -37,14 +38,17 @@ const SSSSection = () => {
 
     return (
         <div className="pt-5">
-            <ContributionTable
-                data={ssss}
-                columns={columns}
-                editableColumns={editableColumns}
-                keyField="sss_contribution_rate_id"
-                onEdit={handleUpdateSss}
-            />
-        </div>
+            {ssssLoading && <LoadingBackground />}
+            {ssss
+                && <ContributionTable
+                    data={ssss}
+                    columns={columns}
+                    editableColumns={editableColumns}
+                    keyField="sss_contribution_rate_id"
+                    onEdit={handleUpdateSss}
+                />
+            }
+        </div >
     )
 };
 export default SSSSection;
