@@ -3,6 +3,7 @@ import { useToastContext } from "../contexts/ToastProvider";
 import { useUserContext } from "../contexts/UserProvider";
 import { fetchPhics, updatePhicRecord } from "../services/contribution.service";
 import { convertToISO8601 } from "../utility/datetime.utility";
+import { useLocation } from "react-router-dom";
 
 const usePhic = () => {
     const [phics, setPhics] = useState([]);
@@ -10,6 +11,7 @@ const usePhic = () => {
 
     const { addToast } = useToastContext();
     const { user } = useUserContext();
+    const location = useLocation();
 
     const handleFetchPhics = async () => {
         setPhicsLoading(true);
@@ -55,8 +57,10 @@ const usePhic = () => {
     useEffect(() => {
         if (!user) return;
 
-        handleFetchPhics();
-    }, []);
+        if (location.pathname === '/configuration/contribution') {
+            handleFetchPhics();
+        }
+    }, [user, location.pathname]);
 
     return {
         phics, setPhics,

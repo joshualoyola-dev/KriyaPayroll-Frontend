@@ -1,8 +1,9 @@
+import LoadingBackground from "../../../../components/LoadingBackground";
 import { usePhicContext } from "../../../../contexts/PhicProvider";
 import ContributionTable from "./ContributionTable";
 
 const PHICSection = () => {
-    const { phics, handleUpdatePhic } = usePhicContext();
+    const { phics, handleUpdatePhic, phicsLoading } = usePhicContext();
 
     const columns = [
         'phic_contribution_rate_id',
@@ -24,13 +25,16 @@ const PHICSection = () => {
 
     return (
         <div className="pt-5">
-            <ContributionTable
-                data={phics}
-                columns={columns}
-                editableColumns={editableColumns}
-                keyField="phic_contribution_rate_id"
-                onEdit={handleUpdatePhic}
-            />
+            {phicsLoading && <LoadingBackground />}
+            {phics
+                && <ContributionTable
+                    data={phics}
+                    columns={columns}
+                    editableColumns={editableColumns}
+                    keyField="phic_contribution_rate_id"
+                    onEdit={handleUpdatePhic}
+                />
+            }
         </div>
     )
 };
