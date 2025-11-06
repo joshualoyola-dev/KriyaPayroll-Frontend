@@ -5,6 +5,7 @@ import { addOneOvertime, deleteOneOvertime, fetchOvertimes } from "../services/o
 import * as XLSX from 'xlsx';
 import { formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelFile } from "../utility/upload.utility";
 import useDebounce from "./useDebounce";
+import { useLocation } from "react-router-dom";
 
 const formData = {
     employee_id: '',
@@ -48,6 +49,7 @@ const useOvertime = () => {
     // Contexts
     const { company } = useCompanyContext();
     const { addToast } = useToastContext();
+    const location = useLocation();
 
     const handleFetchOvertimes = async () => {
         setIsOvertimesLoading(true);
@@ -76,7 +78,10 @@ const useOvertime = () => {
     useEffect(() => {
         if (!company) return;
 
-        handleFetchOvertimes();
+        if (location.pathname === '/attendance/overtime') {
+            handleFetchOvertimes();
+        }
+
     }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]); // Fixed: Added dependency array
 
     // Modal related function

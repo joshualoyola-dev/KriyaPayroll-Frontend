@@ -5,6 +5,7 @@ import { deleteOneLeave, fetchLeaves, addOneLeave } from "../services/leave.serv
 import * as XLSX from 'xlsx';
 import { formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
 import useDebounce from "./useDebounce";
+import { useLocation } from "react-router-dom";
 
 const formData = {
     employee_id: '',
@@ -43,6 +44,7 @@ const useLeave = () => {
     // Contexts
     const { addToast } = useToastContext();
     const { company } = useCompanyContext();
+    const location = useLocation();
 
     const handleFetchLeaves = async () => {
         setIsLeavesLoading(true);
@@ -68,7 +70,10 @@ const useLeave = () => {
     useEffect(() => {
         if (!company) return;
 
-        handleFetchLeaves();
+        if (location.pathname === '/attendance/leave') {
+            handleFetchLeaves();
+        }
+
     }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]);
 
     // Modal related function

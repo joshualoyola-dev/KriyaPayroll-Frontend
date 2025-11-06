@@ -6,6 +6,7 @@ import { addAttendances, deleteAttendance, fetchAttendances } from "../services/
 import * as XLSX from 'xlsx';
 import { formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelFile } from "../utility/upload.utility";
 import useDebounce from "./useDebounce";
+import { useLocation } from "react-router-dom";
 
 const formData = {
     employee_id: '',
@@ -46,6 +47,7 @@ const useAttendance = () => {
     const { employee } = useEmployeeContext();
     const { company } = useCompanyContext();
     const { addToast } = useToastContext();
+    const location = useLocation();
 
     const debouncedQuery_employee_id = useDebounce(filters.employee_id, 800);
     const debouncedQuery_to = useDebounce(filters.to, 800);
@@ -77,8 +79,11 @@ const useAttendance = () => {
     useEffect(() => {
         if (!company) return;
 
-        handleFetchAttendances();
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]);
+        if (location.pathname === '/attendance') {
+            handleFetchAttendances();
+        }
+
+    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit, location.pathname]);
 
     const handleRowClick = (data, row) => {
         console.log('clicked: ', data);

@@ -4,6 +4,7 @@ import { useToastContext } from "../contexts/ToastProvider";
 import { addOneAbsence, deleteOneAbsence, fetchAbsences } from "../services/absence.service";
 import { formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
 import useDebounce from "./useDebounce";
+import { useLocation } from "react-router-dom";
 
 const formData = {
     employee_id: '',
@@ -39,6 +40,7 @@ const useAbsence = () => {
 
     const { company } = useCompanyContext();
     const { addToast } = useToastContext();
+    const location = useLocation();
 
     const handleFetchAbsences = async () => {
         setIsAbsencesLoading(true);
@@ -63,8 +65,12 @@ const useAbsence = () => {
 
     useEffect(() => {
         if (!company) return;
-        handleFetchAbsences();
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]);
+
+        if (location.pathname === '/attendance/absence') {
+            handleFetchAbsences();
+        }
+
+    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit, location.pathname]);
 
     const handleShowAbsenceModal = () => {
         setShowAbsenceModal(!showAbsenceModal);

@@ -6,6 +6,7 @@ import { useToastContext } from "../contexts/ToastProvider";
 import useDebounce from "./useDebounce";
 import * as XLSX from 'xlsx';
 import { convertExcelTimeToHHMM } from "../utility/excel.utility";
+import { useLocation } from "react-router-dom";
 
 const formData = {
     employee_id: '',
@@ -98,6 +99,7 @@ const useEmployee = () => {
 
     const { addToast } = useToastContext();
     const debouncedQuery = useDebounce(query, 800);
+    const location = useLocation();
 
     // Fix: Use useState correctly for employeesFormData
     const [employeesFormData, setEmployeesFormData] = useState([
@@ -106,26 +108,26 @@ const useEmployee = () => {
 
     const [salaryFormData, setSalaryFormData] = useState({ ...formData });
 
-    useEffect(() => {
-        const fetchEmployees = async () => {
-            if (!employees.length) setIsEmployeesLoading(true);
-            try {
-                let result;
-                if (debouncedQuery && debouncedQuery.trim() !== "") {
-                    result = await fetchEmployeesByCompanyIdAndQuery(company.company_id, debouncedQuery);
-                } else {
-                    result = await fetchEmployeesByCompanyId(company.company_id);
-                }
-
-                setEmployees(result.data.employees);
-            } catch (error) {
-                console.error(error);
-                addToast("Failed to fetch employees", "error");
-            } finally {
-                setIsEmployeesLoading(false);
+    const fetchEmployees = async () => {
+        if (!employees.length) setIsEmployeesLoading(true);
+        try {
+            let result;
+            if (debouncedQuery && debouncedQuery.trim() !== "") {
+                result = await fetchEmployeesByCompanyIdAndQuery(company.company_id, debouncedQuery);
+            } else {
+                result = await fetchEmployeesByCompanyId(company.company_id);
             }
-        };
 
+            setEmployees(result.data.employees);
+        } catch (error) {
+            console.error(error);
+            addToast("Failed to fetch employees", "error");
+        } finally {
+            setIsEmployeesLoading(false);
+        }
+    };
+
+    useEffect(() => {
         if (company) fetchEmployees();
     }, [company, debouncedQuery]);
 

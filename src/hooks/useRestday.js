@@ -4,6 +4,7 @@ import { useCompanyContext } from "../contexts/CompanyProvider";
 import { addOneRestday, deleteOneRestday, fetchRestdays } from "../services/restday.service";
 import { formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelFile } from "../utility/upload.utility";
 import useDebounce from "./useDebounce";
+import { useLocation } from "react-router-dom";
 
 const formData = {
     employee_id: '',
@@ -47,6 +48,7 @@ const useRestday = () => {
 
     const { company } = useCompanyContext();
     const { addToast } = useToastContext();
+    const location = useLocation();
 
     const handleFetchRestdays = async () => {
         setIsRestdaysLoading(true);
@@ -71,7 +73,10 @@ const useRestday = () => {
 
     useEffect(() => {
         if (!company) return;
-        handleFetchRestdays();
+
+        if (location.pathname === '/attendance/restday') {
+            handleFetchRestdays();
+        }
     }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]); // Added dependency array
 
     const handleAddRow = () => {
