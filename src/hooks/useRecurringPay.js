@@ -4,6 +4,7 @@ import { useToastContext } from "../contexts/ToastProvider";
 import { addOneRecurringPay, deleteOneRecurringPay, getRecurringPays } from "../services/recurring-pay.service";
 import { formatDateToISO18601, normalizeHeader, parseExcelDate, parseExcelDateTime, parseExcelFile } from "../utility/upload.utility";
 import useDebounce from "./useDebounce";
+import { useLocation } from "react-router-dom";
 
 const formData = {
     employee_id: '',
@@ -38,6 +39,7 @@ const useRecurringPay = () => {
 
     const { company } = useCompanyContext();
     const { addToast } = useToastContext();
+    const location = useLocation();
 
     const handleFetchRecurringPays = async () => {
         setRecurringPaysLoading(true);
@@ -62,8 +64,10 @@ const useRecurringPay = () => {
     useEffect(() => {
         if (!company) return;
 
-        handleFetchRecurringPays();
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from]);
+        if (location.pathname === '/configuration/recurring-pay') {
+            handleFetchRecurringPays();
+        }
+    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, location.pathname]);
 
     // Form data manipulation
     const handleAddRow = () => {

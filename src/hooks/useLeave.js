@@ -74,7 +74,7 @@ const useLeave = () => {
             handleFetchLeaves();
         }
 
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]);
+    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit, location.pathname]);
 
     // Modal related function
     const handleShowLeaveModal = () => {

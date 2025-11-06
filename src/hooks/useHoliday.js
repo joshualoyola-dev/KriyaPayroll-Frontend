@@ -3,6 +3,7 @@ import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { addOneHoliday, deleteOneHoliday, fetchEmployeesAttendanceOnHoliday, fetchHolidays, updateOneHoliday } from "../services/holiday.service";
 import { convertToISO8601 } from "../utility/datetime.utility";
+import { useLocation } from "react-router-dom";
 
 const initialFormData = {
     holiday_date: '',
@@ -27,6 +28,7 @@ const useHoliday = () => {
 
     const { company } = useCompanyContext();
     const { addToast } = useToastContext();
+    const location = useLocation();
 
     const handleFetchHolidays = useCallback(async () => {
         if (!company?.company_id) return;
@@ -66,8 +68,10 @@ const useHoliday = () => {
     }, [selectedHoliday])
 
     useEffect(() => {
-        handleFetchHolidays();
-    }, [handleFetchHolidays]);
+        if (location.pathname === '/attendance/holiday') {
+            handleFetchHolidays();
+        }
+    }, [handleFetchHolidays, location.pathname]);
 
     //populate the update form if there is a selected
     useEffect(() => {

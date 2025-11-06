@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { fetchPayitems } from "../services/payitem.service";
+import { useLocation } from "react-router-dom";
 
 const usePayitem = () => {
     const [payitems, setPayitems] = useState([]);
@@ -11,6 +12,7 @@ const usePayitem = () => {
 
     const { company } = useCompanyContext();
     const { addToast } = useToastContext();
+    const location = useLocation();
 
     //pay-items are same for all company
     const handleFetchPayitems = async () => {
@@ -43,8 +45,11 @@ const usePayitem = () => {
 
     useEffect(() => {
         if (!company) return;
-        handleFetchPayitems();
-    }, [company]);
+
+        if (location.pathname === '/configuration/company-configuration') {
+            handleFetchPayitems();
+        }
+    }, [company, location.pathname]);
 
     //change the filtered payitems based on query
     useEffect(() => {
