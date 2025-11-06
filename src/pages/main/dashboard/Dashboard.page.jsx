@@ -1,5 +1,6 @@
 import Question1Img from "../../../../public/question1.svg";
 import Question from "../../../components/Question";
+import UnderDevelopment from "../../../components/UnderDevelopment";
 import { useCompanyContext } from "../../../contexts/CompanyProvider";
 import DashboardPlaceholder from "./DashboardPlaceholder";
 
@@ -17,8 +18,7 @@ const DashboardPage = () => {
     />;
 
     return (
-
-        <DashboardPlaceholder />
+        <UnderDevelopment title={`Under Development`} label={`This gives overview on payruns, employees records and daily records`} />
     );
 }
 

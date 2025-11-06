@@ -3,6 +3,7 @@ import { useToastContext } from "../contexts/ToastProvider";
 import { fetchHdmfs, updateHdmfRecord } from "../services/contribution.service"; // Add update service
 import { useUserContext } from "../contexts/UserProvider";
 import { convertToISO8601 } from "../utility/datetime.utility";
+import { useLocation } from "react-router-dom";
 
 const useHdmf = () => {
     const [hdmfs, setHdmfs] = useState([]);
@@ -10,6 +11,7 @@ const useHdmf = () => {
 
     const { addToast } = useToastContext();
     const { user } = useUserContext();
+    const location = useLocation();
 
     const handleFetchHdmfs = async () => {
         setHdmfsLoading(true);
@@ -57,8 +59,11 @@ const useHdmf = () => {
 
     useEffect(() => {
         if (!user) return;
-        handleFetchHdmfs();
-    }, []);
+
+        if (location.pathname === '/configuration/contribution') {
+            handleFetchHdmfs();
+        }
+    }, [user, location.pathname]);
 
     return {
         hdmfs,

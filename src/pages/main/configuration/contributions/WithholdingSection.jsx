@@ -1,8 +1,9 @@
+import LoadingBackground from "../../../../components/LoadingBackground";
 import { useWithholdingContext } from "../../../../contexts/WithholdingProvider";
 import ContributionTable from "./ContributionTable";
 
 const WithholdingSection = () => {
-    const { withholdings, handleUpdateWithholding } = useWithholdingContext();
+    const { withholdings, handleUpdateWithholding, withholdingsLoading } = useWithholdingContext();
 
     const columns = [
         'frequency',
@@ -27,13 +28,16 @@ const WithholdingSection = () => {
 
     return (
         <div className="pt-5">
-            <ContributionTable
-                data={withholdings}
-                columns={columns}
-                editableColumns={editableColumns}
-                keyField="withholding_tax_id"
-                onEdit={handleUpdateWithholding}
-            />
+            {withholdingsLoading && <LoadingBackground />}
+            {withholdings
+                && <ContributionTable
+                    data={withholdings}
+                    columns={columns}
+                    editableColumns={editableColumns}
+                    keyField="withholding_tax_id"
+                    onEdit={handleUpdateWithholding}
+                />
+            }
         </div>
     )
 };

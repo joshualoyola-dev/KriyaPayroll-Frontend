@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useToastContext } from "../contexts/ToastProvider";
 import { useUserContext } from "../contexts/UserProvider";
 import { fetchWithholdings, updateWithholdings } from "../services/contribution.service";
+import { useLocation } from "react-router-dom";
 
 const useWithholding = () => {
     const [withholdings, setWithholdings] = useState([]);
@@ -9,6 +10,7 @@ const useWithholding = () => {
 
     const { addToast } = useToastContext();
     const { user } = useUserContext();
+    const location = useLocation();
 
     const handleFetchWithholdings = async () => {
         setWithholdingsLoading(true);
@@ -48,8 +50,10 @@ const useWithholding = () => {
 
     useEffect(() => {
         if (!user) return;
-        handleFetchWithholdings();
-    }, []);
+        if (location.pathname === '/configuration/contribution') {
+            handleFetchWithholdings();
+        }
+    }, [user, location.pathname]);
 
     return {
         withholdings, setWithholdings,

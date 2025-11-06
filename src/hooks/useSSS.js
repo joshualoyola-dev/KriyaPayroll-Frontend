@@ -3,6 +3,7 @@ import { useToastContext } from "../contexts/ToastProvider";
 import { fetchSSS, updateSSS } from "../services/contribution.service";
 import { useUserContext } from "../contexts/UserProvider";
 import { convertToISO8601 } from "../utility/datetime.utility";
+import { useLocation } from "react-router-dom";
 
 const useSSS = () => {
     const [ssss, setSSSS] = useState([]);
@@ -10,6 +11,7 @@ const useSSS = () => {
 
     const { addToast } = useToastContext();
     const { user } = useUserContext();
+    const location = useLocation();
 
     const handleFetchSss = async () => {
         setSsssLoading(true);
@@ -33,8 +35,12 @@ const useSSS = () => {
 
     useEffect(() => {
         if (!user) return;
-        handleFetchSss();
-    }, []);
+
+        //fetch if the user is on /configuration/contribution 
+        if (location.pathname === '/configuration/contribution') {
+            handleFetchSss();
+        }
+    }, [user, location.pathname]);
 
     const handleUpdateSss = async (id, updatedData) => {
         try {

@@ -1,9 +1,10 @@
 
+import LoadingBackground from "../../../../components/LoadingBackground";
 import { useHdmfContext } from "../../../../contexts/HdmfProvider";
 import ContributionTable from "./ContributionTable";
 
 const HDMFSection = () => {
-    const { hdmfs, handleUpdateHdmf } = useHdmfContext();
+    const { hdmfs, handleUpdateHdmf, hdmfsLoading } = useHdmfContext();
 
     const columns = [
         'hdmf_contribution_rate_id',
@@ -25,13 +26,17 @@ const HDMFSection = () => {
 
     return (
         <div className="pt-5">
-            <ContributionTable
-                data={hdmfs}
-                columns={columns}
-                editableColumns={editableColumns}
-                keyField="hdmf_contribution_rate_id"
-                onEdit={handleUpdateHdmf}
-            />
+            {hdmfsLoading && <LoadingBackground />}
+            {hdmfs
+                &&
+                <ContributionTable
+                    data={hdmfs}
+                    columns={columns}
+                    editableColumns={editableColumns}
+                    keyField="hdmf_contribution_rate_id"
+                    onEdit={handleUpdateHdmf}
+                />
+            }
         </div>
     );
 };

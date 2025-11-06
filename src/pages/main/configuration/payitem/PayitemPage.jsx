@@ -1,16 +1,19 @@
+import LoadingBackground from "../../../../components/LoadingBackground";
 import Search from "../../../../components/Search";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import PayitemTable from "./PayitemTable";
 
 const PayitemPage = () => {
-    const { query, setQuery, } = usePayitemContext();
+    const { query, setQuery, payitemsLoading, payitems } = usePayitemContext();
 
     return (
         <>
             <div className="flex pb-4">
                 <Search query={query} setQuery={setQuery} />
             </div>
-            <PayitemTable />
+            {payitems && <PayitemTable />}
+            {payitemsLoading && <LoadingBackground />}
+
         </>
     )
 };

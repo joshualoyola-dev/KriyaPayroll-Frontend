@@ -28,6 +28,14 @@ const PayrunCard = ({ payrun, idx, oncClickCard, onDelete, onNavigateSendPayslip
 
     const status = statusConfig[payrun.status];
 
+    const handleDelete = (e) => {
+        e.stopPropagation();
+        const confirmed = window.confirm(`Are you sure you want to delete ${payrun.payrun_title}? This action cannot be undone.`);
+        if (confirmed) {
+            onDelete(payrun.payrun_id);
+        }
+    }
+
     return (
         <div
             onClick={() => oncClickCard(payrun.payrun_id)}
@@ -87,10 +95,7 @@ const PayrunCard = ({ payrun, idx, oncClickCard, onDelete, onNavigateSendPayslip
                         </button>
                     )}
                     <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDelete(payrun.payrun_id);
-                        }}
+                        onClick={handleDelete}
                         className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                         title="Delete"
                     >

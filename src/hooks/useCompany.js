@@ -19,6 +19,7 @@ import {
 } from "../services/company.service";
 import { useToastContext } from "../contexts/ToastProvider";
 import { useAuthContext } from "../contexts/AuthProvider";
+import { useLocation } from "react-router-dom";
 
 const initialFormData = {
     company_id: "",
@@ -68,6 +69,7 @@ const useCompany = () => {
 
     const { addToast } = useToastContext();
     const { token } = useAuthContext();
+    const location = useLocation();
 
     const fetchCompanies = async () => {
         setLoading(true);
@@ -154,8 +156,10 @@ const useCompany = () => {
     useEffect(() => {
         if (!company) return;
 
-        handleFetchCompanyPayrunConfigurations();
-    }, [company]);
+        if (location.pathname === '/configuration/company-configuration') {
+            handleFetchCompanyPayrunConfigurations();
+        }
+    }, [company, location.pathname]);
 
     const handleFetchCompanyFullDetail = async (companyId) => {
         if (!companyId) return;
