@@ -45,11 +45,8 @@ const usePayitem = () => {
 
     useEffect(() => {
         if (!company) return;
-
-        if (location.pathname === '/configuration/payitem') {
-            handleFetchPayitems();
-        }
-    }, [company, location.pathname]);
+        handleFetchPayitems();
+    }, [company]);
 
     //change the filtered payitems based on query
     useEffect(() => {
