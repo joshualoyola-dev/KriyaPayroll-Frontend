@@ -4,12 +4,21 @@ import PayrunFilter from "./PayrunFilter";
 import PayrunCard from "./PayrunCard";
 import DualBallLoading from "../../../../components/DualBallLoading";
 import LoadingBackground from "../../../../components/LoadingBackground";
+import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
+import env from "../../../../configs/env.config";
+import NoAccess from "../../../../components/NoAccess";
 
 const PayrunPage = () => {
     const { payruns, isPayrunLoading, handleClickPayrun, handleDeleteOnePayrun, deleteLoading, handleNavigateSendPayslip, handleDownloadPayslipsExcel, isDownloading } = usePayrunContext();
     const regularPayruns = payruns.filter(payrun => payrun.payrun_type === 'REGULAR');
     const specialPayruns = payruns.filter(payrun => payrun.payrun_type === 'SPECIAL');
     const lastPayruns = payruns.filter(payrun => payrun.payrun_type === 'LAST');
+
+    const hasAccess = userHasFeatureAccess(env.VITE_PAYROLL_PAYRUNS_VIEW);
+
+    if (!hasAccess) {
+        return <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
+    };
 
     return (
         <>
