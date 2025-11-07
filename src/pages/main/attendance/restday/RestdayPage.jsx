@@ -1,8 +1,11 @@
 import AddModal from "../../../../components/AddModal";
 import DailyRecordFilter from "../../../../components/DailyRecordFilter";
 import DualBallLoading from "../../../../components/DualBallLoading";
+import NoAccess from "../../../../components/NoAccess";
 import TanStackTable from "../../../../components/TanStackTable";
+import env from "../../../../configs/env.config";
 import { useRestdayContext } from "../../../../contexts/RestdayProvider";
+import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import RestdayForm from "./RestdayForm";
 import { column } from "./TableConfigs";
 
@@ -25,6 +28,11 @@ const RestdayPage = () => {
 
         limit, setLimit
     } = useRestdayContext();
+
+    const hasAccess = userHasFeatureAccess(env.VITE_PAYROLL_DAILY_RECORDS);
+    if (!hasAccess) {
+        return <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
+    }
 
     return (
         <>
