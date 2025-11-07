@@ -1,5 +1,8 @@
 import { PencilIcon } from "@heroicons/react/24/solid";
 import { useCompanyContext } from "../../../../contexts/CompanyProvider";
+import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
+import env from "../../../../configs/env.config";
+import NoAccess from "../../../../components/NoAccess";
 
 const CompanyConfigsPage = () => {
     const { workingDays, payrollFrequency, ndRate, restdayRate, regularOTRate } = useCompanyContext();
@@ -31,6 +34,11 @@ const CompanyConfigsPage = () => {
             description: "Rate of Nigh differential, i.e., hours between 10pm-6am. Must be 10% of hourly rate",
         },
     ];
+
+    const hasAccess = userHasFeatureAccess(env.VITE_PAYROLL_CONFIGURE_PAYRUN_SETTING);
+    if (!hasAccess) {
+        return <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
+    }
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">

@@ -1,10 +1,13 @@
 import AddModal from "../../../../components/AddModal";
 import DailyRecordFilter from "../../../../components/DailyRecordFilter";
 import DualBallLoading from "../../../../components/DualBallLoading";
+import NoAccess from "../../../../components/NoAccess";
 import TanStackTable from "../../../../components/TanStackTable"; // Added missing import
+import env from "../../../../configs/env.config";
 import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { useRecurringPayContext } from "../../../../contexts/RecurringPayProvider";
+import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import RecurringPayForm from "./RecurringPayForm";
 import { getRecurringPayColumns } from "./TableConfigs";
 
@@ -27,6 +30,11 @@ const RecurringPayPage = () => {
     const { mapPayitemIdToPayitemName } = usePayitemContext();
     const columns = getRecurringPayColumns(mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName);
 
+
+    const hasAccess = userHasFeatureAccess(env.VITE_PAYROLL_RECURRING_PAYS);
+    if (!hasAccess) {
+        return <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
+    }
 
     return (
         <>
