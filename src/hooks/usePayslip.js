@@ -13,6 +13,7 @@ const usePayslip = () => {
     const [isPayslipsLoading, setIsPayslipsLoading] = useState(false);
     const [isSending, setIsSending] = useState(false);
     const [isPayrunLoading, setIsPayrunLoading] = useState(false);
+    const [failedIds, setFailedIds] = useState([]); //this is string array of ids of employee that failed to be send an payslip email
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -59,7 +60,15 @@ const usePayslip = () => {
                 employee_ids: payslips.map(payslip => payslip.employee_id)
             }
 
-            await sendMultiplePayslip(company.company_id, payrun.payrun_id, payload);
+            const result = await sendMultiplePayslip(company.company_id, payrun.payrun_id, payload);
+
+            if (result.data.failed_pdf_count > 0) {
+                setFailedIds(result.data.failed_pdf_count);
+                console.log(`Failed to sent payslip to ${result.data.failed_pdf_count} employees`);
+                alert(`Failed to sent payslip to ${result.data.failed_pdf_count} employees`);
+                addToast(`Failed to sent payslip to ${result.data.failed_pdf_count} employees`, "error");
+                return;
+            }
 
             addToast("Successfully sent all payslips", "success");
             navigate('/payrun');
