@@ -64,9 +64,9 @@ const usePayslip = () => {
 
             if (result.data.failed_pdf_count > 0) {
                 setFailedIds(result.data.failed_pdf_count);
-                console.log(`Failed to sent payslip to ${result.data.failed_pdf_count} employees`);
-                alert(`Failed to sent payslip to ${result.data.failed_pdf_count} employees`);
-                addToast(`Failed to sent payslip to ${result.data.failed_pdf_count} employees`, "error");
+                console.log(`Failed to generate payslip: ${result.data.failed_pdf_count}. Failed to send emails: ${result.data.failed_emails_count}`);
+                alert(`Failed to generate payslip: ${result.data.failed_pdf_count}. Failed to send emails: ${result.data.failed_emails_count}`);
+                addToast(`Failed to generate payslip: ${result.data.failed_pdf_count}. Failed to send emails: ${result.data.failed_emails_count}`, "error");
                 return;
             }
 
