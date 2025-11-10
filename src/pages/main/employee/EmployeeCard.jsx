@@ -2,6 +2,7 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 import { format } from "date-fns";
 import AddSalaryForm from "./AddSalaryForm";
 import { PencilIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
+import { getYYYYMMDDPartOfUTCDate } from "../../../utility/datetime.utility";
 
 const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSalaryForm, handleChangeEmploymentStatus }) => {
     if (!employee) {
@@ -90,13 +91,13 @@ const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSala
                             <tr className="border-b border-gray-200">
                                 <td className="font-medium text-gray-700 px-3 py-2 w-1/3">Date Hired</td>
                                 <td className="text-gray-600 px-3 py-2">
-                                    {format(new Date(date_hired), "MMM dd, yyyy")}
+                                    {getYYYYMMDDPartOfUTCDate(date_hired)}
                                 </td>
                             </tr>
                             <tr>
                                 <td className="font-medium text-gray-700 px-3 py-2">Date End</td>
                                 <td className="text-gray-600 px-3 py-2">
-                                    {format(new Date(date_end), "MMM dd, yyyy")}
+                                    {date_end ? getYYYYMMDDPartOfUTCDate(date_end) : "None"}
                                 </td>
                             </tr>
                         </tbody>

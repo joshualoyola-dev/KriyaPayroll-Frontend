@@ -42,3 +42,6 @@ export const convertToDatetimeString = (datetime) => {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
+export const getYYYYMMDDPartOfUTCDate = (date) => {
+    return String(date).split('T')[0];
+}
