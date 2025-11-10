@@ -2,6 +2,8 @@ import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { useRegularPayrunContext } from "../../../../contexts/RegularPayrunProvider";
 import { convertToISO8601 } from "../../../../utility/datetime.utility";
+import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
+import env from "../../../../configs/env.config";
 
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();
@@ -18,6 +20,9 @@ const OptionEdit = () => {
 
     const isForApproval = payrun.status === "FOR_APPROVAL";
     const isApproved = payrun.status === "APPROVED";
+
+    const hasChangedStatusAccess = userHasFeatureAccess(env.VITE_PAYROLL_CHANGE_PAYRUN_STATUS);
+    const hasEditPayrunAccess = userHasFeatureAccess(env.VITE_PAYROLL_EDIT_PAYRUNS)
 
     return (
         <div className="relative bg-white p-6 rounded-xl border border-gray-200">
@@ -39,22 +44,24 @@ const OptionEdit = () => {
                         <div className="flex gap-x-2">
                             <button
                                 onClick={handleSaveEdit}
-                                disabled={isForApproval || isApproved}
+                                disabled={isForApproval || isApproved || !hasEditPayrunAccess}
                                 className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${isForApproval || isApproved
                                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                                     : "bg-teal-600 text-white hover:bg-teal-700"
                                     }`}
+                                title={(!hasEditPayrunAccess || isApproved) ? "You have no access to edit this payrun or it is already approved" : ""}
                             >
                                 Save
                             </button>
 
                             <button
                                 onClick={handleSaveAndCalculateTaxWitheld}
-                                disabled={isForApproval || isApproved}
+                                disabled={isForApproval || isApproved || !hasEditPayrunAccess}
                                 className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${isForApproval || isApproved
                                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                                     : "bg-teal-600 text-white hover:bg-teal-700"
                                     }`}
+                                title={(!hasEditPayrunAccess || isApproved) ? "You have no access to edit this payrun or it is already approved" : ""}
                             >
                                 Calculate Tax Withheld
                             </button>
@@ -67,9 +74,10 @@ const OptionEdit = () => {
                         <select
                             value={payrun.status}
                             onChange={(e) => handleChangeStatus(e.target.value)}
-                            disabled={isApproved}
+                            disabled={isApproved || !hasChangedStatusAccess}
                             className={`px-3 py-2 text-sm rounded-xl border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 ${isApproved ? "cursor-not-allowed bg-gray-100 text-gray-400" : ""
                                 }`}
+                            title={!hasChangedStatusAccess ? "You don’t have access to change status" : ""}
                         >
                             <option value="DRAFT">Draft</option>
                             <option value="FOR_APPROVAL">For Approval</option>
