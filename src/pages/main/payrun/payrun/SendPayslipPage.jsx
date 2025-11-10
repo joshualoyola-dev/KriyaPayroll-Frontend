@@ -1,3 +1,4 @@
+import LoadingBackground from "../../../../components/LoadingBackground";
 import { usePayslipContext } from "../../../../contexts/PayslipProvider";
 import { convertToISO8601 } from "../../../../utility/datetime.utility";
 import FinalPayslipTable from "./FinalPayslipTable";
@@ -45,6 +46,7 @@ const SendPayslipPage = () => {
                 ? "Loading..."
                 : <FinalPayslipTable payslips={payslips} />
             }
+            {isSending && <LoadingBackground />}
         </div>
     );
 };
