@@ -28,8 +28,8 @@ const useAuth = () => {
             const decoded = jwtDecode(token);
 
             localStorage.setItem("system_user_id", decoded.system_user_id);
+            localStorage.setItem("service_features_access", JSON.stringify(decoded.accessPermissions))
             localStorage.setItem('token', token);
-
 
             setToken(token);
 
@@ -46,9 +46,6 @@ const useAuth = () => {
 
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
-
-        console.log('token: ', storedToken);
-
         if (storedToken) {
             setToken(storedToken);
         }

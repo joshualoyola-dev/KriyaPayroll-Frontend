@@ -1,8 +1,16 @@
+import NoAccess from "../../../components/NoAccess";
+import env from "../../../configs/env.config";
 import { useExportContext } from "../../../contexts/ExportProvider";
+import { userHasFeatureAccess } from "../../../utility/access-controll.utility";
 import YtdSection from "./YtdSection";
 
 const DataExportPage = () => {
     const { selectedExport, handleChangeSelection } = useExportContext();
+
+    const hasAccess = userHasFeatureAccess(env.VITE_PAYROLL_DATA_EXPORTS);
+    if (!hasAccess) {
+        return <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
+    }
 
     return (
         <div className="flex flex-col">

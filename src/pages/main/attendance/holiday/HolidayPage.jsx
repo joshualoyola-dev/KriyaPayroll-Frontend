@@ -1,5 +1,8 @@
 import DualBallLoading from "../../../../components/DualBallLoading";
+import NoAccess from "../../../../components/NoAccess";
+import env from "../../../../configs/env.config";
 import { useHolidayContext } from "../../../../contexts/HolidayProvider";
+import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import AttendanceList from "./AttendanceList";
 import Filter from "./Filter";
 import HolidayForm from "./HolidayForm";
@@ -16,6 +19,11 @@ const HolidayPage = () => {
         attendancesLoading,
         attendances
     } = useHolidayContext();
+
+    const hasAccess = userHasFeatureAccess(env.VITE_PAYROLL_DAILY_RECORDS);
+    if (!hasAccess) {
+        return <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
+    }
 
     return (
         <>

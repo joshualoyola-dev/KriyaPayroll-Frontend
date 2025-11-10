@@ -1,8 +1,11 @@
 import AddModal from "../../../../components/AddModal";
 import DailyRecordFilter from "../../../../components/DailyRecordFilter";
 import DualBallLoading from "../../../../components/DualBallLoading";
+import NoAccess from "../../../../components/NoAccess";
 import TanStackTable from "../../../../components/TanStackTable";
+import env from "../../../../configs/env.config";
 import { useAbsenceContext } from "../../../../contexts/AbsenceProvider";
+import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import AbsenceForm from "./AbsenceForm";
 import { column } from "./TableConfigs";
 
@@ -20,6 +23,11 @@ const AbsencePage = () => {
         isAbsencesLoading,
         limit, setLimit
     } = useAbsenceContext();
+
+    const hasAccess = userHasFeatureAccess(env.VITE_PAYROLL_DAILY_RECORDS);
+    if (!hasAccess) {
+        return <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
+    }
 
     return (
         <>

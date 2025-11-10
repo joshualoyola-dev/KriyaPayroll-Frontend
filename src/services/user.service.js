@@ -6,8 +6,6 @@ export const getUser = async () => {
 }
 
 export const getPayrollUsers = async () => {
-    console.log('service id of payroll: ', env.VITE_PAYROLL_SERVICE_ID);
-
     return await hris_api.get(`/api/hris-user-accounts/users-payroll/${env.VITE_PAYROLL_SERVICE_ID}`)
 }
 

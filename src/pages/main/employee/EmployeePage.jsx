@@ -1,14 +1,25 @@
-// export default EmployeePage;
 import AddModal from "../../../components/AddModal";
 import LoadingBackground from "../../../components/LoadingBackground";
+import NoAccess from "../../../components/NoAccess";
 import Search from "../../../components/Search";
+import env from "../../../configs/env.config";
 import { useEmployeeContext } from "../../../contexts/EmployeeProvider";
+import { userHasFeatureAccess } from "../../../utility/access-controll.utility";
 import AddEmployeeForm from "./AddEmployeeForm";
 import EmployeeCard from "./EmployeeCard";
 import EmployeeTable from "./EmployeeTable";
 
 const EmployeePage = () => {
     const { query, setQuery, employee, setEmployee, handleShowAddModal, showAddModal, showAddSalaryForm, setShowAddSalaryForm, handleChangeEmploymentStatus, uploadEmployeeFile, isUploading, isEmployeesLoading, isEmployeeLoading } = useEmployeeContext();
+
+
+    const hasAccess = userHasFeatureAccess(env.VITE_PAYROLL_EMPLOYEE_MANAGEMENT);
+
+    if (!hasAccess) {
+        return (
+            <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
+        );
+    }
 
     return (
         <>
@@ -22,7 +33,6 @@ const EmployeePage = () => {
                         Add +
                     </button>
                 </div>
-
                 <div className="flex gap-4">
                     {
                         isEmployeesLoading

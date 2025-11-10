@@ -7,6 +7,7 @@ const useTopNav = () => {
         console.log("Logging out...");
         localStorage.removeItem("token");
         localStorage.removeItem("system_user_id");
+        localStorage.removeItem("service_features_access");
         window.location.href = "/";
     };
 

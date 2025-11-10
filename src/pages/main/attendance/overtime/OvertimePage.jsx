@@ -1,8 +1,11 @@
 import AddModal from "../../../../components/AddModal";
 import DailyRecordFilter from "../../../../components/DailyRecordFilter";
 import DualBallLoading from "../../../../components/DualBallLoading";
+import NoAccess from "../../../../components/NoAccess";
 import TanStackTable from "../../../../components/TanStackTable";
+import env from "../../../../configs/env.config";
 import { useOvertimeContext } from "../../../../contexts/OvertimeProvider";
+import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import OvertimeForm from "./OvertimeForm";
 import { column } from "./TableConfigs";
 
@@ -16,6 +19,12 @@ const OvertimePage = () => {
         isOvertimesLoading,
         limit, setLimit
     } = useOvertimeContext();
+
+    const hasAccess = userHasFeatureAccess(env.VITE_PAYROLL_DAILY_RECORDS);
+    if (!hasAccess) {
+        return <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
+    }
+
     return (
 
         <>
