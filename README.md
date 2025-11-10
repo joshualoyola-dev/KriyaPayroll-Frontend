@@ -43,3 +43,13 @@ It provides core services such as:
     ```bash 
     npm run start    # for production
     npm run dev      # for development
+
+## Docker
+1. Pull the image from the docker repository: 
+```
+   docker pull spacemanatee/ats-payroll:latest
+```
+2. Run the container
+```
+   docker run -d -p 5173:80 spacemanatee/ats-payroll:latest
+```
