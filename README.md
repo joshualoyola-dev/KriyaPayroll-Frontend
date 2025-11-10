@@ -53,3 +53,7 @@ It provides core services such as:
 ```
    docker run -d -p 5173:80 spacemanatee/ats-payroll:latest
 ```
+2. Run the container with the injected environment variables
+```
+   docker run -d -p 5173:80 --env-file .env spacemanatee/ats-payroll:latest
+```
