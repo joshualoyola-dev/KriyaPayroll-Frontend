@@ -13,7 +13,8 @@ const usePayslip = () => {
     const [isPayslipsLoading, setIsPayslipsLoading] = useState(false);
     const [isSending, setIsSending] = useState(false);
     const [isPayrunLoading, setIsPayrunLoading] = useState(false);
-    const [failedIds, setFailedIds] = useState([]); //this is string array of ids of employee that failed to be send an payslip email
+    const [failedIds, setFailedIds] = useState([]);
+    const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([]); // New state for selection
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -27,7 +28,6 @@ const usePayslip = () => {
         try {
             const result = await getPayrun(company_id, payrun_id);
             console.log('payrun from sending payslip: ', result);
-
             setPayrun(result.data.payrun);
         } catch (error) {
             console.log(error);
@@ -44,6 +44,8 @@ const usePayslip = () => {
             const result = await getPayslips(payrun_id);
             console.log('payslips content for sending: ', result);
             setPayslips(result.data.payslips);
+            // Auto-select all employees initially
+            setSelectedEmployeeIds(result.data.payslips.map(p => p.employee_id));
         } catch (error) {
             console.log(error);
             addToast("Failed to fetch payslips", "error");
@@ -53,20 +55,41 @@ const usePayslip = () => {
         }
     }
 
+    const handleToggleEmployee = (employee_id) => {
+        setSelectedEmployeeIds(prev =>
+            prev.includes(employee_id)
+                ? prev.filter(id => id !== employee_id)
+                : [...prev, employee_id]
+        );
+    };
+
+    const handleSelectAll = () => {
+        setSelectedEmployeeIds(payslips.map(p => p.employee_id));
+    };
+
+    const handleDeselectAll = () => {
+        setSelectedEmployeeIds([]);
+    };
+
     const handleSendFinalPayslip = async () => {
+        if (selectedEmployeeIds.length === 0) {
+            addToast("Please select at least one employee", "warning");
+            return;
+        }
+
         setIsSending(true);
         try {
             const payload = {
-                employee_ids: payslips.map(payslip => payslip.employee_id)
+                employee_ids: selectedEmployeeIds
             }
 
             const result = await sendMultiplePayslip(company.company_id, payrun.payrun_id, payload);
 
-            if (result.data.failed_pdf_count > 0) {
-                setFailedIds(result.data.failed_pdf_count);
+            if (result.data.failed_pdf_count > 0 || result.data.failed_emails_count) {
                 console.log(`Failed to generate payslip: ${result.data.failed_pdf_count}. Failed to send emails: ${result.data.failed_emails_count}`);
                 alert(`Failed to generate payslip: ${result.data.failed_pdf_count}. Failed to send emails: ${result.data.failed_emails_count}`);
-                addToast(`Failed to generate payslip: ${result.data.failed_pdf_count}. Failed to send emails: ${result.data.failed_emails_count}`, "error");
+                addToast(`Try sending payslips to the failed employees again}`, "error");
+                setSelectedEmployeeIds(result.data.failed_email_ids)
                 return;
             }
 
@@ -79,7 +102,6 @@ const usePayslip = () => {
         finally {
             setIsSending(false);
         }
-
     };
 
     useEffect(() => {
@@ -89,16 +111,12 @@ const usePayslip = () => {
         if (payrun_id) {
             handleFetchPayslips(payrun_id);
             handleFetchPayrun(company.company_id, payrun_id);
-
         }
-
     }, [location.search]);
-
 
     const handleDownloadPayslips = async () => {
         try {
             console.log('payslips before download: ', payslips);
-            //transform payslips
             const cleanedPayslips = payslips.map(payslip => ({
                 employee_id: payslip.employee_id,
                 total_deductions: payslip.total_deductions,
@@ -109,7 +127,6 @@ const usePayslip = () => {
 
             console.log('cleaned payslips: ', cleanedPayslips);
             downloadExcelPayrunSummary(cleanedPayslips, mapEmployeeIdToEmployeeName, 'Payrun Summary', 'Payrun-summary');
-
         } catch (error) {
             console.log(error);
             addToast("Failed to download payslips", "error");
@@ -123,7 +140,11 @@ const usePayslip = () => {
         handleSendFinalPayslip,
         payrun, setPayrun,
         isPayrunLoading, setIsPayrunLoading,
-        handleDownloadPayslips
+        handleDownloadPayslips,
+        selectedEmployeeIds,
+        handleToggleEmployee,
+        handleSelectAll,
+        handleDeselectAll
     }
 };
 
