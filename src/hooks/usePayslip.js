@@ -86,10 +86,10 @@ const usePayslip = () => {
             const result = await sendMultiplePayslip(company.company_id, payrun.payrun_id, payload);
 
             if (result.data.failed_pdf_count > 0 || result.data.failed_emails_count) {
-                setFailedIds(result.data.failed_pdf_count);
                 console.log(`Failed to generate payslip: ${result.data.failed_pdf_count}. Failed to send emails: ${result.data.failed_emails_count}`);
                 alert(`Failed to generate payslip: ${result.data.failed_pdf_count}. Failed to send emails: ${result.data.failed_emails_count}`);
-                addToast(`Failed to generate payslip: ${result.data.failed_pdf_count}. Failed to send emails: ${result.data.failed_emails_count}`, "error");
+                addToast(`Try sending payslips to the failed employees again}`, "error");
+                setSelectedEmployeeIds(result.data.failed_email_ids)
                 return;
             }
 
