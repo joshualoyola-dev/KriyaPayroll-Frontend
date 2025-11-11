@@ -1,7 +1,9 @@
 import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
+import { usePayslipContext } from "../../../../contexts/PayslipProvider";
 
-const FinalPayslipTable = ({ payslips = [] }) => {
+const FinalPayslipTable = () => {
     const headers = ["Name", "Taxes", "Deductions", "Earnings", "Net Pay"];
+    const { payslips } = usePayslipContext();
     const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
 
     return (

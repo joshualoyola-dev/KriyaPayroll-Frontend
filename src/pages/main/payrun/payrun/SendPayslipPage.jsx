@@ -44,7 +44,7 @@ const SendPayslipPage = () => {
 
             {isPayslipsLoading
                 ? "Loading..."
-                : <FinalPayslipTable payslips={payslips} />
+                : <FinalPayslipTable />
             }
             {isSending && <LoadingBackground />}
         </div>
