@@ -245,7 +245,7 @@ const useOvertime = () => {
                     // Handle overtime type enum
                     else if (matchingField === "overtime_type") { // Fixed: Changed from "shift_type"
                         const overtimeType = String(value).toUpperCase().trim();
-                        mappedRow[matchingField] = validOvertimeType.includes(overtimeType) ? overtimeType : 'REGULAR_DAY';
+                        mappedRow[matchingField] = validOvertimeType.includes(overtimeType) ? overtimeType : "";
                     }
                     // Handle overtime status enum
                     else if (matchingField === "overtime_status") {
