@@ -66,6 +66,7 @@ const OvertimeForm = () => {
                                     value={ot.ot_hours || ''}
                                     onChange={(e) => handleFieldChange(ot.id, 'ot_hours', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
                                 {/* OT Hour Rendered Same day */}
@@ -76,6 +77,7 @@ const OvertimeForm = () => {
                                     value={ot.ot_hsameday || ''}
                                     onChange={(e) => handleFieldChange(ot.id, 'ot_hsameday', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
                                 {/* OT Hour Rendered next day */}
@@ -86,6 +88,7 @@ const OvertimeForm = () => {
                                     value={ot.ot_hnextday || ''}
                                     onChange={(e) => handleFieldChange(ot.id, 'ot_hnextday', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
 
@@ -97,6 +100,7 @@ const OvertimeForm = () => {
                                     value={ot.nd_ot_hours || ''}
                                     onChange={(e) => handleFieldChange(ot.id, 'nd_ot_hours', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
                                 {/* OT ND same day*/}
@@ -107,6 +111,7 @@ const OvertimeForm = () => {
                                     value={ot.ndot_hsameday || ''}
                                     onChange={(e) => handleFieldChange(ot.id, 'ndot_hsameday', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
 
@@ -118,6 +123,7 @@ const OvertimeForm = () => {
                                     value={ot.ndot_hnextday || ''}
                                     onChange={(e) => handleFieldChange(ot.id, 'ndot_hnextday', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
                                 />
 
                                 {/* Overtime Type */}
@@ -125,7 +131,9 @@ const OvertimeForm = () => {
                                     value={ot.overtime_type || 'REGULAR'}
                                     onChange={(e) => handleFieldChange(ot.id, 'overtime_type', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                                    required
                                 >
+                                    <option value=""></option>
                                     <option value="REGULAR_DAY">Regular Day</option>
                                     <option value="REST_DAY">Rest Day</option>
                                     <option value="SPECIAL_HOLIDAY">Special Holiday</option>
@@ -139,11 +147,11 @@ const OvertimeForm = () => {
                                     value={ot.overtime_status || 'PENDING'}
                                     onChange={(e) => handleFieldChange(ot.id, 'overtime_status', e.target.value)}
                                     className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                                    required
                                 >
                                     <option value="PENDING">Pending</option>
                                     <option value="ACCEPTED">Accepted</option>
                                     <option value="REJECTED">Rejected</option>
-
                                 </select>
 
                                 {/* Remove Button */}
