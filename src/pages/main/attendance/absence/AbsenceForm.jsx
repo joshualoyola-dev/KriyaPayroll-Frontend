@@ -23,12 +23,13 @@ const AbsenceForm = () => {
             <div className="overflow-x-auto">
                 <div className="min-w-max">
                     {/* Header Row */}
-                    <div className="grid grid-cols-[40px_150px_150px_200px_120px_100px_120px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
+                    <div className="grid grid-cols-[40px_150px_150px_200px_120px_100px_120px_120px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
                         <div></div>
                         <div>Employee Id *</div>
                         <div>Absence Date *</div>
                         <div>Absence Type</div>
                         <div>Absence Status</div>
+                        <div>Halfday</div>
                         <div>Is Paid</div>
                         <div></div>
                     </div>
@@ -36,7 +37,7 @@ const AbsenceForm = () => {
                     {/* Absence Rows */}
                     <div className="space-y-0">
                         {absencesFormData.map((absence, index) => (
-                            <div key={absence.id} className="grid grid-cols-[40px_150px_150px_200px_120px_100px_120px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                            <div key={absence.id} className="grid grid-cols-[40px_150px_150px_200px_120px_100px_120px_120px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
                                 {/* Row Number */}
                                 <div className="flex items-center justify-center text-sm text-gray-500 font-medium">
                                     {index + 1}
@@ -87,12 +88,22 @@ const AbsenceForm = () => {
                                     <option value="REJECTED">Rejected</option>
                                 </select>
 
-                                {/* Is Paid Checkbox */}
+                                {/* Is halfday */}
                                 <div className="flex items-center justify-center">
                                     <input
                                         type="checkbox"
                                         checked={absence.is_paid || false}
                                         onChange={(e) => handleFieldChange(absence.id, 'is_paid', e.target.checked)}
+                                        className="h-4 w-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
+                                    />
+                                </div>
+
+                                {/* Is Paid Checkbox */}
+                                <div className="flex items-center justify-center">
+                                    <input
+                                        type="checkbox"
+                                        checked={absence.is_half_day || false}
+                                        onChange={(e) => handleFieldChange(absence.id, 'is_half_day', e.target.checked)}
                                         className="h-4 w-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
                                     />
                                 </div>

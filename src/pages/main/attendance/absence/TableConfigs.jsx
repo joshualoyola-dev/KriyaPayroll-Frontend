@@ -29,6 +29,18 @@ export const column = [
         ),
     },
     {
+        accessorKey: "is_half_day",
+        header: "halfday",
+        cell: (info) => (
+            <span className={`inline-block px-2 py-1 text-xs rounded-full ${info.getValue()
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+                }`}>
+                {info.getValue() ? "True" : "False"}
+            </span>
+        ),
+    },
+    {
         accessorKey: "is_paid",
         header: "Status",
         cell: (info) => (
