@@ -1,9 +1,10 @@
-import { ChevronDownIcon } from "@heroicons/react/24/solid";
+import { ChevronDownIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { useRegularPayrunContext } from "../../../../contexts/RegularPayrunProvider";
 import { convertToISO8601 } from "../../../../utility/datetime.utility";
 import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import env from "../../../../configs/env.config";
+import PayrunLogs from "../../../../components/PayrunLogs";
 
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();
@@ -15,7 +16,9 @@ const OptionEdit = () => {
         statusLoading,
         isSaving,
         handleAddPayitemToPayslips,
-        handleSaveAndCalculateTaxWitheld
+        handleSaveAndCalculateTaxWitheld,
+        toggleLogs, handleToggleLogs,
+        logs,
     } = useRegularPayrunContext();
 
     const isForApproval = payrun.status === "FOR_APPROVAL";
@@ -28,7 +31,16 @@ const OptionEdit = () => {
         <div className="relative bg-white p-6 rounded-xl border border-gray-200">
             {/* Top controls section - with proper spacing */}
             <div className="flex items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">Payrun Details</h3>
+                <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-gray-900">Payrun Details</h3>
+                    <button
+                        onClick={handleToggleLogs}
+                        className="relative p-1 hover:bg-gray-100 rounded-full focus:outline-none"
+                    >
+                        <InformationCircleIcon className="w-4 h-4 text-gray-500" />
+                        {toggleLogs && < PayrunLogs logs={logs} />}
+                    </button>
+                </div>
 
                 <div className="flex items-center gap-3">
                     <button

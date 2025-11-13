@@ -20,6 +20,7 @@ import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sanitizedPayslips } from "../utility/payrun.utility";
 import { usePayrunContext } from "../contexts/PayrunProvider";
+import { fetchPayrunLogs } from "../services/log.service";
 
 const formData = {
     date_from: '',
@@ -41,6 +42,9 @@ const useRegularPayrun = () => {
     const [isSaving, setIsSaving] = useState(false); //use for both saving draft and save edit
     const [statusLoading, setStatusLoading] = useState(false);
     const [isInitializing, setIsInitializing] = useState(false);
+    const [logs, setLogs] = useState([]);
+    const [logsLoading, setLogsLoading] = useState(false);
+    const [toggleLogs, setToggleLogs] = useState(false);
 
 
     const { payitems } = usePayitemContext();
@@ -90,6 +94,35 @@ const useRegularPayrun = () => {
         }
     }, [location.search]);
 
+
+    const handleFetchPayrunLogs = async () => {
+        setLogsLoading(true);
+        try {
+            const results = await fetchPayrunLogs(payrun.payrun_id);
+
+            //we need to map the performed_by value to actual name
+            const logsPerformedIdsMappedToName = results.data.logs.map(log => ({
+                name: log.performed_by,
+                action: log.action,
+                created_at: new Date(log.created_at).toLocaleString(),
+            }));
+
+            setLogs(logsPerformedIdsMappedToName);
+        } catch (error) {
+            console.log(error);
+            addToast("Failed to fetch payrun logs", "error");
+            setLogs([]);
+        }
+        finally {
+            setLogsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        if (!payrun) return;
+
+        handleFetchPayrunLogs();
+    }, [payrun]);
 
     // Handle input changes
     const handleInputChange = (field, value) => {
@@ -303,6 +336,9 @@ const useRegularPayrun = () => {
         navigate("/payrun/regular/send-payslip");
     };
 
+    const handleToggleLogs = () => {
+        setToggleLogs(!toggleLogs);
+    }
 
     return {
         options, setOptions,
@@ -331,7 +367,12 @@ const useRegularPayrun = () => {
         handleSaveAndCalculateTaxWitheld,
 
         //initialize
-        isInitializing, setIsInitializing
+        isInitializing, setIsInitializing,
+
+        //logs
+        logs, setLogs,
+        logsLoading, setLogsLoading,
+        toggleLogs, handleToggleLogs,
     };
 };
 
