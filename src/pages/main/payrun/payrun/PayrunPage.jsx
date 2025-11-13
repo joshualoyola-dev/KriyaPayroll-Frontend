@@ -15,10 +15,12 @@ const PayrunPage = () => {
     const lastPayruns = payruns.filter(payrun => payrun.payrun_type === 'LAST');
 
     const hasAccess = userHasFeatureAccess(env.VITE_PAYROLL_PAYRUNS_VIEW);
+    const hasDeleteAccess = userHasFeatureAccess(env.VITE_PAYROLL_DELETE_PAYRUN);
 
     if (!hasAccess) {
         return <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
     };
+
 
     return (
         <>
@@ -44,6 +46,7 @@ const PayrunPage = () => {
                                             onDelete={handleDeleteOnePayrun}
                                             onNavigateSendPayslip={handleNavigateSendPayslip}
                                             onDownloadPayslips={handleDownloadPayslipsExcel}
+                                            hasDeleteAccess={hasDeleteAccess}
                                         />
                                     ))}
                                 </div>
