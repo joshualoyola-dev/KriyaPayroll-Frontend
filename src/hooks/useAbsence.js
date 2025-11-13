@@ -11,6 +11,7 @@ const formData = {
     absence_date: '',
     absence_type: 'SICK', //SICK, MATERNITY, PATERNITY, VACATION, BEREAVEMENT, etc
     absence_status: "PENDING", //PENDING, ACCEPTED, REJECTED
+    is_half_day: false,
     is_paid: false,
 };
 
@@ -211,7 +212,7 @@ const useAbsence = () => {
                         mappedRow[matchingField] = validAbsenceStatus.includes(absenceStatus) ? absenceStatus : 'PENDING';
                     }
                     // Handle is_paid (boolean)
-                    else if (matchingField === "is_paid") {
+                    else if (matchingField === "is_paid" || matchingField === "is_half_day") {
                         const boolValue = String(value).toLowerCase().trim();
                         mappedRow[matchingField] = ['true', '1', 'yes', 'y', 'paid'].includes(boolValue);
                     }

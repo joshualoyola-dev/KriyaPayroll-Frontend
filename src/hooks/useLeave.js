@@ -12,6 +12,7 @@ const formData = {
     leave_date: '', // date type. and in YY-MM-DD format
     leave_type: 'SICK_LEAVE', // sick leave, maternity leave, paternity leave, etc.
     leave_status: 'PENDING', // PENDING, ACCEPTED, REJECTED
+    is_half_day: false,
     is_paid: false,
 };
 
@@ -128,6 +129,7 @@ const useLeave = () => {
 
                     // Convert is_paid to boolean
                     cleaned.is_paid = Boolean(cleaned.is_paid);
+                    cleaned.is_half_day = Boolean(cleaned.is_half_day);
 
                     await addOneLeave(company.company_id, cleaned);
                     addToast(`Successfully added leave: ${leave.employee_id}`, "success");
@@ -218,7 +220,7 @@ const useLeave = () => {
                         mappedRow[matchingField] = validLeaveStatus.includes(leaveStatus) ? leaveStatus : 'PENDING';
                     }
                     // Handle is_paid boolean
-                    else if (matchingField === "is_paid") {
+                    else if (matchingField === "is_paid" || matchingField === "is_half_day") {
                         const stringValue = String(value).toLowerCase().trim();
                         mappedRow[matchingField] = ['true', '1', 'yes', 'paid'].includes(stringValue);
                     }

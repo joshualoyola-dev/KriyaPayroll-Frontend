@@ -23,12 +23,13 @@ const LeaveForm = () => {
             <div className="overflow-x-auto">
                 <div className="min-w-max">
                     {/* Header Row */}
-                    <div className="grid grid-cols-[40px_150px_150px_200px_150px_120px_120px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
+                    <div className="grid grid-cols-[40px_150px_150px_200px_150px_120px_120px_120px] gap-3 p-3 bg-gray-50 rounded-t-lg border-b border-gray-200 text-sm font-medium text-gray-700">
                         <div></div>
                         <div>Employee Id *</div>
                         <div>Leave Date *</div>
                         <div>Leave Type</div>
                         <div>Leave Status</div>
+                        <div>Is Halfday</div>
                         <div>Is Paid</div>
                         <div></div>
                     </div>
@@ -36,7 +37,7 @@ const LeaveForm = () => {
                     {/* Employee Rows */}
                     <div className="space-y-0">
                         {leavesFormData.map((leave, index) => (
-                            <div key={leave.id} className="grid grid-cols-[40px_150px_150px_200px_150px_120px_120px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                            <div key={leave.id} className="grid grid-cols-[40px_150px_150px_200px_150px_120px_120px_120px] gap-3 p-3 border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
                                 {/* Row Number */}
                                 <div className="flex items-center justify-center text-sm text-gray-500 font-medium">
                                     {index + 1}
@@ -87,6 +88,16 @@ const LeaveForm = () => {
                                     <option value="ACCEPTED">Accepted</option>
                                     <option value="REJECTED">Rejected</option>
                                 </select>
+
+                                {/* Is Halfday */}
+                                <div className="flex items-center justify-center">
+                                    <input
+                                        type="checkbox"
+                                        checked={leave.is_half_day || false}
+                                        onChange={(e) => handleFieldChange(leave.id, 'is_half_day', e.target.checked)}
+                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                    />
+                                </div>
 
                                 {/* Is Paid */}
                                 <div className="flex items-center justify-center">
