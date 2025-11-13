@@ -2,7 +2,7 @@ import { FolderArrowDownIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { convertToISO8601 } from "../../../../utility/datetime.utility";
 import { PaperAirplaneIcon } from "@heroicons/react/16/solid";
 
-const PayrunCard = ({ payrun, idx, oncClickCard, onDelete, onNavigateSendPayslip, onDownloadPayslips }) => {
+const PayrunCard = ({ payrun, idx, oncClickCard, onDelete, onNavigateSendPayslip, onDownloadPayslips, hasDeleteAccess }) => {
     const statusConfig = {
         DRAFT: {
             bg: "bg-slate-100",
@@ -94,13 +94,15 @@ const PayrunCard = ({ payrun, idx, oncClickCard, onDelete, onNavigateSendPayslip
                             <PaperAirplaneIcon className="h-5 w-5" />
                         </button>
                     )}
-                    <button
-                        onClick={handleDelete}
-                        className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                        title="Delete"
-                    >
-                        <TrashIcon className="h-5 w-5" />
-                    </button>
+                    {hasDeleteAccess &&
+                        <button
+                            onClick={handleDelete}
+                            className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                            title="Delete"
+                        >
+                            <TrashIcon className="h-5 w-5" />
+                        </button>
+                    }
                 </div>
             </div>
         </div>
