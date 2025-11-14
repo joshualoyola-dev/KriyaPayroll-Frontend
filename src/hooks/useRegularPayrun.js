@@ -195,7 +195,17 @@ const useRegularPayrun = () => {
         const payitem_ids = options.pay_items.flatMap(payitem => Object.keys(payitem));
 
         try {
-            const result = await generateRegularPayrun(company.company_id, { payitem_ids, payrun_start_date: options.date_from, payrun_end_date: options.date_to }); console.log('generated payslip result', result);
+            const result = await generateRegularPayrun(company.company_id,
+                {
+                    payitem_ids,
+                    payrun_start_date: options.date_from,
+                    payrun_end_date: options.date_to,
+                    employee_ids: [], //if empty, means include all active in payrun
+                    payrun_type: 'REGULAR',
+
+                }
+            );
+            console.log('generated payslip result', result);
             setPayslips(result.data.payslips);
         } catch (error) {
             console.log(error);
