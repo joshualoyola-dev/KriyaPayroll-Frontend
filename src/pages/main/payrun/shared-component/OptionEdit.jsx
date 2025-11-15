@@ -3,9 +3,9 @@ import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { convertToISO8601 } from "../../../../utility/datetime.utility";
 import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import env from "../../../../configs/env.config";
-import PayrunLogs from "../shared-component/PayrunLogs";
 import Tooltip from "../../../../components/Tooltip";
 import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
+import PayrunLogs from "./PayrunLogs";
 
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();

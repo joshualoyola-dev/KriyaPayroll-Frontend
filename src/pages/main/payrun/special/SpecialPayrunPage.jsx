@@ -1,4 +1,5 @@
 import UnderDevelopment from "../../../../components/UnderDevelopment";
+import PayslipTable from "../shared-component/PayslipTable";
 
 const SpecialPayrunPage = () => {
     return (
