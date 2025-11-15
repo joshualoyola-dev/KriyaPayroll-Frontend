@@ -1,7 +1,7 @@
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
-import { useRegularPayrunContext } from "../../../../contexts/RegularPayrunProvider";
 import { useToastContext } from "../../../../contexts/ToastProvider";
+import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
 
 const OptionGenerate = () => {
     const { payitems } = usePayitemContext();
@@ -12,7 +12,7 @@ const OptionGenerate = () => {
         validateEmployeesDailyRecordAgainstPayrunPeriod,
         handleSaveDraft, payslips, payslipsLoading,
         isSaving,
-    } = useRegularPayrunContext();
+    } = useSharedRunningPayrunOperationContext();
 
     const { addToast } = useToastContext();
 

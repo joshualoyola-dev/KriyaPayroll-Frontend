@@ -1,11 +1,11 @@
 import { ChevronDownIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
-import { useRegularPayrunContext } from "../../../../contexts/RegularPayrunProvider";
 import { convertToISO8601 } from "../../../../utility/datetime.utility";
 import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import env from "../../../../configs/env.config";
 import PayrunLogs from "../shared-component/PayrunLogs";
 import Tooltip from "../../../../components/Tooltip";
+import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
 
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();
@@ -21,7 +21,7 @@ const OptionEdit = () => {
         logs,
         calculateTaxWithheld,
         handleToggleCalculateTaxWithhelds
-    } = useRegularPayrunContext();
+    } = useSharedRunningPayrunOperationContext();
 
     const isForApproval = payrun.status === "FOR_APPROVAL";
     const isApproved = payrun.status === "APPROVED";
