@@ -10,7 +10,7 @@ const OptionEdit = () => {
     const { payitems } = usePayitemContext();
     const {
         payrun,
-        handleCloseRegularPayrun,
+        handleClosePayrun,
         handleSaveEdit,
         handleChangeStatus,
         statusLoading,
@@ -44,7 +44,7 @@ const OptionEdit = () => {
 
                 <div className="flex items-center gap-3">
                     <button
-                        onClick={handleCloseRegularPayrun}
+                        onClick={handleClosePayrun}
                         className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 bg-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all"
                     >
                         Close

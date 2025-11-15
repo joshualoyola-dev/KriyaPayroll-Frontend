@@ -57,7 +57,7 @@ const useRegularPayrun = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const initializeRegularPayrun = async (payrun_id) => {
+    const initializePayrun = async (payrun_id) => {
         setIsInitializing(true);
         try {
             //trigger the fetch of existing payrun
@@ -67,13 +67,9 @@ const useRegularPayrun = () => {
             setPayrun(resultPayrun.data.payrun);
 
 
-
-            //populate the options
-
             //populate the payslips. this will cause the save draft to hide. 
             // and show the save edit or finalize
             const resultPayables = await getPayrunPayslipPayables(company.company_id, payrun_id);
-            console.log('fetched payslip payables: ', resultPayables);
             setPayslips(resultPayables.data.payslips);
             setOldPayslips(resultPayables.data.payslips);
         } catch (error) {
@@ -90,7 +86,7 @@ const useRegularPayrun = () => {
         const payrun_id = params.get("payrun_id");
 
         if (payrun_id) {
-            initializeRegularPayrun(payrun_id);
+            initializePayrun(payrun_id);
         }
     }, [location.search]);
 
@@ -205,7 +201,6 @@ const useRegularPayrun = () => {
 
                 }
             );
-            console.log('generated payslip result', result);
             setPayslips(result.data.payslips);
         } catch (error) {
             console.log(error);
@@ -233,11 +228,10 @@ const useRegularPayrun = () => {
                 generated_by: localStorage.getItem('system_user_id'),
                 status: 'DRAFT',
             };
-            const result = await saveRegularPayrunDraft(company.company_id, payload);
-            console.log('result saving draft', result);
+            await saveRegularPayrunDraft(company.company_id, payload);
             addToast("Successfully saved regular payrun draft", "success");
             await handleFetchPayruns();
-            handleCloseRegularPayrun();
+            handleClosePayrun();
         } catch (error) {
             console.log(error);
             addToast(`Error occurred in saving payroll.`, "error");
@@ -259,8 +253,7 @@ const useRegularPayrun = () => {
             const result = await saveEdit(company.company_id, payrun.payrun_id, payload);
             console.log('result saving edits', result);
             addToast("Successfully saved regular payrun edits", "success");
-            // handleCloseRegularPayrun();
-            await initializeRegularPayrun(payrun.payrun_id);
+            await initializePayrun(payrun.payrun_id);
         } catch (error) {
             console.log(error);
             addToast(`Error occurred in saving edits.`, "error");
@@ -273,7 +266,6 @@ const useRegularPayrun = () => {
 
     const handleSaveAndCalculateTaxWitheld = async () => {
         setIsSaving(true);
-
         try {
             const cleanedEditedPayslips = sanitizedPayslips(payslips);
             const cleanedOldPayslips = sanitizedPayslips(oldPayslips);
@@ -284,8 +276,7 @@ const useRegularPayrun = () => {
             const result = await saveEdit(company.company_id, payrun.payrun_id, payload, true);
             console.log('result calculating tax withheld', result);
             addToast("Successfully calculated tax withheld", "success");
-            // handleCloseRegularPayrun();
-            await initializeRegularPayrun(payrun.payrun_id);
+            await initializePayrun(payrun.payrun_id);
         } catch (error) {
             console.log(error);
             addToast(`Error occurred in calculating tax withhelds.`, "error");
@@ -295,7 +286,10 @@ const useRegularPayrun = () => {
         }
     };
 
-    const handleCloseRegularPayrun = () => {
+    const handleClosePayrun = () => {
+        setPayslips([]);
+        setOldPayslips([]);
+        setOptions({ ...formData });
         setPayrun(null);
         setPayslips([]);
         navigate('/payrun');
@@ -309,7 +303,7 @@ const useRegularPayrun = () => {
             console.log('update status result: ', result);
 
             await handleFetchPayruns();
-            await initializeRegularPayrun(payrun.payrun_id);
+            await initializePayrun(payrun.payrun_id);
             addToast("Successfully updated status", "success");
         } catch (error) {
             console.log(error);
@@ -319,12 +313,6 @@ const useRegularPayrun = () => {
             setStatusLoading(false);
         }
     };
-
-    // const handleAddPayitemToPayslips = (payitem_id) => {
-    //     console.log('payslips data for additinal payitems: ', payslips);
-
-
-    // };
 
     const handleAddPayitemToPayslips = (payitem_id) => {
         setPayslips(prevPayslips => {
@@ -336,14 +324,8 @@ const useRegularPayrun = () => {
                     [payitem_id]: payitems[payitem_id] ?? 0, // add with default 0 if not exists
                 };
             }
-            console.log('updated payslips: ', updated);
-
             return updated;
         });
-    };
-
-    const handleSendPayslips = () => {
-        navigate("/payrun/regular/send-payslip");
     };
 
     const handleToggleLogs = () => {
@@ -368,12 +350,11 @@ const useRegularPayrun = () => {
         handleSaveDraft,
         payrun, setPayrun,
 
-        handleCloseRegularPayrun,
+        handleClosePayrun,
         handleSaveEdit,
         handleChangeStatus,
         statusLoading, setStatusLoading,
         handleAddPayitemToPayslips,
-        handleSendPayslips,
         handleSaveAndCalculateTaxWitheld,
 
         //initialize
