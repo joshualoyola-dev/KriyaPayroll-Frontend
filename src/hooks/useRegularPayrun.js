@@ -45,7 +45,7 @@ const useRegularPayrun = () => {
     const [logs, setLogs] = useState([]);
     const [logsLoading, setLogsLoading] = useState(false);
     const [toggleLogs, setToggleLogs] = useState(false);
-
+    const [calculateTaxWithheld, setCalculateTaxWithheld] = useState(false);
 
     const { payitems } = usePayitemContext();
     const { activeEmployees } = useEmployeeContext();
@@ -72,6 +72,9 @@ const useRegularPayrun = () => {
             const resultPayables = await getPayrunPayslipPayables(company.company_id, payrun_id);
             setPayslips(resultPayables.data.payslips);
             setOldPayslips(resultPayables.data.payslips);
+
+            //reset the tax withheld option
+            setCalculateTaxWithheld(false);
         } catch (error) {
             console.log(error);
             addToast("Failed to initialize the payrun", "error");
@@ -228,7 +231,7 @@ const useRegularPayrun = () => {
                 generated_by: localStorage.getItem('system_user_id'),
                 status: 'DRAFT',
             };
-            await saveRegularPayrunDraft(company.company_id, payload);
+            await saveRegularPayrunDraft(company.company_id, payload, 'regular');
             addToast("Successfully saved regular payrun draft", "success");
             await handleFetchPayruns();
             handleClosePayrun();
@@ -250,7 +253,7 @@ const useRegularPayrun = () => {
                 edited_payslips: cleanedEditedPayslips,
                 old_payslips: cleanedOldPayslips
             };
-            const result = await saveEdit(company.company_id, payrun.payrun_id, payload);
+            const result = await saveEdit(company.company_id, payrun.payrun_id, payload, calculateTaxWithheld, 'regular');
             console.log('result saving edits', result);
             addToast("Successfully saved regular payrun edits", "success");
             await initializePayrun(payrun.payrun_id);
@@ -263,30 +266,8 @@ const useRegularPayrun = () => {
         }
     };
 
-
-    const handleSaveAndCalculateTaxWitheld = async () => {
-        setIsSaving(true);
-        try {
-            const cleanedEditedPayslips = sanitizedPayslips(payslips);
-            const cleanedOldPayslips = sanitizedPayslips(oldPayslips);
-            const payload = {
-                edited_payslips: cleanedEditedPayslips,
-                old_payslips: cleanedOldPayslips
-            };
-            const result = await saveEdit(company.company_id, payrun.payrun_id, payload, true);
-            console.log('result calculating tax withheld', result);
-            addToast("Successfully calculated tax withheld", "success");
-            await initializePayrun(payrun.payrun_id);
-        } catch (error) {
-            console.log(error);
-            addToast(`Error occurred in calculating tax withhelds.`, "error");
-        }
-        finally {
-            setIsSaving(false);
-        }
-    };
-
     const handleClosePayrun = () => {
+        setCalculateTaxWithheld(false);
         setPayslips([]);
         setOldPayslips([]);
         setOptions({ ...formData });
@@ -332,6 +313,10 @@ const useRegularPayrun = () => {
         setToggleLogs(!toggleLogs);
     }
 
+    const handleToggleCalculateTaxWithhelds = () => {
+        setCalculateTaxWithheld(!calculateTaxWithheld);
+    }
+
     return {
         options, setOptions,
         //options controll
@@ -355,7 +340,6 @@ const useRegularPayrun = () => {
         handleChangeStatus,
         statusLoading, setStatusLoading,
         handleAddPayitemToPayslips,
-        handleSaveAndCalculateTaxWitheld,
 
         //initialize
         isInitializing, setIsInitializing,
@@ -364,6 +348,9 @@ const useRegularPayrun = () => {
         logs, setLogs,
         logsLoading, setLogsLoading,
         toggleLogs, handleToggleLogs,
+
+        handleToggleCalculateTaxWithhelds,
+        calculateTaxWithheld
     };
 };
 
