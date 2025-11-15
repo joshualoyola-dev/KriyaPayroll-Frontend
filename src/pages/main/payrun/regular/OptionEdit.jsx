@@ -4,7 +4,7 @@ import { useRegularPayrunContext } from "../../../../contexts/RegularPayrunProvi
 import { convertToISO8601 } from "../../../../utility/datetime.utility";
 import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import env from "../../../../configs/env.config";
-import PayrunLogs from "../../../../components/PayrunLogs";
+import PayrunLogs from "../shared-component/PayrunLogs";
 
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();

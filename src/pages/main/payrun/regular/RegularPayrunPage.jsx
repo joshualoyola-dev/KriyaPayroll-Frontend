@@ -1,8 +1,8 @@
 import LoadingBackground from "../../../../components/LoadingBackground";
 import { useRegularPayrunContext } from "../../../../contexts/RegularPayrunProvider";
+import PayslipTable from "../shared-component/PayslipTable";
 import OptionEdit from "./OptionEdit";
 import OptionGenerate from "./OptionGenerate";
-import PayslipTable from "./PayslipTable";
 
 const RegularPayrunPage = () => {
     const { payslips, setPayslips, payrun, payslipsLoading, isSaving, statusLoading, isInitializing } = useRegularPayrunContext();
