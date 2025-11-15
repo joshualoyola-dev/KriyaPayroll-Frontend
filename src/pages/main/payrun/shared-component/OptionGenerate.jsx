@@ -12,6 +12,7 @@ const OptionGenerate = () => {
         handleSaveDraft, payslips, payslipsLoading,
         isSaving,
         payrunType,
+        handleClosePayrun
     } = useSharedRunningPayrunOperationContext();
     const { addToast } = useToastContext();
 
@@ -34,13 +35,21 @@ const OptionGenerate = () => {
             <div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">Payrun Details</h3>
                 {(Object.keys(payslips).length > 0) && (
-                    <button
-                        onClick={handleSaveDraft}
-                        disabled={isSaving}
-                        className="px-4 py-2 text-sm font-medium rounded-xl bg-teal-600 text-white hover:bg-teal-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-all"
-                    >
-                        {isSaving ? "Saving..." : "Save Draft"}
-                    </button>
+                    <div className="space-x-2">
+                        <button
+                            onClick={handleClosePayrun}
+                            className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 bg-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all"
+                        >
+                            Close
+                        </button>
+                        <button
+                            onClick={handleSaveDraft}
+                            disabled={isSaving}
+                            className="px-4 py-2 text-sm font-medium rounded-xl bg-teal-600 text-white hover:bg-teal-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-all"
+                        >
+                            {isSaving ? "Saving..." : "Save Draft"}
+                        </button>
+                    </div>
                 )}
             </div>
 
