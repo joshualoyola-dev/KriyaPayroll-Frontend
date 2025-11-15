@@ -6,7 +6,7 @@ const PayrunFilter = () => {
     const navigate = useNavigate();
 
     const handleOptionClick = (option) => {
-        navigate(`/payrun/${option}`);
+        navigate(`/payrun/${option}?payrun_type=${option}`);
     };
 
     return (

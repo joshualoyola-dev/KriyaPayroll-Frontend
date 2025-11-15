@@ -15,7 +15,7 @@ import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { validateDailyRecordOfOneEmployee } from "../services/attendance.service";
 import { convertToISO8601 } from "../utility/datetime.utility";
-import { generateRegularPayrun, getPayrun, getPayrunPayslipPayables, saveEdit, saveRegularPayrunDraft, updateStatus } from "../services/payrun.service";
+import { generatePayrun, getPayrun, getPayrunPayslipPayables, saveEdit, savePayrunDraft, updateStatus } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sanitizedPayslips } from "../utility/payrun.utility";
@@ -46,6 +46,7 @@ const useRegularPayrun = () => {
     const [logsLoading, setLogsLoading] = useState(false);
     const [toggleLogs, setToggleLogs] = useState(false);
     const [calculateTaxWithheld, setCalculateTaxWithheld] = useState(false);
+    const [payrunType, setPayrunType] = useState('REGULAR');
 
     const { payitems } = usePayitemContext();
     const { activeEmployees } = useEmployeeContext();
@@ -87,6 +88,11 @@ const useRegularPayrun = () => {
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const payrun_id = params.get("payrun_id");
+        const payrun_type = params.get("payrun_type");
+
+        if (payrun_type) {
+            setPayrunType(payrun_type);
+        }
 
         if (payrun_id) {
             initializePayrun(payrun_id);
@@ -194,13 +200,13 @@ const useRegularPayrun = () => {
         const payitem_ids = options.pay_items.flatMap(payitem => Object.keys(payitem));
 
         try {
-            const result = await generateRegularPayrun(company.company_id,
+            const result = await generatePayrun(company.company_id,
                 {
                     payitem_ids,
                     payrun_start_date: options.date_from,
                     payrun_end_date: options.date_to,
                     employee_ids: [], //if empty, means include all active in payrun
-                    payrun_type: 'REGULAR',
+                    payrun_type: payrunType.toUpperCase(),
 
                 }
             );
@@ -223,16 +229,16 @@ const useRegularPayrun = () => {
             //logic for saving. 
             const payload = {
                 payslips: cleanedPayslips,
-                payrun_type: 'REGULAR',
+                payrun_type: payrunType.toUpperCase(),
                 payrun_start_date: options.date_from,
                 payrun_end_date: options.date_to,
                 payment_date: options.payment_date,
-                payrun_title: `REGULAR PAYRUN: ${options.date_from} - ${options.date_to}`,
+                payrun_title: `${payrunType.toUpperCase()} PAYRUN: ${options.date_from} - ${options.date_to}`,
                 generated_by: localStorage.getItem('system_user_id'),
                 status: 'DRAFT',
             };
-            await saveRegularPayrunDraft(company.company_id, payload, 'regular');
-            addToast("Successfully saved regular payrun draft", "success");
+            await savePayrunDraft(company.company_id, payload, payrunType.toLowerCase());
+            addToast("Successfully saved payrun draft", "success");
             await handleFetchPayruns();
             handleClosePayrun();
         } catch (error) {
@@ -253,9 +259,9 @@ const useRegularPayrun = () => {
                 edited_payslips: cleanedEditedPayslips,
                 old_payslips: cleanedOldPayslips
             };
-            const result = await saveEdit(company.company_id, payrun.payrun_id, payload, calculateTaxWithheld, 'regular');
+            const result = await saveEdit(company.company_id, payrun.payrun_id, payload, calculateTaxWithheld, payrunType.toLowerCase());
             console.log('result saving edits', result);
-            addToast("Successfully saved regular payrun edits", "success");
+            addToast("Successfully saved payrun edits", "success");
             await initializePayrun(payrun.payrun_id);
         } catch (error) {
             console.log(error);

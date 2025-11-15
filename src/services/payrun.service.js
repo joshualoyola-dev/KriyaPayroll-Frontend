@@ -12,11 +12,11 @@ export const getCompanyPayruns = async (company_id) => {
     return await payroll_api.get(`/api/v1/payruns/${company_id}`);
 };
 
-export const generateRegularPayrun = async (company_id, formData) => {
-    return await payroll_api.post(`/api/v1/payruns/${company_id}/regular/generate`, formData)
+export const generatePayrun = async (company_id, formData) => {
+    return await payroll_api.post(`/api/v1/payruns/${company_id}/generate`, formData)
 };
 
-export const saveRegularPayrunDraft = async (company_id, formData, payrun_type) => {
+export const savePayrunDraft = async (company_id, formData, payrun_type) => {
     return await payroll_api.post(`/api/v1/payruns/${company_id}/${payrun_type}/save-draft`, formData);
 };
 
