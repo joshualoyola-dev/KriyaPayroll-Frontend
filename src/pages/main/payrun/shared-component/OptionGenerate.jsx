@@ -2,6 +2,7 @@ import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
 import { useToastContext } from "../../../../contexts/ToastProvider";
+import EmployeeSelection from "./EmployeeSelection";
 
 const OptionGenerate = () => {
     const { payitems } = usePayitemContext();
@@ -147,6 +148,9 @@ const OptionGenerate = () => {
                         {isValidating || payslipsLoading ? "Loading..." : "Generate"}
                     </button>
                 </div>
+
+                {/* Employee Selection */}
+                {String(payrunType).toUpperCase() === 'SPECIAL' && <EmployeeSelection />}
             </form>
 
             {/* Selected Payitems */}
@@ -177,6 +181,7 @@ const OptionGenerate = () => {
                     </div>
                 </div>
             )}
+
         </div>
     );
 };

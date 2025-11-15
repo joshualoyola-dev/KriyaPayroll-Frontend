@@ -37,6 +37,7 @@ const useSharedRunningPayrunOperation = () => {
     const [toggleLogs, setToggleLogs] = useState(false);
     const [calculateTaxWithheld, setCalculateTaxWithheld] = useState(false);
     const [payrunType, setPayrunType] = useState('REGULAR');
+    const [toggleEmployeeSelections, setToggleEmployeeSelections] = useState(false);
 
     const { payitems } = usePayitemContext();
     const { activeEmployees } = useEmployeeContext();
@@ -264,6 +265,7 @@ const useSharedRunningPayrunOperation = () => {
 
     const handleClosePayrun = () => {
         setCalculateTaxWithheld(false);
+        setToggleEmployeeSelections(false);
         setPayslips([]);
         setOldPayslips([]);
         setOptions({ ...formData });
@@ -313,6 +315,23 @@ const useSharedRunningPayrunOperation = () => {
         setCalculateTaxWithheld(!calculateTaxWithheld);
     }
 
+    const handleEmployeeIdsChange = (employee_id) => {
+        const value = employee_id;
+
+        const exists = options.employee_ids.includes(value);
+
+        setOptions(prev => ({
+            ...prev,
+            employee_ids: exists
+                ? prev.employee_ids.filter(id => id !== value)
+                : [...prev.employee_ids, value]
+        }));
+    };
+
+    const handleToggleEmployeeSelections = () => {
+        setToggleEmployeeSelections(!toggleEmployeeSelections);
+    }
+
     return {
         options, setOptions,
         //options controll
@@ -349,6 +368,9 @@ const useSharedRunningPayrunOperation = () => {
         calculateTaxWithheld,
 
         payrunType, setPayrunType,
+        handleEmployeeIdsChange,
+        toggleEmployeeSelections, setToggleEmployeeSelections,
+        handleToggleEmployeeSelections,
     };
 };
 
