@@ -1,7 +1,7 @@
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
-import { useToastContext } from "../../../../contexts/ToastProvider";
 import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
+import { useToastContext } from "../../../../contexts/ToastProvider";
 
 const OptionGenerate = () => {
     const { payitems } = usePayitemContext();
@@ -9,23 +9,21 @@ const OptionGenerate = () => {
         options, handleInputChange,
         handlePayitemChange, removePayitem,
         handleGenerate, isValidating,
-        validateEmployeesDailyRecordAgainstPayrunPeriod,
         handleSaveDraft, payslips, payslipsLoading,
         isSaving,
+        payrunType,
     } = useSharedRunningPayrunOperationContext();
-
     const { addToast } = useToastContext();
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        //validate
-        // const allValid = await validateEmployeesDailyRecordAgainstPayrunPeriod();
-        // if (!allValid) {
-        //     addToast("Fix the daily record first", "warning");
-        //     return;
-        // }
-
+        //for special, check if there is atleast one selected employee
+        if (String(payrunType).toUpperCase() === 'SPECIAL') {
+            if (options.employee_ids.length === 0) {
+                return addToast("Select at least one employee to run payrun", "error");
+            }
+        }
         //generate
         handleGenerate();
     }

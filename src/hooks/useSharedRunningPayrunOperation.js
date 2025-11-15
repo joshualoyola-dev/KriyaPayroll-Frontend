@@ -19,6 +19,7 @@ const formData = {
         { 'payitem-id-01': "Tax Withheld" },
         { 'payitem-id-02': "Basic Pay" },
     ], //payitem_id : pay_item_name in the column
+    employee_ids: [],
 };
 
 const useSharedRunningPayrunOperation = () => {
@@ -194,7 +195,7 @@ const useSharedRunningPayrunOperation = () => {
                     payitem_ids,
                     payrun_start_date: options.date_from,
                     payrun_end_date: options.date_to,
-                    employee_ids: [], //if empty, means include all active in payrun
+                    employee_ids: options.employee_ids, //if empty, means include all active in payrun
                     payrun_type: payrunType.toUpperCase(),
 
                 }
@@ -345,7 +346,9 @@ const useSharedRunningPayrunOperation = () => {
         toggleLogs, handleToggleLogs,
 
         handleToggleCalculateTaxWithhelds,
-        calculateTaxWithheld
+        calculateTaxWithheld,
+
+        payrunType, setPayrunType,
     };
 };
 
