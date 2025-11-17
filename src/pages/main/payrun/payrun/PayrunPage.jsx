@@ -58,7 +58,16 @@ const PayrunPage = () => {
                                 </span>
                                 <div className="space-y-3">
                                     {specialPayruns?.map((payrun, idx) => (
-                                        <PayrunCard key={idx} payrun={payrun} idx={idx} oncClickCard={handleClickPayrun} />
+                                        <PayrunCard
+                                            key={idx}
+                                            payrun={payrun}
+                                            idx={idx}
+                                            oncClickCard={handleClickPayrun}
+                                            onDelete={handleDeleteOnePayrun}
+                                            onNavigateSendPayslip={handleNavigateSendPayslip}
+                                            onDownloadPayslips={handleDownloadPayslipsExcel}
+                                            hasDeleteAccess={hasDeleteAccess}
+                                        />
                                     ))}
                                 </div>
                             </div>

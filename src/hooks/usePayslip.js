@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
-import { getPayrun, getPayslips, sendMultiplePayslip, sendOnePayslip } from "../services/payrun.service";
+import { getPayrun, getPayslips, sendMultiplePayslip } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
-import { downloadExcelMatrix, downloadExcelPayrunSummary } from "../utility/excel.utility";
+import { downloadExcelPayrunSummary } from "../utility/excel.utility";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { usePayitemContext } from "../contexts/PayitemProvider";
 

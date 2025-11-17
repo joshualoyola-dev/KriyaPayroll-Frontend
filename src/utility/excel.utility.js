@@ -30,7 +30,7 @@ export const downloadExcelMatrix = (
 
         for (const payItemId of allInnerKeys) {
             const payItemName = mapPayitemIdToPayitemName(payItemId) || payItemId;
-            row[payItemName] = data[empId]?.[payItemId] ?? '';
+            row[payItemName] = data[empId]?.[payItemId] != null ? Number(data[empId]?.[payItemId]) : null;
         }
 
         rows.push(row);
@@ -77,21 +77,21 @@ export const downloadPayablesAndTotals = (
 
         for (const payItemId of allInnerKeys) {
             const payItemName = mapPayitemIdToPayitemName(payItemId) || payItemId;
-            row[payItemName] = data[empId]?.[payItemId] ?? '';
+            row[payItemName] = data[empId]?.[payItemId] != null ? Number(data[empId]?.[payItemId]) : 0;
         }
 
         // Add payslip data
         const payslip = payslipMap.get(empId);
         if (payslip) {
-            row['Total Earnings'] = payslip.total_earnings || '0';
-            row['Total Deductions'] = payslip.total_deductions || '0';
-            row['Total Taxes'] = payslip.total_taxes || '0';
-            row['Net Salary'] = payslip.net_salary || '0';
+            row['Total Earnings'] = payslip.total_earnings != null ? Number(payslip.total_earnings) : 0;
+            row['Total Deductions'] = payslip.total_deductions != null ? Number(payslip.total_deductions) : 0;
+            row['Total Taxes'] = payslip.total_taxes != null ? Number(payslip.total_taxes) : 0;
+            row['Net Salary'] = payslip.net_salary != null ? Number(payslip.total_taxes) : 0;
         } else {
-            row['Total Earnings'] = '';
-            row['Total Deductions'] = '';
-            row['Total Taxes'] = '';
-            row['Net Salary'] = '';
+            row['Total Earnings'] = 0;
+            row['Total Deductions'] = 0;
+            row['Total Taxes'] = 0;
+            row['Net Salary'] = 0;
         }
 
         rows.push(row);
@@ -122,12 +122,12 @@ export const downloadExcelPayrunSummary = (
 
         // Transform data into desired Excel structure
         const rows = data.map(payslip => ({
-            "Employee ID": payslip.employee_id,
-            "Employee Name": mapEmployeeIdToEmployeeName(payslip.employee_id) || "",
-            "Total Earnings": payslip.total_earnings,
-            "Total Deductions": payslip.total_deductions,
-            "Total Taxes": payslip.total_taxes,
-            "Net Salary": payslip.net_salary,
+            "Employee ID": payslip.employee_id || null,
+            "Employee Name": mapEmployeeIdToEmployeeName(payslip.employee_id) || null,
+            "Total Earnings": Number(payslip.total_earnings),
+            "Total Deductions": Number(payslip.total_deductions),
+            "Total Taxes": Number(payslip.total_taxes),
+            "Net Salary": Number(payslip.net_salary),
         }));
 
         // Create worksheet and workbook
