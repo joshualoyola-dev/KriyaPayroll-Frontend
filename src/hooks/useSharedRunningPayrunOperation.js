@@ -1,14 +1,3 @@
-/**
- * we have 3 cases: 
- * 1) generate a payrun
- * 2) payrun is already generated. for editing
- * 3) payrun is already generated. for viewing (i.e., approved)
- * 
- * 
- * to check for a currently selected regular payrun, we can rely on the url.
- * i.e., if it is /payruns/regular?payrun_id=123, we run a useeffect to get the record of payrun 123. 
- */
-
 import { useEffect, useState } from "react";
 import { usePayitemContext } from "../contexts/PayitemProvider";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
@@ -30,9 +19,10 @@ const formData = {
         { 'payitem-id-01': "Tax Withheld" },
         { 'payitem-id-02': "Basic Pay" },
     ], //payitem_id : pay_item_name in the column
+    employee_ids: [],
 };
 
-const useRegularPayrun = () => {
+const useSharedRunningPayrunOperation = () => {
     const [payrun, setPayrun] = useState(null);
     const [options, setOptions] = useState({ ...formData }); //case 1, 2, 3
     const [isValidating, setIsValidating] = useState(false); //case 1,
@@ -47,6 +37,7 @@ const useRegularPayrun = () => {
     const [toggleLogs, setToggleLogs] = useState(false);
     const [calculateTaxWithheld, setCalculateTaxWithheld] = useState(false);
     const [payrunType, setPayrunType] = useState('REGULAR');
+    const [toggleEmployeeSelections, setToggleEmployeeSelections] = useState(false);
 
     const { payitems } = usePayitemContext();
     const { activeEmployees } = useEmployeeContext();
@@ -205,7 +196,7 @@ const useRegularPayrun = () => {
                     payitem_ids,
                     payrun_start_date: options.date_from,
                     payrun_end_date: options.date_to,
-                    employee_ids: [], //if empty, means include all active in payrun
+                    employee_ids: options.employee_ids, //if empty, means include all active in payrun
                     payrun_type: payrunType.toUpperCase(),
 
                 }
@@ -274,6 +265,7 @@ const useRegularPayrun = () => {
 
     const handleClosePayrun = () => {
         setCalculateTaxWithheld(false);
+        setToggleEmployeeSelections(false);
         setPayslips([]);
         setOldPayslips([]);
         setOptions({ ...formData });
@@ -323,6 +315,23 @@ const useRegularPayrun = () => {
         setCalculateTaxWithheld(!calculateTaxWithheld);
     }
 
+    const handleEmployeeIdsChange = (employee_id) => {
+        const value = employee_id;
+
+        const exists = options.employee_ids.includes(value);
+
+        setOptions(prev => ({
+            ...prev,
+            employee_ids: exists
+                ? prev.employee_ids.filter(id => id !== value)
+                : [...prev.employee_ids, value]
+        }));
+    };
+
+    const handleToggleEmployeeSelections = () => {
+        setToggleEmployeeSelections(!toggleEmployeeSelections);
+    }
+
     return {
         options, setOptions,
         //options controll
@@ -356,8 +365,13 @@ const useRegularPayrun = () => {
         toggleLogs, handleToggleLogs,
 
         handleToggleCalculateTaxWithhelds,
-        calculateTaxWithheld
+        calculateTaxWithheld,
+
+        payrunType, setPayrunType,
+        handleEmployeeIdsChange,
+        toggleEmployeeSelections, setToggleEmployeeSelections,
+        handleToggleEmployeeSelections,
     };
 };
 
-export default useRegularPayrun;
+export default useSharedRunningPayrunOperation;

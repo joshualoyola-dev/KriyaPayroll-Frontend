@@ -1,25 +1,27 @@
 import { ChevronDownIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
-import { useRegularPayrunContext } from "../../../../contexts/RegularPayrunProvider";
 import { convertToISO8601 } from "../../../../utility/datetime.utility";
 import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import env from "../../../../configs/env.config";
-import PayrunLogs from "../../../../components/PayrunLogs";
+import Tooltip from "../../../../components/Tooltip";
+import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
+import PayrunLogs from "./PayrunLogs";
 
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();
     const {
         payrun,
-        handleCloseRegularPayrun,
+        handleClosePayrun,
         handleSaveEdit,
         handleChangeStatus,
         statusLoading,
         isSaving,
         handleAddPayitemToPayslips,
-        handleSaveAndCalculateTaxWitheld,
         toggleLogs, handleToggleLogs,
         logs,
-    } = useRegularPayrunContext();
+        calculateTaxWithheld,
+        handleToggleCalculateTaxWithhelds
+    } = useSharedRunningPayrunOperationContext();
 
     const isForApproval = payrun.status === "FOR_APPROVAL";
     const isApproved = payrun.status === "APPROVED";
@@ -44,7 +46,7 @@ const OptionEdit = () => {
 
                 <div className="flex items-center gap-3">
                     <button
-                        onClick={handleCloseRegularPayrun}
+                        onClick={handleClosePayrun}
                         className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 bg-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all"
                     >
                         Close
@@ -54,48 +56,46 @@ const OptionEdit = () => {
                         <span className="text-sm text-gray-500">Saving...</span>
                     ) : (
                         <div className="flex gap-x-2">
-                            <button
-                                onClick={handleSaveEdit}
-                                disabled={isForApproval || isApproved || !hasEditPayrunAccess}
-                                className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${isForApproval || isApproved
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-teal-600 text-white hover:bg-teal-700"
-                                    }`}
-                                title={(!hasEditPayrunAccess || isApproved) ? "You have no access to edit this payrun or it is already approved" : ""}
-                            >
-                                Save
-                            </button>
-
-                            <button
-                                onClick={handleSaveAndCalculateTaxWitheld}
-                                disabled={isForApproval || isApproved || !hasEditPayrunAccess}
-                                className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${isForApproval || isApproved
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-teal-600 text-white hover:bg-teal-700"
-                                    }`}
-                                title={(!hasEditPayrunAccess || isApproved) ? "You have no access to edit this payrun or it is already approved" : ""}
-                            >
-                                Calculate Tax Withheld
-                            </button>
+                            <Tooltip text={(!hasEditPayrunAccess || isApproved) ? "You have no access to edit this payrun or it is already approved" : ""}>
+                                <button
+                                    onClick={handleSaveEdit}
+                                    disabled={isForApproval || isApproved || !hasEditPayrunAccess}
+                                    className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${isForApproval || isApproved
+                                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                        : "bg-teal-600 text-white hover:bg-teal-700"
+                                        }`}
+                                >
+                                    Save
+                                </button>
+                            </Tooltip>
+                            <Tooltip text={"Calculate the tax withheld for edited records. Otherwise, save all and calculate tax withheld for all records."}>
+                                <input
+                                    type="checkbox"
+                                    value={calculateTaxWithheld}
+                                    onChange={handleToggleCalculateTaxWithhelds}
+                                    disabled={isForApproval || isApproved}
+                                />
+                            </Tooltip>
                         </div>
                     )}
 
                     {statusLoading ? (
                         <span className="text-sm text-gray-500">Loading...</span>
                     ) : (
-                        <select
-                            value={payrun.status}
-                            onChange={(e) => handleChangeStatus(e.target.value)}
-                            disabled={isApproved || !hasChangedStatusAccess}
-                            className={`px-3 py-2 text-sm rounded-xl border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 ${isApproved ? "cursor-not-allowed bg-gray-100 text-gray-400" : ""
-                                }`}
-                            title={!hasChangedStatusAccess ? "You don’t have access to change status" : ""}
-                        >
-                            <option value="DRAFT">Draft</option>
-                            <option value="FOR_APPROVAL">For Approval</option>
-                            <option value="APPROVED">Approved</option>
-                            <option value="REJECTED">Rejected</option>
-                        </select>
+                        <Tooltip text={(!hasChangedStatusAccess || isApproved) ? "Approved or No Access" : ""}>
+                            <select
+                                value={payrun.status}
+                                onChange={(e) => handleChangeStatus(e.target.value)}
+                                disabled={isApproved || !hasChangedStatusAccess}
+                                className={`px-3 py-2 text-sm rounded-xl border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 ${isApproved ? "cursor-not-allowed bg-gray-100 text-gray-400" : ""
+                                    }`}
+                            >
+                                <option value="DRAFT">Draft</option>
+                                <option value="FOR_APPROVAL">For Approval</option>
+                                <option value="APPROVED">Approved</option>
+                                <option value="REJECTED">Rejected</option>
+                            </select>
+                        </Tooltip>
                     )}
                 </div>
             </div>

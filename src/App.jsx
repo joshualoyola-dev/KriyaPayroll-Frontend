@@ -25,7 +25,6 @@ import HolidayPage from "./pages/main/attendance/holiday/HolidayPage"
 import { HolidayProvider } from "./contexts/HolidayProvider"
 import RegularPayrunPage from "./pages/main/payrun/regular/RegularPayrunPage"
 import { PayitemProvider } from "./contexts/PayitemProvider"
-import { RegularPayrunProvider } from "./contexts/RegularPayrunProvider"
 import { RecurringPayProvider } from "./contexts/RecurringPayProvider"
 import PayitemPage from "./pages/main/configuration/payitem/PayitemPage"
 import CompanyConfigsPage from "./pages/main/configuration/company-configs/CompanyConfigsPage"
@@ -45,6 +44,7 @@ import { PayslipProvider } from "./contexts/PayslipProvider"
 import DataExportPage from "./pages/main/data-export/DataExportPage"
 import { ExportProvider } from "./contexts/ExportProvider"
 import { YtdProvider } from "./contexts/YtdProvider"
+import { SharedRunningPayrunOperationProvider } from "./contexts/SharedRunningPayrunOperationProvider"
 
 function App() {
   return (
@@ -62,8 +62,7 @@ function App() {
                           <HolidayProvider>
                             <PayitemProvider >
                               <PayrunProvider >
-
-                                <RegularPayrunProvider>
+                                <SharedRunningPayrunOperationProvider>
                                   <RecurringPayProvider >
                                     <ContributionProvider >
                                       <HdmfProvider >
@@ -125,7 +124,8 @@ function App() {
                                       </HdmfProvider>
                                     </ContributionProvider>
                                   </RecurringPayProvider>
-                                </RegularPayrunProvider>
+
+                                </SharedRunningPayrunOperationProvider>
                               </PayrunProvider>
                             </PayitemProvider>
                           </HolidayProvider>
