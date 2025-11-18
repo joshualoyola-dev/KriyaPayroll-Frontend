@@ -13,7 +13,7 @@ import {
     ChevronLeftIcon,
     ChevronRightIcon
 } from "@heroicons/react/24/outline";
-import { compactEmployeeColumns, fullEmployeeColumns } from "./TableConfigs";
+import { compactEmployeeColumns, fullEmployeeColumns } from "./tableConfigs";
 
 const EmployeeTable = ({ isCardOpen = false }) => {
     const { employees, handleFetchEmployeeInfo } = useEmployeeContext();
@@ -160,7 +160,7 @@ const EmployeeTable = ({ isCardOpen = false }) => {
                                                 key={currentPage}
                                                 onClick={() => table.setPageIndex(currentPage)}
                                                 className={`px-3 py-1 rounded-md text-sm font-medium ${currentPage === pageIndex
-                                                    ? 'bg-teal-600 text-white'
+                                                    ? 'bg-blue-600 text-white'
                                                     : 'bg-white text-gray-500 border border-gray-300 hover:bg-gray-50'
                                                     }`}
                                             >
