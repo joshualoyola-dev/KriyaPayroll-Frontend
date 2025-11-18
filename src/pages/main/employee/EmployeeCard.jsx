@@ -1,14 +1,13 @@
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { format } from "date-fns";
 import AddSalaryForm from "./AddSalaryForm";
-import { PencilIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
+import { PlusCircleIcon } from "@heroicons/react/24/solid";
 import { getYYYYMMDDPartOfUTCDate } from "../../../utility/datetime.utility";
 
 const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSalaryForm, handleChangeEmploymentStatus }) => {
     if (!employee) {
         return null;
     }
-
 
     const {
         first_name,
@@ -32,8 +31,8 @@ const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSala
     const sortedSalaries = employee_salaries?.sort((a, b) => new Date(a.date) - new Date(b.date)) || [];
 
     return (
-        <div className="h-fit">
-            <div className="relative bg-white shadow-sm rounded-2xl p-6 space-y-6 min-w-[350px] max-w-[400px]">
+        <div className="h-screen flex">
+            <div className="relative bg-white shadow-sm rounded-2xl p-6 space-y-6 min-w-lg max-w-lg flex flex-col overflow-hidden">
                 {/* Close Icon */}
                 <button
                     className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
@@ -42,7 +41,7 @@ const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSala
                     <XCircleIcon className="h-6 w-6" />
                 </button>
                 {/* Header */}
-                <div className="pr-8">
+                <div className="pr-8 flex-shrink-0">
                     <h2 className="text-xl font-semibold text-gray-800 break-words">{fullName}</h2>
                     <p className="text-gray-600 break-words">
                         {job_title} • {department}
@@ -68,128 +67,127 @@ const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSala
                     </select>
                 </div>
 
-                <div className="max-w-md mx-auto mt-4">
+                <div className="max-w-md mx-auto mt-4 flex-shrink-0">
                     {/* Contact Info */}
-                    <h3 className="text-sm font-semibold text-gray-800 mb-2 border-b pb-1">Contact</h3>
-                    <table className="w-full border border-gray-300 text-sm mb-4">
-                        <tbody>
-                            <tr className="border-b border-gray-200">
-                                <td className="font-medium text-gray-700 px-3 py-2 w-1/3">Work</td>
-                                <td className="text-gray-600 px-3 py-2 break-all">{work_email}</td>
-                            </tr>
-                            <tr>
-                                <td className="font-medium text-gray-700 px-3 py-2">Personal</td>
-                                <td className="text-gray-600 px-3 py-2 break-all">{personal_email}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div>
+                        <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3 text-teal-600">Contact</h3>
+                        <div className="grid grid-cols-2 gap-3 bg-gray-50 rounded-lg p-3">
+                            <div>
+                                <p className="text-xs text-gray-600">Work</p>
+                                <p className="text-sm text-gray-800 break-all font-medium">{work_email}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-600">Personal</p>
+                                <p className="text-sm text-gray-800 break-all font-medium">{personal_email}</p>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Employment Info */}
-                    <h3 className="text-sm font-semibold text-gray-800 mb-2 border-b pb-1">Employment</h3>
-                    <table className="w-full border border-gray-300 text-sm mb-4">
-                        <tbody>
-                            <tr className="border-b border-gray-200">
-                                <td className="font-medium text-gray-700 px-3 py-2 w-1/3">Date Hired</td>
-                                <td className="text-gray-600 px-3 py-2">
-                                    {getYYYYMMDDPartOfUTCDate(date_hired)}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td className="font-medium text-gray-700 px-3 py-2">Date End</td>
-                                <td className="text-gray-600 px-3 py-2">
-                                    {date_end ? getYYYYMMDDPartOfUTCDate(date_end) : "None"}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div>
+                        <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3 text-teal-600">Employment</h3>
+                        <div className="grid grid-cols-2 gap-3 bg-gray-50 rounded-lg p-3">
+                            <div>
+                                <p className="text-xs text-gray-600">Date Hired</p>
+                                <p className="text-sm text-gray-800 font-medium">{getYYYYMMDDPartOfUTCDate(date_hired)}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-600">Date End</p>
+                                <p className="text-sm text-gray-800 font-medium">{date_end ? getYYYYMMDDPartOfUTCDate(date_end) : "None"}</p>
+                            </div>
+                        </div>
+                    </div>
+
 
                     {/* Shift Info */}
-                    <h3 className="text-sm font-semibold text-gray-800 mb-2 border-b pb-1">Shift</h3>
-                    <table className="w-full border border-gray-300 text-sm">
-                        <tbody>
-                            <tr className="border-b border-gray-200">
-                                <td className="font-medium text-ms text-gray-700 px-3 py-2 w-1/3">Shift Start</td>
-                                <td className="text-gray-600 px-3 py-2">{EmployeeShift.shift_start}</td>
-                            </tr>
-                            <tr className="border-b border-gray-200">
-                                <td className="font-medium text-gray-700 px-3 py-2">Shift End</td>
-                                <td className="text-gray-600 px-3 py-2">{EmployeeShift.shift_end}</td>
-                            </tr>
-                            <tr className="border-b border-gray-200">
-                                <td className="font-medium text-gray-700 px-3 py-2">Break Start</td>
-                                <td className="text-gray-600 px-3 py-2">{EmployeeShift.break_start}</td>
-                            </tr>
-                            <tr className="border-b border-gray-200">
-                                <td className="font-medium text-gray-700 px-3 py-2">Break End</td>
-                                <td className="text-gray-600 px-3 py-2">{EmployeeShift.break_end}</td>
-                            </tr>
-                            <tr>
-                                <td className="font-medium text-gray-700 px-3 py-2">Shift Hours</td>
-                                <td className="text-gray-600 px-3 py-2">{EmployeeShift.shift_hours}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div>
+                        <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3 text-teal-600">Shift Schedule</h3>
+                        <div className="grid grid-cols-2 gap-3 bg-gray-50 rounded-lg p-3">
+                            <div>
+                                <p className="text-xs text-gray-600">Shift Start</p>
+                                <p className="text-sm text-gray-800 font-medium">{EmployeeShift.shift_start}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-600">Shift End</p>
+                                <p className="text-sm text-gray-800 font-medium">{EmployeeShift.shift_end}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-600">Break Start</p>
+                                <p className="text-sm text-gray-800 font-medium">{EmployeeShift.break_start}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-600">Break End</p>
+                                <p className="text-sm text-gray-800 font-medium">{EmployeeShift.break_end}</p>
+                            </div>
+                            <div className="col-span-2">
+                                <p className="text-xs text-gray-600">Hours</p>
+                                <p className="text-sm text-gray-800 font-medium">{EmployeeShift.shift_hours}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
 
 
-                {/* Salary History */}
-                {showAddSalaryForm ? (
-                    <AddSalaryForm />
-                ) : (
-                    <>
-                        {sortedSalaries.length > 0 && (
-                            <div className="relative space-y-1">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-sm font-semibold text-gray-700">Salary History</h3>
-                                    <button
-                                        onClick={() => setShowAddSalaryForm(true)}
-                                        className="cursor-pointer"
-                                    >
-                                        <PlusCircleIcon className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-                                    </button>
-                                </div>
+                {/* Salary History - Scrollable */}
+                <div className="flex-1 overflow-y-auto min-h-0">
+                    {showAddSalaryForm ? (
+                        <AddSalaryForm />
+                    ) : (
+                        <>
+                            {sortedSalaries.length > 0 && (
+                                <div className="relative space-y-1">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-sm font-semibold text-gray-700">Salary History</h3>
+                                        <button
+                                            onClick={() => setShowAddSalaryForm(true)}
+                                            className="cursor-pointer"
+                                        >
+                                            <PlusCircleIcon className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                                        </button>
+                                    </div>
 
-                                <div className="relative pl-4">
-                                    {/* Vertical Line */}
-                                    <div className="absolute left-2 top-2 bottom-2 w-px bg-gray-200"></div>
+                                    <div className="relative pl-4">
+                                        {/* Vertical Line */}
+                                        <div className="absolute left-2 top-2 bottom-2 w-px bg-gray-200"></div>
 
-                                    {/* Salary Items */}
-                                    <div className="space-y-3">
-                                        {sortedSalaries.map((salary, index) => (
-                                            <div key={salary.employee_salary_id} className="relative">
-                                                {/* Indicator Dot */}
-                                                <div className={`absolute -left-[9px] top-1 w-3 h-3 rounded-full border-2 ${salary.is_active
-                                                    ? "bg-green-500 border-green-500"
-                                                    : "bg-white border-gray-300"
-                                                    }`}></div>
+                                        {/* Salary Items */}
+                                        <div className="space-y-3">
+                                            {sortedSalaries.map((salary, index) => (
+                                                <div key={salary.employee_salary_id} className="relative">
+                                                    {/* Indicator Dot */}
+                                                    <div className={`absolute -left-[9px] top-1 w-3 h-3 rounded-full border-2 ${salary.is_active
+                                                        ? "bg-green-500 border-green-500"
+                                                        : "bg-white border-gray-300"
+                                                        }`}></div>
 
-                                                {/* Salary Details */}
-                                                <div className="ml-4">
-                                                    <div className="flex items-center justify-between">
-                                                        <span className={`text-sm font-medium ${salary.is_active ? "text-gray-900" : "text-gray-600"
-                                                            }`}>
-                                                            P{parseFloat(salary.base_pay).toLocaleString()}
-                                                        </span>
-                                                        {salary.is_active && (
-                                                            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                                                                Current
+                                                    {/* Salary Details */}
+                                                    <div className="ml-4">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className={`text-sm font-medium ${salary.is_active ? "text-gray-900" : "text-gray-600"
+                                                                }`}>
+                                                                P{parseFloat(salary.base_pay).toLocaleString()}
                                                             </span>
-                                                        )}
+                                                            {salary.is_active && (
+                                                                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                                                    Current
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-xs text-gray-500">
+                                                            {format(new Date(salary.date), "MMM dd, yyyy")} • {salary.change_type.toLowerCase()}
+                                                        </p>
                                                     </div>
-                                                    <p className="text-xs text-gray-500">
-                                                        {format(new Date(salary.date), "MMM dd, yyyy")} • {salary.change_type.toLowerCase()}
-                                                    </p>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                    </>
-                )}
-            </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            </div >
         </div>
     );
 };
