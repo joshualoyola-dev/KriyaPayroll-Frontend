@@ -1,8 +1,7 @@
-import Question1Img from "../../../../public/question1.svg";
 import Question from "../../../components/Question";
 import UnderDevelopment from "../../../components/UnderDevelopment";
 import { useCompanyContext } from "../../../contexts/CompanyProvider";
-import DashboardPlaceholder from "./DashboardPlaceholder";
+import { DailyRecordsCounts } from "../attendance/analytics/DailyRecordsCounts";
 
 
 const DashboardPage = () => {
@@ -18,7 +17,17 @@ const DashboardPage = () => {
     />;
 
     return (
-        <UnderDevelopment title={`Under Development`} label={`This gives overview on payruns, employees records and daily records`} />
+        <div className="px-4 py-3">
+            {/* 4 boxes in one row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="bg-gray-200 rounded-xl p-6 h-24"></div>
+                <div className="bg-gray-200 rounded-xl p-6 h-24"></div>
+                <div className="bg-gray-200 rounded-xl p-6 h-24"></div>
+                <div className="bg-gray-200 rounded-xl p-6 h-24"></div>
+            </div>
+
+            <DailyRecordsCounts />
+        </div>
     );
 }
 

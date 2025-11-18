@@ -45,3 +45,32 @@ export const convertToDatetimeString = (datetime) => {
 export const getYYYYMMDDPartOfUTCDate = (date) => {
     return String(date).split('T')[0];
 }
+
+export const getNearestDateRangePerPayrollPeriod = (date = new Date()) => {
+    const d = new Date(date);
+    const day = d.getDate();
+    const month = d.getMonth() + 1; // 1-indexed month
+    const year = d.getFullYear();
+
+    let startDay, endDay;
+
+    if (day <= 15) {
+        // Payrun period 1-15
+        startDay = 1;
+        endDay = 15;
+    } else {
+        // Payrun period 16-end of month
+        startDay = 16;
+        // get last day of month
+        endDay = new Date(year, month, 0).getDate(); // day 0 of next month = last day of current month
+    }
+
+    // Format as YYYY-MM-DD
+    const formatDate = (y, m, d) => `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
+    return {
+        from: formatDate(year, month, startDay),
+        to: formatDate(year, month, endDay)
+    };
+}
+
