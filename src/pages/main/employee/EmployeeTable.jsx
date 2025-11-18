@@ -13,14 +13,14 @@ import {
     ChevronLeftIcon,
     ChevronRightIcon
 } from "@heroicons/react/24/outline";
-import { compactEmployeeColumns, fullEmployeeColumns } from "./tableConfigs";
+import { fullEmployeeColumns } from "./TableConfigs";
 
 const EmployeeTable = ({ isCardOpen = false }) => {
     const { employees, handleFetchEmployeeInfo } = useEmployeeContext();
     const [sorting, setSorting] = useState([]);
 
     // Choose columns based on whether card is open
-    const columns = isCardOpen ? compactEmployeeColumns : fullEmployeeColumns;
+    const columns = fullEmployeeColumns;
 
     const table = useReactTable({
         data: employees,
