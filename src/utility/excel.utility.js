@@ -86,7 +86,7 @@ export const downloadPayablesAndTotals = (
             row['Total Earnings'] = payslip.total_earnings != null ? Number(payslip.total_earnings) : 0;
             row['Total Deductions'] = payslip.total_deductions != null ? Number(payslip.total_deductions) : 0;
             row['Total Taxes'] = payslip.total_taxes != null ? Number(payslip.total_taxes) : 0;
-            row['Net Salary'] = payslip.net_salary != null ? Number(payslip.total_taxes) : 0;
+            row['Net Salary'] = payslip.net_salary != null ? Number(payslip.net_salary) : 0;
         } else {
             row['Total Earnings'] = 0;
             row['Total Deductions'] = 0;
