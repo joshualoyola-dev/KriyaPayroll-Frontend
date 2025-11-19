@@ -7,6 +7,7 @@ const formData = {
     date_from: '',
     date_to: '',
     payment_date: '',
+    payrun_type: 'REGULAR',
 };
 
 const useUploadPayrun = () => {

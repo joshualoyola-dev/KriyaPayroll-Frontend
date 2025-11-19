@@ -1,7 +1,5 @@
-import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { useToastContext } from "../../../../contexts/ToastProvider";
-import EmployeeSelection from "./EmployeeSelection";
 import { useUploadPayrunContext } from "../../../../contexts/UploadPayrunProvider";
 
 const OptionUpload = () => {
@@ -98,16 +96,14 @@ const OptionUpload = () => {
                 {/* Generate Button */}
                 <div className="space-y-2">
                     <label className="block text-xs font-medium text-gray-700">
-                        Upload
+                        Select File
                     </label>
                     <input
                         type="file"
                         accept=".xlsx,.xls"
                         onChange={handleFileChange}
                         className="w-full px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm rounded-3xl disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-all"
-                    >
-                        Select file
-                    </input>
+                    />
                 </div>
             </form>
         </div>
