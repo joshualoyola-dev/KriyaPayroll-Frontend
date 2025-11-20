@@ -1,13 +1,12 @@
-import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { useToastContext } from "../../../../contexts/ToastProvider";
 import { useUploadPayrunContext } from "../../../../contexts/UploadPayrunProvider";
 
 const OptionUpload = () => {
-    const { payitems } = usePayitemContext();
     const {
-        payslips, isUploading, handleClosePayrun, options,
+        payslipsPayables, isUploading, handleClosePayrun, options,
         handleInputChange, uploadPayrunFile,
-
+        handleCheckEmployeesIfExist,
+        handleSave
     } = useUploadPayrunContext();
 
     const handleFileChange = (e) => {
@@ -19,6 +18,8 @@ const OptionUpload = () => {
     };
 
     const handleSubmit = async (e) => {
+        handleCheckEmployeesIfExist();
+        handleSave();
         e.preventDefault();
     };
 
@@ -27,7 +28,7 @@ const OptionUpload = () => {
             {/* Top controls section - with proper spacing */}
             <div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">Payrun Details</h3>
-                {(Object.keys(payslips).length > 0) && (
+                {(Object.keys(payslipsPayables).length > 0) && (
                     <div className="space-x-2">
                         <button
                             onClick={handleClosePayrun}
@@ -48,7 +49,7 @@ const OptionUpload = () => {
 
             {/* Main form grid */}
             <form
-                className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6"
+                className="grid grid-cols-1 lg:grid-cols-6 gap-4 mb-6"
             >
                 {/* Date From */}
                 <div className="space-y-2">
@@ -90,6 +91,43 @@ const OptionUpload = () => {
                         className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                         required
                     />
+                </div>
+
+                {/*  Payrun Type */}
+                <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">
+                        Payrun Type
+                    </label>
+                    <select
+                        value={options.payrun_type}
+                        onChange={(e) => handleInputChange('payrun_type', e.target.value)}
+                        className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                        required
+                    >
+                        <option value="REGULAR">Regular Payrun</option>
+                        <option value="SPECIAL">Special Payrun</option>
+                        <option value="LAST">Last Payrun</option>
+
+                    </select>
+                </div>
+
+                {/*  Payrun Status */}
+                <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">
+                        Payrun Status
+                    </label>
+                    <select
+                        value={options.payrun_status}
+                        onChange={(e) => handleInputChange('payrun_status', e.target.value)}
+                        className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                        required
+                    >
+                        <option value="DRAFT">Draft</option>
+                        <option value="FOR_APPROVAL">For Approval</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="REJECTED">Rejected</option>
+
+                    </select>
                 </div>
 
 

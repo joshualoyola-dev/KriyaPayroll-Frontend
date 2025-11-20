@@ -521,6 +521,9 @@ const useEmployee = () => {
 
     const mapEmployeeIdToEmployeeName = (employee_id) => {
         const emp = employees.find(obj => obj['employee_id'] === employee_id);
+
+        if (!emp) return "N/A";
+
         return `${emp.first_name} ${emp.last_name}`
     };
 
