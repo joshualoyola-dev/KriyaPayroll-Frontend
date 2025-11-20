@@ -37,3 +37,7 @@ export const addEmployeeSalary = async (company_id, employee_id, formData) => {
 export const updateEmploymentStatus = async (company_id, employee_id, employement_status) => {
     return await payroll_api.patch(`/api/v1/employees/${employee_id}/companies/${company_id}/employment-status`, { employement_status });
 }
+
+export const getCheckEmployeesIfExist = async (company_id, concat_employee_ids) => {
+    return await payroll_api.get(`/api/v1/employees/existence/companies/${company_id}?employee_ids=${concat_employee_ids}`)
+};

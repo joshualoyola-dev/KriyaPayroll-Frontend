@@ -1,9 +1,10 @@
 import { useUploadPayrunContext } from "../../../../contexts/UploadPayrunProvider";
 import OptionUpload from "../shared-component/OptionUpload";
 import PayslipTable from "../shared-component/PayslipTable";
+import ErrorModal from "./ErrorModal";
 
 const UploadPayrunPage = () => {
-    const { payslipsPayables, setPayslipsPayables } = useUploadPayrunContext();
+    const { payslipsPayables, setPayslipsPayables, missingEmpIds } = useUploadPayrunContext();
     return (
         <>
             <div className="pb-4">
@@ -15,6 +16,7 @@ const UploadPayrunPage = () => {
                     : <PayslipTable data={payslipsPayables} setData={setPayslipsPayables} />
                 }
             </div>
+            {missingEmpIds.length > 0 && <ErrorModal />}
         </>
     );
 };

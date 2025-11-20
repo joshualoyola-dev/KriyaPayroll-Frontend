@@ -3,10 +3,10 @@ import { useUploadPayrunContext } from "../../../../contexts/UploadPayrunProvide
 
 const OptionUpload = () => {
     const {
-        payslipsPayables, isUploading, handleClosePayrun, options,
+        payslipsPayables, isLoading, handleClosePayrun, options,
         handleInputChange, uploadPayrunFile,
         handleCheckEmployeesIfExist,
-        handleSave
+        handleSave,
     } = useUploadPayrunContext();
 
     const handleFileChange = (e) => {
@@ -18,9 +18,10 @@ const OptionUpload = () => {
     };
 
     const handleSubmit = async (e) => {
-        handleCheckEmployeesIfExist();
-        handleSave();
         e.preventDefault();
+        const missing = await handleCheckEmployeesIfExist();
+        if (missing.length > 0) return;
+        handleSave();
     };
 
     return (
@@ -38,10 +39,10 @@ const OptionUpload = () => {
                         </button>
                         <button
                             onClick={handleSubmit}
-                            disabled={isUploading}
+                            disabled={isLoading}
                             className="px-4 py-2 text-sm font-medium rounded-xl bg-teal-600 text-white hover:bg-teal-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-all"
                         >
-                            {isUploading ? "Saving..." : "Save"}
+                            {isLoading ? "Saving..." : "Save"}
                         </button>
                     </div>
                 )}

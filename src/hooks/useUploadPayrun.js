@@ -3,6 +3,9 @@ import { useToastContext } from "../contexts/ToastProvider";
 import { useNavigate } from "react-router-dom";
 import { parseExcelFile } from "../utility/upload.utility";
 import { oldPayitemsNameToPayitemIDMap } from "../utility/payitem.utility";
+import { getCheckEmployeesIfExist } from "../services/employee.service";
+import { useCompanyContext } from "../contexts/CompanyProvider";
+import getErrorMessage from "../utility/error.utility";
 
 const formData = {
     date_from: '',
@@ -16,12 +19,13 @@ const useUploadPayrun = () => {
     const [options, setOptions] = useState({ ...formData });
     const [payslipsPayables, setPayslipsPayables] = useState([]); //payables only
     const [payslipsTotals, setPayslipsTotals] = useState([]); // totals in payslips
-    const [payslipsLoading, setPayslipsLoading] = useState(false);
     const [employeesCheckLoading, setEmployeesCheckLoading] = useState(false);
-    const [isUploading, setIsUploading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [missingEmpIds, setMissingEmpIds] = useState([]);
 
     const { addToast } = useToastContext();
     const navigate = useNavigate();
+    const { company } = useCompanyContext();
 
     const handleClosePayrun = () => {
         setOptions({ ...formData });
@@ -50,7 +54,7 @@ const useUploadPayrun = () => {
             return;
         }
 
-        setPayslipsLoading(true);
+        setIsLoading(true);
 
         try {
             let parsedData = [];
@@ -81,7 +85,6 @@ const useUploadPayrun = () => {
                     if (value != undefined || value != null) {
                         if (key === "Total Earnings") {
                             payslipTotalsData[employeeId]['total_earnings'] = Number(value);
-
                         }
                         if (key === "Total Taxes") {
                             payslipTotalsData[employeeId]['total_taxes'] = Number(value);
@@ -98,7 +101,6 @@ const useUploadPayrun = () => {
                         const payitem_id = oldPayitemsNameToPayitemIDMap(key);
                         if (!payitem_id) return;
                         payslipPayablesData[employeeId][payitem_id] = Number(value);
-
                     }
                 });
             });
@@ -114,16 +116,38 @@ const useUploadPayrun = () => {
             addToast(`Failed to process file: ${error.message}`, "error");
         }
         finally {
-            setPayslipsLoading(false);
+            setIsLoading(false);
         }
 
     };
 
-    const handleCheckEmployeesIfExist = () => {
-        return;
+    const handleCheckEmployeesIfExist = async () => {
+        setIsLoading(true);
+
+        const employee_ids = Object.keys(payslipsPayables);
+        const concat_employee_ids = employee_ids.join(',');
+
+        try {
+            const result = await getCheckEmployeesIfExist(company.company_id, concat_employee_ids);
+            const { missingEmployeeIds } = result.data;
+
+            setMissingEmpIds(missingEmployeeIds);
+
+
+            if (missingEmployeeIds.length === 0) {
+                addToast("Insert the employees first into the record before uploading", "error");
+            }
+            return missingEmployeeIds;
+        } catch (error) {
+            addToast(`Failed to check if employees exist: ${getErrorMessage(error)}`, "error");
+        }
+        finally {
+            setIsLoading(false);
+        }
     };
 
     const handleSave = () => {
+        addToast("Running the saving of records for upload", "success");
         return;
     };
 
@@ -131,16 +155,15 @@ const useUploadPayrun = () => {
         options, setOptions,
         payslipsPayables, setPayslipsPayables,
         payslipsTotals, setPayslipsTotals,
-        payslipsLoading, setPayslipsLoading,
         employeesCheckLoading, setEmployeesCheckLoading,
-        isUploading, setIsUploading,
+        isLoading, setIsLoading,
         handleCheckEmployeesIfExist,
         handleSave,
-
+        missingEmpIds, setMissingEmpIds,
 
         handleClosePayrun,
         handleInputChange,
-        uploadPayrunFile
+        uploadPayrunFile,
     };
 };
 
