@@ -21,7 +21,7 @@ const SpecialPayrunPage = () => {
             </div>
             {(payslipsLoading || isSaving || statusLoading || isInitializing) && <LoadingBackground />}
         </>
-    )
+    );
 };
 
 export default SpecialPayrunPage;

@@ -77,7 +77,7 @@ const useRestday = () => {
         if (location.pathname === '/attendance/restday') {
             handleFetchRestdays();
         }
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]); // Added dependency array
+    }, [location.pathname, company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]); // Added dependency array
 
     const handleAddRow = () => {
         const newRow = { ...formData, id: Date.now() };
