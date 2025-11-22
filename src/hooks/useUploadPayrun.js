@@ -6,6 +6,9 @@ import { oldPayitemsNameToPayitemIDMap } from "../utility/payitem.utility";
 import { getCheckEmployeesIfExist } from "../services/employee.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import getErrorMessage from "../utility/error.utility";
+import { sanitizedPayslips } from "../utility/payrun.utility";
+import { usePayrunContext } from "../contexts/PayrunProvider";
+import { saveUploadedPayrun } from "../services/payrun.service";
 
 const formData = {
     date_from: '',
@@ -26,6 +29,7 @@ const useUploadPayrun = () => {
     const { addToast } = useToastContext();
     const navigate = useNavigate();
     const { company } = useCompanyContext();
+    const { handleFetchPayruns } = usePayrunContext();
 
     const handleClosePayrun = () => {
         setOptions({ ...formData });
@@ -133,10 +137,6 @@ const useUploadPayrun = () => {
 
             setMissingEmpIds(missingEmployeeIds);
 
-
-            if (missingEmployeeIds.length === 0) {
-                addToast("Insert the employees first into the record before uploading", "error");
-            }
             return missingEmployeeIds;
         } catch (error) {
             addToast(`Failed to check if employees exist: ${getErrorMessage(error)}`, "error");
@@ -146,9 +146,33 @@ const useUploadPayrun = () => {
         }
     };
 
-    const handleSave = () => {
-        addToast("Running the saving of records for upload", "success");
-        return;
+    const handleSave = async () => {
+        setIsLoading(true);
+        try {
+            const cleanedPayables = sanitizedPayslips(payslipsPayables);
+            const cleanedTotals = sanitizedPayslips(payslipsTotals);
+
+            const payload = {
+                payslips_payables: cleanedPayables,
+                payslips_totals: cleanedTotals,
+                payrun_start_date: options.date_from,
+                payrun_end_date: options.date_to,
+                payment_date: options.payment_date,
+                payrun_title: `${options.payrun_type.toUpperCase()} PAYRUN: ${options.date_from} - ${options.date_to}`,
+                generated_by: localStorage.getItem('system_user_id'),
+                status: options.payrun_status,
+                payrun_type: options.payrun_type,
+            }
+            await saveUploadedPayrun(company.company_id, payload);
+            addToast("Successfully saved uploaded payrun", "success");
+            await handleFetchPayruns();
+            handleClosePayrun();
+        } catch (error) {
+            addToast(`Error occurred in saving payroll. ${getErrorMessage(error)}`, "error");
+        }
+        finally {
+            setIsLoading(false);
+        }
     };
 
     return {

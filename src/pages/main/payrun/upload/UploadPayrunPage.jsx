@@ -1,10 +1,11 @@
+import LoadingBackground from "../../../../components/LoadingBackground";
 import { useUploadPayrunContext } from "../../../../contexts/UploadPayrunProvider";
 import OptionUpload from "../shared-component/OptionUpload";
 import PayslipTable from "../shared-component/PayslipTable";
 import ErrorModal from "./ErrorModal";
 
 const UploadPayrunPage = () => {
-    const { payslipsPayables, setPayslipsPayables, missingEmpIds } = useUploadPayrunContext();
+    const { payslipsPayables, setPayslipsPayables, missingEmpIds, isLoading } = useUploadPayrunContext();
     return (
         <>
             <div className="pb-4">
@@ -17,6 +18,7 @@ const UploadPayrunPage = () => {
                 }
             </div>
             {missingEmpIds.length > 0 && <ErrorModal />}
+            {isLoading && <LoadingBackground />}
         </>
     );
 };
