@@ -1,4 +1,7 @@
+import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
+
 const PayrunLogs = ({ logs }) => {
+    const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
     return (
         <div className="px-3 py-1 absolute top-1 left-4 z-50 w-sm bg-white border border-gray-300 rounded-lg overflow-hidden max-h-96 shadow-lg overflow-y-auto">
             <h1 className="text-xs font-semibold text-start pb-1">Payrun Logs</h1>
@@ -14,7 +17,7 @@ const PayrunLogs = ({ logs }) => {
                     >
                         <div className="flex items-center space-x-4">
                             <p className="text-gray-800 text-sm font-medium flex-shrink-0 w-1/3 truncate">
-                                {log.name}
+                                {mapEmployeeIdToEmployeeName(log.performed_by) !== 'N/A' ? mapEmployeeIdToEmployeeName(log.performed_by) : log.performed_by}
                             </p>
                             <span className="text-xs text-gray-600 flex-1">
                                 {log.action}
