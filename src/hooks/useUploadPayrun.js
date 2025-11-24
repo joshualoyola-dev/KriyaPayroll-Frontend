@@ -35,8 +35,10 @@ const useUploadPayrun = () => {
         setOptions({ ...formData });
         setPayslipsPayables([]);
         setPayslipsTotals([]);
+        setMissingEmpIds([]);
         navigate('/payrun');
     };
+
 
     const handleInputChange = (field, value) => {
         setOptions(prev => ({
