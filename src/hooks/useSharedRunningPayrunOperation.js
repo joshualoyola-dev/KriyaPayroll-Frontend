@@ -98,7 +98,7 @@ const useSharedRunningPayrunOperation = () => {
 
             //we need to map the performed_by value to actual name
             const logsPerformedIdsMappedToName = results.data.logs.map(log => ({
-                name: log.performed_by,
+                performed_by: log.performed_by,
                 action: log.action,
                 created_at: new Date(log.created_at).toLocaleString(),
             }));
