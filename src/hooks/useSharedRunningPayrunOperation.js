@@ -56,7 +56,6 @@ const useSharedRunningPayrunOperation = () => {
             //trigger the fetch of existing payrun
             //fetch payrun
             const resultPayrun = await getPayrun(company.company_id, payrun_id);
-            console.log('fetched payrun: ', resultPayrun);
             setPayrun(resultPayrun.data.payrun);
 
             //populate the payslips. this will cause the save draft to hide. 
@@ -68,8 +67,6 @@ const useSharedRunningPayrunOperation = () => {
             // get payslips totals
             const resultPayablesTotals = await getPayslipsTotals(resultPayrun.data.payrun.payrun_id, resultPayrun.data.payrun.status);
             setPayslipTotal(resultPayablesTotals.data.totals);
-
-            console.log('payslips totals: ', resultPayablesTotals.data);
 
             //reset the tax withheld option
             setCalculateTaxWithheld(false);
