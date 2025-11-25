@@ -1,7 +1,7 @@
 import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 
-const PayslipTable = ({ data, setData }) => {
+const PayslipTable = ({ data, setData, totals = [] }) => {
     // const employee_ids = Object.keys(data);
     const employee_ids = Object.keys(data).sort((a, b) => {
         const numA = parseInt(a.split("-").pop(), 10);
@@ -54,6 +54,23 @@ const PayslipTable = ({ data, setData }) => {
                                 {mapPayitemIdToPayitemName(payitem_id)}
                             </th>
                         ))}
+                        {
+                            totals.length !== 0 &&
+                            <>
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-40 top-0 z-30 bg-red-300 shadow-sm whitespace-nowrap">
+                                    Total Earnings
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-40 top-0 z-30 bg-red-300 shadow-sm whitespace-nowrap">
+                                    Total Deductions
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-40 top-0 z-30 bg-red-300 shadow-sm whitespace-nowrap">
+                                    Total Taxes
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-40 top-0 z-30 bg-red-300 shadow-sm whitespace-nowrap">
+                                    Net Salary
+                                </th>
+                            </>
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -80,6 +97,31 @@ const PayslipTable = ({ data, setData }) => {
 
                                 </td>
                             ))}
+
+                            {totals.length !== 0 &&
+                                <>
+                                    {/* Earnings  */}
+                                    <td className={`border border-gray-300 px-4 py-2 sticky left-40 z-20 whitespace-nowrap
+                                        ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
+                                        {totals[employee_id].total_earnings}
+                                    </td>
+                                    {/* Deductions */}
+                                    <td className={`border border-gray-300 px-4 py-2 sticky left-40 z-20 whitespace-nowrap
+                                        ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
+                                        {totals[employee_id].total_deductions}
+                                    </td>
+                                    {/* Taxes */}
+                                    <td className={`border border-gray-300 px-4 py-2 sticky left-40 z-20 whitespace-nowrap
+                                         ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
+                                        {totals[employee_id].total_taxes}
+                                    </td>
+                                    {/* Net Salary */}
+                                    <td className={`border border-gray-300 px-4 py-2 sticky left-40 z-20 whitespace-nowrap
+                                        ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
+                                        {totals[employee_id].net_salary}
+                                    </td>
+                                </>
+                            }
                         </tr>
                     ))}
                 </tbody>
