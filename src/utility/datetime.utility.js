@@ -74,3 +74,17 @@ export const getNearestDateRangePerPayrollPeriod = (date = new Date()) => {
     };
 }
 
+export const formatDateToWords = (date) => {
+    const d = new Date(date);
+
+    const months = [
+        "Jan.", "Feb.", "Mar.", "Apr.", "May.", "Jun.",
+        "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."
+    ];
+
+    const month = months[d.getUTCMonth()];
+    const day = d.getUTCDate();
+    const year = d.getUTCFullYear();
+
+    return `${month} ${day}, ${year}`;
+};

@@ -4,7 +4,7 @@ import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { validateDailyRecordOfOneEmployee } from "../services/attendance.service";
 import { convertToISO8601 } from "../utility/datetime.utility";
-import { generatePayrun, getPayrun, getPayrunPayslipPayables, saveEdit, savePayrunDraft, updateStatus } from "../services/payrun.service";
+import { generatePayrun, getPayrun, getPayrunPayslipPayables, getPayslipsTotals, saveEdit, savePayrunDraft, updateStatus } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sanitizedPayslips } from "../utility/payrun.utility";
@@ -27,6 +27,7 @@ const useSharedRunningPayrunOperation = () => {
     const [options, setOptions] = useState({ ...formData }); //case 1, 2, 3
     const [isValidating, setIsValidating] = useState(false); //case 1,
     const [payslips, setPayslips] = useState([]); //case: 1, 2, 3
+    const [payslipsTotal, setPayslipTotal] = useState([]);
     const [oldPayslips, setOldPayslips] = useState([]);
     const [payslipsLoading, setPayslipsLoading] = useState(false); //case: 1, 2, 3
     const [isSaving, setIsSaving] = useState(false); //use for both saving draft and save edit
@@ -55,15 +56,17 @@ const useSharedRunningPayrunOperation = () => {
             //trigger the fetch of existing payrun
             //fetch payrun
             const resultPayrun = await getPayrun(company.company_id, payrun_id);
-            console.log('fetched payrun: ', resultPayrun);
             setPayrun(resultPayrun.data.payrun);
-
 
             //populate the payslips. this will cause the save draft to hide. 
             // and show the save edit or finalize
             const resultPayables = await getPayrunPayslipPayables(company.company_id, payrun_id);
             setPayslips(resultPayables.data.payslips);
             setOldPayslips(resultPayables.data.payslips);
+
+            // get payslips totals
+            const resultPayablesTotals = await getPayslipsTotals(resultPayrun.data.payrun.payrun_id, resultPayrun.data.payrun.status);
+            setPayslipTotal(resultPayablesTotals.data.totals);
 
             //reset the tax withheld option
             setCalculateTaxWithheld(false);
@@ -266,6 +269,7 @@ const useSharedRunningPayrunOperation = () => {
     const handleClosePayrun = () => {
         setCalculateTaxWithheld(false);
         setToggleEmployeeSelections(false);
+        setPayslipTotal([]);
         setPayslips([]);
         setOldPayslips([]);
         setOptions({ ...formData });
@@ -371,6 +375,8 @@ const useSharedRunningPayrunOperation = () => {
         handleEmployeeIdsChange,
         toggleEmployeeSelections, setToggleEmployeeSelections,
         handleToggleEmployeeSelections,
+
+        payslipsTotal, setPayslipTotal
     };
 };
 
