@@ -1,5 +1,5 @@
 import { FolderArrowDownIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { convertToISO8601 } from "../../../../utility/datetime.utility";
+import { formatDateToWords } from "../../../../utility/datetime.utility";
 import { PaperAirplaneIcon } from "@heroicons/react/16/solid";
 
 const PayrunCard = ({ payrun, idx, oncClickCard, onDelete, onNavigateSendPayslip, onDownloadPayslips, hasDeleteAccess }) => {
@@ -50,24 +50,24 @@ const PayrunCard = ({ payrun, idx, oncClickCard, onDelete, onNavigateSendPayslip
                     {status.label}
                 </span>
                 <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 text-sm">
-                        {payrun.payrun_title}
+                    <h3 className="font-medium text-gray-900 text-sm">
+                        {formatDateToWords(payrun.payrun_start_date)} to {formatDateToWords(payrun.payrun_end_date)}
                     </h3>
                     <p className="text-xs text-gray-500 mt-1">
-                        {convertToISO8601(payrun.payrun_start_date)} — {convertToISO8601(payrun.payrun_end_date)}
+                        Type: Regular Payrun
                     </p>
                 </div>
             </div>
 
             {/* Right section */}
             <div className="flex items-center gap-6 ml-6">
-                <div className="text-right text-sm w-32">
+                <div className="text-right text-sm w-40">
                     <p className="text-gray-500 text-xs mb-0.5">Payment Date</p>
                     <p className="font-semibold text-gray-900">
-                        {convertToISO8601(payrun.payment_date)}
+                        {formatDateToWords(payrun.payment_date)}
                     </p>
                     <p className="text-xs text-gray-400 mt-1">
-                        Updated {convertToISO8601(payrun.updated_at)}
+                        Updated {formatDateToWords(payrun.updated_at)}
                     </p>
                 </div>
 
