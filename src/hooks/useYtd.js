@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { fetchYearToDate } from "../services/data-export.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
-import { convertToISO8601 } from "../utility/datetime.utility";
+import { convertToISO8601, formatDateToWords } from "../utility/datetime.utility";
 import { useToastContext } from "../contexts/ToastProvider";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { usePayitemContext } from "../contexts/PayitemProvider";
@@ -41,7 +41,8 @@ const useYtd = () => {
     };
 
     const handleDownload = () => {
-        downloadExcelMatrix(ytds, mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName, 'Year-to-Date', 'Year-to-Date');
+        const filename = `Year-to-Date - ${formatDateToWords(dateRangeFormData.date_start)} to ${formatDateToWords(dateRangeFormData.date_end)}`;
+        downloadExcelMatrix(ytds, mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName, filename, 'Year-to-Date');
         return;
     };
 
