@@ -1,5 +1,6 @@
 import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
+import { formatNumber } from "../../../../utility/number.utility";
 
 const PayslipTable = ({ data, setData, totals = [] }) => {
     // const employee_ids = Object.keys(data);
@@ -90,7 +91,7 @@ const PayslipTable = ({ data, setData, totals = [] }) => {
                                     <input
                                         type="text"
                                         inputMode="numeric"
-                                        value={data[employee_id][payitem_id] ?? ""}
+                                        value={formatNumber(data[employee_id][payitem_id])}
                                         onChange={(e) => handleChange(employee_id, payitem_id, e.target.value)}
                                         className="w-full rounded px-2 py-1 text-sm"
                                     />
@@ -103,22 +104,22 @@ const PayslipTable = ({ data, setData, totals = [] }) => {
                                     {/* Earnings  */}
                                     <td className={`border border-gray-300 px-4 py-2 sticky left-40 z-20 whitespace-nowrap
                                         ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
-                                        {totals[employee_id].total_earnings}
+                                        {formatNumber(totals[employee_id].total_earnings)}
                                     </td>
                                     {/* Deductions */}
                                     <td className={`border border-gray-300 px-4 py-2 sticky left-40 z-20 whitespace-nowrap
                                         ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
-                                        {totals[employee_id].total_deductions}
+                                        {formatNumber(totals[employee_id].total_deductions)}
                                     </td>
                                     {/* Taxes */}
                                     <td className={`border border-gray-300 px-4 py-2 sticky left-40 z-20 whitespace-nowrap
                                          ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
-                                        {totals[employee_id].total_taxes}
+                                        {formatNumber(totals[employee_id].total_taxes)}
                                     </td>
                                     {/* Net Salary */}
                                     <td className={`border border-gray-300 px-4 py-2 sticky left-40 z-20 whitespace-nowrap
                                         ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
-                                        {totals[employee_id].net_salary}
+                                        {formatNumber(totals[employee_id].net_salary)}
                                     </td>
                                 </>
                             }

@@ -34,7 +34,7 @@ const usePayitem = () => {
 
     const mapPayitemIdToPayitemName = (payitem_id) => {
         const payitem = payitems.find(obj => obj['payitem_id'] === payitem_id);
-        if (!payitem) console.log('no payitem found');
+        if (!payitem) return payitem_id; //it can't be mapped, so it can either be a totals
         return payitem.payitem_name;
     };
 
