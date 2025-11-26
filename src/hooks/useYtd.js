@@ -42,7 +42,6 @@ const useYtd = () => {
 
     const handleDownload = () => {
         downloadExcelMatrix(ytds, mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName, 'Year-to-Date', 'Year-to-Date');
-        // downloadExcelMatrix(ytds);
         return;
     };
 
