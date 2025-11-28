@@ -1,9 +1,10 @@
+import LoadingBackground from "../../../components/LoadingBackground";
 import StartIllustration from "../../../components/Start";
 import { useYtdContext } from "../../../contexts/YtdProvider";
 import DataExportTable from "./Table";
 
 const YtdSection = () => {
-    const { dateRangeFormData, setDateRangeFormData, handleGenerateYTD, ytds, setYtds, handleDownload } = useYtdContext();
+    const { dateRangeFormData, setDateRangeFormData, handleGenerateYTD, ytds, setYtds, handleDownload, ytdsLoading, downloadLoading } = useYtdContext();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -71,6 +72,9 @@ const YtdSection = () => {
                     : <DataExportTable data={ytds} setData={setYtds} />
                 }
             </div>
+
+            {/* Loading Generate or Download  */}
+            {(ytdsLoading || downloadLoading) && <LoadingBackground />}
         </div>
     );
 };
