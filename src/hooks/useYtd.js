@@ -36,14 +36,22 @@ const useYtd = () => {
             addToast("Failed to fetch the year-to-date data", "error");
         }
         finally {
-            setYtdsLoading(true);
+            setYtdsLoading(false);
         }
     };
 
     const handleDownload = () => {
-        const filename = `Year-to-Date - ${formatDateToWords(dateRangeFormData.date_start)} to ${formatDateToWords(dateRangeFormData.date_end)}`;
-        downloadExcelMatrix(ytds, mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName, filename, 'Year-to-Date');
-        return;
+        setDownloadLoading(true);
+        try {
+            const filename = `Year-to-Date - ${formatDateToWords(dateRangeFormData.date_start)} to ${formatDateToWords(dateRangeFormData.date_end)}`;
+            downloadExcelMatrix(ytds, mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName, filename, 'Year-to-Date');
+            return;
+        } catch (error) {
+            addToast(`Failed to download the year to date summary: ${error.message}`, "error");
+        }
+        finally {
+            setDownloadLoading(false);
+        }
     };
 
     return {

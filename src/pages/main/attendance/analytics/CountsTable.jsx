@@ -1,9 +1,8 @@
-
 export const CountsTable = ({ data, columns, payrun_days }) => {
     return (
-        <div className="overflow-x-auto w-full  border-gray-200">
+        <div className="overflow-x-auto overflow-y-auto max-h-[400px] w-full border-gray-200">
             <table className="min-w-full text-left text-sm text-gray-700">
-                <thead className="font-medium text-gray-800 text-sm tracking-wider border-b border-t">
+                <thead className="sticky top-0 bg-white z-10 font-medium text-gray-800 text-sm tracking-wider border-b">
                     <tr>
                         {columns.map((col) => (
                             <th key={col} className="px-4 py-3 font-medium">
@@ -20,13 +19,11 @@ export const CountsTable = ({ data, columns, payrun_days }) => {
                             return (
                                 <tr key={idx}
                                     className={`${isComplete ? "" : "bg-red-100 hover:bg-red-200"}`} >
-                                    {
-                                        columns.map((col) => (
-                                            <td key={col} className="px-4 py-3">
-                                                {d[col]}
-                                            </td>
-                                        ))
-                                    }
+                                    {columns.map((col) => (
+                                        <td key={col} className="px-4 py-3">
+                                            {d[col]}
+                                        </td>
+                                    ))}
                                 </tr>
                             );
                         })
@@ -39,8 +36,9 @@ export const CountsTable = ({ data, columns, payrun_days }) => {
                     )}
                 </tbody>
             </table>
-        </div >
+        </div>
     );
 };
+
 
 export default CountsTable;

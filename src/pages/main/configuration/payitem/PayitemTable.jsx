@@ -7,17 +7,20 @@ const PayitemTable = () => {
     const columns = ["payitem_id", "payitem_name", "payitem_category", "payitem_type", "payitem_group"];
 
     return (
-        <div className="overflow-x-auto rounded-2xl w-full  border-gray-200">
+        <div className="overflow-x-auto overflow-y-auto max-h-full rounded-2xl w-full border-gray-200">
             <table className="min-w-full text-left text-sm text-gray-700">
-                <thead className="bg-gray-200 text-gray-500 uppercase text-xs tracking-wider">
+
+                {/* Sticky header */}
+                <thead className="bg-gray-200 text-gray-500 uppercase text-xs tracking-wider sticky top-0 z-10">
                     <tr>
                         {columns.map((col) => (
-                            <th key={col} className="px-4 py-3 font-medium">
+                            <th key={col} className="px-4 py-3 font-medium bg-gray-200">
                                 {col.replace(/_/g, " ")}
                             </th>
                         ))}
                     </tr>
                 </thead>
+
                 <tbody className="bg-white">
                     {filteredPayitems && filteredPayitems.length > 0 ? (
                         filteredPayitems.map((item) => (
