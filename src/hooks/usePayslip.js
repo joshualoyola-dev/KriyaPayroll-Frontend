@@ -108,11 +108,13 @@ const usePayslip = () => {
         const params = new URLSearchParams(location.search);
         const payrun_id = params.get("payrun_id");
 
+        if (!company) return;
+
         if (payrun_id) {
             handleFetchPayslips(payrun_id);
             handleFetchPayrun(company.company_id, payrun_id);
         }
-    }, [location.search]);
+    }, [location.search, company]);
 
     const handleDownloadPayslips = async () => {
         try {

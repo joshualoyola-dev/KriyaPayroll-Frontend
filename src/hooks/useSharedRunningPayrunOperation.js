@@ -88,10 +88,13 @@ const useSharedRunningPayrunOperation = () => {
             setPayrunType(payrun_type);
         }
 
+        if (!company) {
+            return;
+        }
         if (payrun_id) {
             initializePayrun(payrun_id);
         }
-    }, [location.search]);
+    }, [location.search, company]);
 
 
     const handleFetchPayrunLogs = async () => {
