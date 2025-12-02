@@ -5,7 +5,7 @@ export const payitemsMap = new Map([
     ["14th Month Pay", "payitem-id-17"],
     ["14th Month Pay - Non-Taxable", "payitem-id-17"],
     ["14th Month Pay (Non-Taxable)", "payitem-id-17"],
-    ["Absences", "payitem-id-33"],
+    ["Absences", "payitem-id-34"],
     ["Anniversary / Quarterly Bonus (Non-Taxable)", "payitem-id-12"],
     ["Anniversary Bonus", "payitem-id-19"],
     ["Anniversary Bonus (Taxable)", "payitem-id-19"],
