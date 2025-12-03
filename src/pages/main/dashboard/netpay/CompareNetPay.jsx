@@ -2,6 +2,7 @@
 
 import { useCompareNetPayContext } from "../../../../contexts/CompareNetPayProvider";
 import { formatDateToWords } from "../../../../utility/datetime.utility";
+import ComparisonGraph from "./ComparisonGraph";
 
 const CompareNetPay = () => {
     const {
@@ -76,6 +77,7 @@ const CompareNetPay = () => {
             </div>
 
             {/* Table Placeholder */}
+            <ComparisonGraph />
         </div>
     );
 }
