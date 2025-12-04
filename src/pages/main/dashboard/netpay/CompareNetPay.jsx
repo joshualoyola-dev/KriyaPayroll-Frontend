@@ -10,13 +10,14 @@ const CompareNetPay = () => {
         handleSelectPayruns,
         payrunsloading,
         payruns,
-        handleRemoveSelectedPayruns
+        handleRemoveSelectedPayruns,
+        netSalariesPerPayrun
     } = useCompareNetPayContext();
 
     return (
         <div className="flex flex-col space-y-4 p-4 bg-white rounded-2xl border border-gray-200 mb-4">
             <div className="space-y-1">
-                <h1 className="text-lg font-semibold text-gray-800">Nety Pay Comparison</h1>
+                <h1 className="text-lg font-semibold text-gray-800">Net Pay Comparison</h1>
                 <p className="text-xs text-gray-500">
                     This helps compare the different net pay from different payruns, allowing you to inspect the progression of salary
                 </p>
@@ -33,6 +34,7 @@ const CompareNetPay = () => {
                             onChange={handleSelectPayruns}
                             className="px-4 py-2 border border-gray-300 rounded-full text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400"
                         >
+                            <option>Select Payrun</option>
                             {payruns
                                 .filter(payrun =>
                                     !selectedPayruns.some(id => payrun.payrun_id === id)
@@ -42,7 +44,7 @@ const CompareNetPay = () => {
                                         key={payrun.payrun_id}
                                         value={payrun.payrun_id}
                                     >
-                                        {formatDateToWords(payrun.payrun_start_date)} to {formatDateToWords(payrun.payrun_start_date)}
+                                        {payrun.status}-{payrun.payrun_type}: {formatDateToWords(payrun.payrun_start_date)} to {formatDateToWords(payrun.payrun_end_date)}
                                     </option>
                                 ))
                             }
@@ -60,12 +62,17 @@ const CompareNetPay = () => {
                         return (
                             <div
                                 key={idx}
-                                className="flex items-center px-3 py-1.5 rounded-full text-sm text-teal-700 bg-teal-50 border border-teal-200"
+                                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs border border-gray-500 text-gray-500`}
                             >
-                                <span>{formatDateToWords(payrun.payrun_start_date)} to {formatDateToWords(payrun.payrun_start_date)}</span>
+                                <span className="font-medium truncate">
+                                    {formatDateToWords(payrun.payrun_start_date)}–{formatDateToWords(payrun.payrun_end_date)}
+                                </span>
+                                <span className="opacity-75">
+                                    {payrun.status} • {payrun.payrun_type}
+                                </span>
                                 <button
                                     onClick={() => handleRemoveSelectedPayruns(payrun_id)}
-                                    className="ml-2 text-teal-600 hover:text-teal-800 focus:outline-none font-medium"
+                                    className="ml-2 focus:outline-none font-medium hover hover:cursor-pointer"
                                     type="button"
                                 >
                                     ×
@@ -77,9 +84,11 @@ const CompareNetPay = () => {
             </div>
 
             {/* Table Placeholder */}
-            <ComparisonGraph />
+            <ComparisonGraph netSalariesPerPayrun={netSalariesPerPayrun} />
         </div>
     );
 }
 
 export default CompareNetPay;
+
+

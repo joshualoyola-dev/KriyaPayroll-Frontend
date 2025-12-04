@@ -59,3 +59,7 @@ export const saveUploadedPayrun = async (company_id, formData) => {
 export const getPayslipsTotals = async (payrun_id, payrun_status) => {
     return await payroll_api.get(`/api/v1/payruns/payslips/totals/${payrun_id}?payrun_status=${payrun_status}`)
 }
+
+export const getSalariesPerPayrun = async (company_id, payrun_ids) => {
+    return await payroll_api.get(`/api/v1/payruns/:company_id/net-salaries-per-payrun?payrun_ids=${payrun_ids}`);
+};
