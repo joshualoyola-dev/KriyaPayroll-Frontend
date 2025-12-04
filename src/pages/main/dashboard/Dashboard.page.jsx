@@ -2,6 +2,7 @@ import Question from "../../../components/Question";
 import UnderDevelopment from "../../../components/UnderDevelopment";
 import { useCompanyContext } from "../../../contexts/CompanyProvider";
 import { DailyRecordsCounts } from "../attendance/analytics/DailyRecordsCounts";
+import CompareNetPay from "./netpay/CompareNetPay";
 
 
 const DashboardPage = () => {
@@ -25,6 +26,8 @@ const DashboardPage = () => {
                 <div className="bg-gray-200 rounded-xl p-6 h-24"></div>
                 <div className="bg-gray-200 rounded-xl p-6 h-24"></div>
             </div>
+
+            <CompareNetPay />
 
             <DailyRecordsCounts />
         </div>
