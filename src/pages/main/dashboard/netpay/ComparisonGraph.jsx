@@ -43,7 +43,26 @@ const ComparisonGraph = ({ netSalariesPerPayrun = {} }) => {
         ? Object.keys(data[0]).filter(key => key !== 'name' && key !== 'employee_id')
         : [];
 
-    const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+    const colors = [
+        '#609899',
+        '#cd5e18',
+        '#3f7c7c',
+        '#b7442f',
+        '#d2eaea',
+        '#e06b21',
+        '#2f5f63',
+        '#c57fa0',
+        '#71a9a9',
+        '#ffb688',
+        '#a6cfcf',
+        '#f07c33',
+        '#7a3e0b',
+        '#f2c14e',
+        '#4f8a8a',
+        '#ff8d45',
+        '#8bbcbb'
+    ];
+
 
     // Custom tooltip component
     const CustomTooltip = ({ active, payload, label }) => {
@@ -85,26 +104,26 @@ const ComparisonGraph = ({ netSalariesPerPayrun = {} }) => {
                 <XAxis
                     dataKey="name"
                     stroke="#64748b"
-                    style={{ fontSize: "14px" }}
-                    label={{ value: "Employee", position: "insideBottom", offset: -5 }}
+                    style={{ fontSize: "12px" }}
+                    label={{ value: "Employee", position: "insideBottom", offset: -5, fontSize: "12px" }}
                 />
                 <YAxis
                     stroke="#64748b"
-                    style={{ fontSize: "14px" }}
-                    label={{ value: "Net Salary", angle: -90, position: "insideLeft" }}
+                    style={{ fontSize: "12px", }}
+                    label={{ value: "Net Salary", angle: -90, position: "insideLeft", fontSize: "12px" }}
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#cbd5e1", strokeWidth: 0 }} />
                 <Legend
-                    wrapperStyle={{ paddingTop: "20px" }}
+                    wrapperStyle={{ paddingTop: "20px", fontSize: "14px" }}
                     iconType="line"
                 />
                 {payruns.map((payrun, index) => (
                     <Line
                         key={payrun}
-                        type="natural"  // Changed from "monotone" to "natural"
+                        type="natural"
                         dataKey={payrun}
                         stroke={colors[index % colors.length]}
-                        strokeWidth={3}
+                        strokeWidth={2}
                         dot={{ fill: colors[index % colors.length], r: 1 }}
                         activeDot={{ r: 0 }}
                         name={mapPayrunIdToReadableName(payrun)}
