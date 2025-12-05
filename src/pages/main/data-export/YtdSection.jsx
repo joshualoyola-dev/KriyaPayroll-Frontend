@@ -40,6 +40,18 @@ const YtdSection = () => {
                         />
                     </div>
 
+                    <div className="flex flex-col">
+                        <label className="mb-1 text-xs font-medium text-gray-700">Employees</label>
+                        <select
+                            value={dateRangeFormData.active_employees}
+                            onChange={(e) => setDateRangeFormData((prev) => ({ ...prev, active_employees: e.target.value }))}
+                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm"
+                        >
+                            <option value={false}>All employees (active & inactive)</option>
+                            <option value={true}>Active employees only</option>
+                        </select>
+                    </div>
+
                     <button
                         type="submit"
                         className="self-end rounded-xl bg-teal-600 px-3 py-1 text-sm font-medium text-white hover:bg-teal-700"
