@@ -47,8 +47,8 @@ const YtdSection = () => {
                             onChange={(e) => setDateRangeFormData((prev) => ({ ...prev, active_employees: e.target.value }))}
                             className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm"
                         >
-                            <option value={false}>All employees (active & inactive)</option>
-                            <option value={true}>Active employees only</option>
+                            <option value={0}>All employees (active & inactive)</option>
+                            <option value={1}>Active employees only</option>
                         </select>
                     </div>
 
