@@ -59,7 +59,7 @@ const PayrunPage = () => {
                             key={idx}
                             payrun={payrun}
                             idx={idx}
-                            oncClickCard={handleClickPayrun}
+                            oncClickCard={() => handleClickPayrun(payrun.payrun_id, payrun.payrun_type)}
                             onDelete={sectionKey !== 'last' ? handleDeleteOnePayrun : undefined}
                             onNavigateSendPayslip={handleNavigateSendPayslip}
                             onDownloadPayslips={handleDownloadPayslipsExcel}
