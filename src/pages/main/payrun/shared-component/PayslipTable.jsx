@@ -91,7 +91,8 @@ const PayslipTable = ({ data, setData, totals = [] }) => {
                                     <input
                                         type="text"
                                         inputMode="numeric"
-                                        value={formatNumber(data[employee_id][payitem_id])}
+                                        // value={formatNumber(data[employee_id][payitem_id])}
+                                        value={(data[employee_id][payitem_id])}
                                         onChange={(e) => handleChange(employee_id, payitem_id, e.target.value)}
                                         className="w-full rounded px-2 py-1 text-sm"
                                     />
