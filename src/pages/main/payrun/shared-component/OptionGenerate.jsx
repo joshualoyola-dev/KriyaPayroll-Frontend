@@ -3,6 +3,7 @@ import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
 import { useToastContext } from "../../../../contexts/ToastProvider";
 import EmployeeSelection from "./EmployeeSelection";
+import { formatDateToWords } from "../../../../utility/datetime.utility";
 
 const OptionGenerate = () => {
     const { payitems } = usePayitemContext();
@@ -13,19 +14,28 @@ const OptionGenerate = () => {
         handleSaveDraft, payslips, payslipsLoading,
         isSaving,
         payrunType,
-        handleClosePayrun
+        handleClosePayrun,
+        employeeForLastPay
     } = useSharedRunningPayrunOperationContext();
     const { addToast } = useToastContext();
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        //for special, check if there is atleast one selected employee
-        if (String(payrunType).toUpperCase() === 'SPECIAL') {
+        //for special and last, check if there is atleast one selected employee
+        if (String(payrunType).toUpperCase() === 'SPECIAL' || String(payrunType).toUpperCase() === 'LAST') {
             if (options.employee_ids.length === 0) {
                 return addToast("Select at least one employee to run payrun", "error");
             }
         }
+
+        //for last payrun, check it date_end is already added
+        if (String(payrunType).toUpperCase() === 'LAST') {
+            if (!employeeForLastPay.date_end) {
+                return addToast("Add the date end of employee first in the employee record", "error");
+            }
+        }
+
         //generate
         handleGenerate();
     }
@@ -35,6 +45,14 @@ const OptionGenerate = () => {
             {/* Top controls section - with proper spacing */}
             <div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">Payrun Details</h3>
+                {(Object.keys(payslips).length === 0) &&
+                    <button
+                        onClick={handleClosePayrun}
+                        className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 bg-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all"
+                    >
+                        Close
+                    </button>
+                }
                 {(Object.keys(payslips).length > 0) && (
                     <div className="space-x-2">
                         <button
@@ -150,7 +168,9 @@ const OptionGenerate = () => {
                 </div>
 
                 {/* Employee Selection */}
-                {String(payrunType).toUpperCase() === 'SPECIAL' && <EmployeeSelection />}
+                {(String(payrunType).toUpperCase() === 'SPECIAL' || String(payrunType).toUpperCase() === 'LAST') && <EmployeeSelection />}
+
+
             </form>
 
             {/* Selected Payitems */}
@@ -181,6 +201,21 @@ const OptionGenerate = () => {
                     </div>
                 </div>
             )}
+
+            {/* Render employee details for last payrun */}
+            {employeeForLastPay && (
+                <div className="pt-4 border-t border-gray-200 mt-2">
+                    <p className="text-xs font-medium text-gray-700 mb-2">Employee for Last Payroll:</p>
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-800">
+                        <span className="font-semibold">{employeeForLastPay.first_name} {employeeForLastPay.last_name}</span> |
+                        <span>Employee ID: {employeeForLastPay.employee_id}</span> |
+                        <span>Date Hired: {formatDateToWords(employeeForLastPay.date_hired)}</span> |
+                        <span>Date End: {employeeForLastPay.date_end ? formatDateToWords(employeeForLastPay.date_end) : 'None'}</span>
+                    </div>
+                </div>
+            )}
+
+
 
         </div>
     );

@@ -39,12 +39,14 @@ const useSharedRunningPayrunOperation = () => {
     const [calculateTaxWithheld, setCalculateTaxWithheld] = useState(false);
     const [payrunType, setPayrunType] = useState('REGULAR');
     const [toggleEmployeeSelections, setToggleEmployeeSelections] = useState(false);
+    const [employeeForLastPay, setEmployeeForLastPay] = useState();
 
     const { payitems } = usePayitemContext();
-    const { activeEmployees } = useEmployeeContext();
+    const { activeEmployees, employees } = useEmployeeContext();
     const { addToast } = useToastContext();
     const { company } = useCompanyContext();
     const { handleFetchPayruns } = usePayrunContext();
+
 
 
     const location = useLocation();
@@ -95,6 +97,26 @@ const useSharedRunningPayrunOperation = () => {
             initializePayrun(payrun_id);
         }
     }, [location.search, company]);
+
+    const getEmployeeForLastPayrun = () => {
+        try {
+            const employee_id = options.employee_ids[0];
+
+            const employee = employees.find(e => e.employee_id === employee_id);
+            setEmployeeForLastPay(employee);
+        } catch (error) {
+            console.log(error.message);
+            addToast("Failed to find the employee for last pay", "error");
+        }
+    };
+
+    useEffect(() => {
+        if (!employees) return;
+        if (options.employee_ids.length === 0) return;
+        if (String(payrunType).toUpperCase() !== 'LAST') return;
+
+        getEmployeeForLastPayrun();
+    }, [options.employee_ids]);
 
 
     const handleFetchPayrunLogs = async () => {
@@ -278,6 +300,7 @@ const useSharedRunningPayrunOperation = () => {
         setOptions({ ...formData });
         setPayrun(null);
         setPayslips([]);
+        setEmployeeForLastPay(null);
         navigate('/payrun');
     };
 
@@ -323,6 +346,14 @@ const useSharedRunningPayrunOperation = () => {
     }
 
     const handleEmployeeIdsChange = (employee_id) => {
+        if (String(payrunType).toUpperCase() === 'LAST') {
+            setOptions(prev => ({
+                ...prev,
+                employee_ids: prev.employee_ids.includes(employee_id) ? [] : [employee_id]
+            }));
+            return;
+        }
+
         const value = employee_id;
 
         const exists = options.employee_ids.includes(value);
@@ -379,7 +410,8 @@ const useSharedRunningPayrunOperation = () => {
         toggleEmployeeSelections, setToggleEmployeeSelections,
         handleToggleEmployeeSelections,
 
-        payslipsTotal, setPayslipTotal
+        payslipsTotal, setPayslipTotal,
+        employeeForLastPay, setEmployeeForLastPay
     };
 };
 
