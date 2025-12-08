@@ -2,8 +2,7 @@ import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { formatNumber } from "../../../../utility/number.utility";
 
-const PayslipTable = ({ data, setData, totals = [] }) => {
-    // const employee_ids = Object.keys(data);
+const PayslipTable = ({ data, setData, totals = [], startEndDates = [] }) => {
     const employee_ids = Object.keys(data).sort((a, b) => {
         const numA = parseInt(a.split("-").pop(), 10);
         const numB = parseInt(b.split("-").pop(), 10);
@@ -22,7 +21,6 @@ const PayslipTable = ({ data, setData, totals = [] }) => {
     const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
 
     const handleChange = (employee_id, payitem_id, value) => {
-        // Allow numbers, one decimal point, and an optional leading minus sign
         const numericValue = value
             .replace(/(?!^)-|[^0-9.-]/g, "")
             .replace(/(\..*)\./g, "$1");
@@ -41,12 +39,26 @@ const PayslipTable = ({ data, setData, totals = [] }) => {
             <table className="border-collapse border border-gray-300 text-sm">
                 <thead className="bg-gray-100">
                     <tr>
-                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-0 top-0 z-30 bg-gray-100 shadow-sm whitespace-nowrap">
+                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-0 top-0 z-30 bg-gray-100 shadow-sm whitespace-nowrap min-w-[200px]">
                             Employee
                         </th>
-                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-40 top-0 z-30 bg-gray-100 shadow-sm whitespace-nowrap">
+                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-[200px] top-0 z-30 bg-gray-100 shadow-sm whitespace-nowrap min-w-[150px]">
                             Employee Id
                         </th>
+                        {
+                            startEndDates && Object.keys(startEndDates).length > 0 &&
+                            <>
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap">
+                                    Date Started
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap">
+                                    Date Ended
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap">
+                                    Payment Date
+                                </th>
+                            </>
+                        }
                         {payitem_ids.map((payitem_id) => (
                             <th
                                 key={payitem_id}
@@ -58,16 +70,16 @@ const PayslipTable = ({ data, setData, totals = [] }) => {
                         {
                             totals.length !== 0 &&
                             <>
-                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-40 top-0 z-30 bg-red-300 shadow-sm whitespace-nowrap">
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-red-300 shadow-sm whitespace-nowrap">
                                     Total Earnings
                                 </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-40 top-0 z-30 bg-red-300 shadow-sm whitespace-nowrap">
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-red-300 shadow-sm whitespace-nowrap">
                                     Total Deductions
                                 </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-40 top-0 z-30 bg-red-300 shadow-sm whitespace-nowrap">
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-red-300 shadow-sm whitespace-nowrap">
                                     Total Taxes
                                 </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-40 top-0 z-30 bg-red-300 shadow-sm whitespace-nowrap">
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-red-300 shadow-sm whitespace-nowrap">
                                     Net Salary
                                 </th>
                             </>
@@ -77,48 +89,61 @@ const PayslipTable = ({ data, setData, totals = [] }) => {
                 <tbody>
                     {employee_ids.map((employee_id, index) => (
                         <tr key={employee_id} className="odd:bg-white even:bg-gray-50">
-                            <td className={`border border-gray-300 px-4 py-2 sticky left-0 z-20 whitespace-nowrap
+                            <td className={`border border-gray-300 px-4 py-2 sticky left-0 z-20 whitespace-nowrap min-w-[200px]
                                  ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
                                 {mapEmployeeIdToEmployeeName(employee_id)}
                             </td>
 
-                            <td className={`border border-gray-300 px-4 py-2 sticky left-40 z-20 whitespace-nowrap
+                            <td className={`border border-gray-300 px-4 py-2 sticky left-[200px] z-20 whitespace-nowrap min-w-[150px]
                                  ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
                                 {employee_id}
                             </td>
+
+                            {
+                                startEndDates && Object.keys(startEndDates).length > 0 &&
+                                <>
+                                    <td className={`border border-gray-300 px-4 py-2 
+                                        ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
+                                        {startEndDates[employee_id].date_hired}
+                                    </td>
+                                    <td className={`border border-gray-300 px-4 py-2 
+                                        ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
+                                        {startEndDates[employee_id].date_end}
+                                    </td>
+                                    <td className={`border border-gray-300 px-4 py-2
+                                         ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
+                                        {startEndDates[employee_id].payment_date}
+                                    </td>
+                                </>
+                            }
+
                             {payitem_ids.map((payitem_id) => (
                                 <td key={payitem_id} className="border border-gray-300 px-2 py-1 min-w-[120px]">
                                     <input
                                         type="text"
                                         inputMode="numeric"
-                                        // value={formatNumber(data[employee_id][payitem_id])}
                                         value={(data[employee_id][payitem_id])}
                                         onChange={(e) => handleChange(employee_id, payitem_id, e.target.value)}
                                         className="w-full rounded px-2 py-1 text-sm"
                                     />
-
                                 </td>
                             ))}
 
                             {totals.length !== 0 &&
                                 <>
-                                    {/* Earnings  */}
-                                    <td className={`border border-gray-300 px-4 py-2 sticky left-40 z-20 whitespace-nowrap
+                                    <td className={`border border-gray-300 px-4 py-2 whitespace-nowrap
                                         ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
                                         {formatNumber(totals[employee_id].total_earnings)}
                                     </td>
-                                    {/* Deductions */}
-                                    <td className={`border border-gray-300 px-4 py-2 sticky left-40 z-20 whitespace-nowrap
+                                    <td className={`border border-gray-300 px-4 py-2 whitespace-nowrap
                                         ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
                                         {formatNumber(totals[employee_id].total_deductions)}
                                     </td>
-                                    {/* Taxes */}
-                                    <td className={`border border-gray-300 px-4 py-2 sticky left-40 z-20 whitespace-nowrap
+                                    <td className={`border border-gray-300 px-4 py-2 whitespace-nowrap
                                          ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
                                         {formatNumber(totals[employee_id].total_taxes)}
                                     </td>
-                                    {/* Net Salary */}
-                                    <td className={`border border-gray-300 px-4 py-2 sticky left-40 z-20 whitespace-nowrap
+                                    <td className={`border border-gray-300 px-4 py-2 whitespace-nowrap
                                         ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
                                         {formatNumber(totals[employee_id].net_salary)}
                                     </td>

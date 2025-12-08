@@ -1,10 +1,18 @@
 export const payitemsMap = new Map([
     ["13th Month Bonus - Non-Taxable", "payitem-id-15"],
     ["13th Month Bonus - Taxable", "payitem-id-14"],
+    ["13th Month (Non Taxable)", "payitem-id-15"],//added by me for last payrun
+    ["13th Month (Taxable)", "payitem-id-14"],//added by me for last payrun
+    ["De Minimis Pay", "payitem-id-30"],//added by me for last payrun
+    ["Overtime", "payitem-id-07"],//added by me for last payrun
+
+
     ["14 Month", "payitem-id-17"],
     ["14th Month Pay", "payitem-id-17"],
     ["14th Month Pay - Non-Taxable", "payitem-id-17"],
     ["14th Month Pay (Non-Taxable)", "payitem-id-17"],
+    ["14th Month (Taxable)", "payitem-id-16"], //added by me for last payrun
+    ["14th Month (Non Taxable)", "payitem-id-17"], //added by me for last payrun
     ["Absences", "payitem-id-34"],
     ["Anniversary / Quarterly Bonus (Non-Taxable)", "payitem-id-12"],
     ["Anniversary Bonus", "payitem-id-19"],
@@ -84,7 +92,16 @@ export const payitemsMap = new Map([
     ["Team Lead Allowance", "payitem-id-27"],
     ["Transportation Allowance", "payitem-id-28"],
     ["Tuition Fee Grant", "payitem-id-31"],
-    ["Undertime/Tardiness", "payitem-id-36"]
+    ["Undertime/Tardiness", "payitem-id-36"],
+    ["Tardiness", "payitem-id-36"],//added by me for last payrun
+    ["Undertime", "payitem-id-36"],//added by me for last payrun
+    ["SSS MPF (EE)", "payitem-id-38"],//added by me for last payrun
+    ["Heartbits Encashment", "payitem-id-30"],//added by me for last payrun
+    ["Tax Refund (2024)", "payitem-id-23"],//added by me for last payrun
+    ["Tax Refund (2025)", "payitem-id-23"],//added by me for last payrun
+    ["Other Company Deductions", "payitem-id-52"],//added by me for last payrun
+
+
 ]);
 
 export const oldPayitemsNameToPayitemIDMap = (payitem) => {

@@ -25,6 +25,7 @@ const useUploadPayrun = () => {
     const [employeesCheckLoading, setEmployeesCheckLoading] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [missingEmpIds, setMissingEmpIds] = useState([]);
+    const [payrunsDates, setPayrunsDates] = useState();
 
     const { addToast } = useToastContext();
     const navigate = useNavigate();
@@ -74,6 +75,7 @@ const useUploadPayrun = () => {
             // further processing
             const payslipPayablesData = {};
             const payslipTotalsData = {};
+            const payrunDatesData = {};
 
             parsedData.forEach(row => {
                 const employeeId = row['Employee ID'];
@@ -85,6 +87,7 @@ const useUploadPayrun = () => {
                     if (!payslipPayablesData[employeeId]) {
                         payslipPayablesData[employeeId] = {};
                         payslipTotalsData[employeeId] = {};
+                        payrunDatesData[employeeId] = {};
                     }
 
                     const value = row[key];
@@ -102,6 +105,18 @@ const useUploadPayrun = () => {
                             payslipTotalsData[employeeId]['net_salary'] = Number(value);
                         }
 
+                        if (key && key === "Date Hired") {
+                            console.log('date hired: ', value);
+
+                            payrunDatesData[employeeId]['date_hired'] = String(value);
+                        }
+                        if (key && key === "Date Resigned") {
+                            payrunDatesData[employeeId]['date_end'] = String(value);
+                        }
+                        if (key && key === "Date Released") {
+                            payrunDatesData[employeeId]['payment_date'] = String(value);
+                        }
+
                         //map it to the payitem id, anything that doesn't get mapped to, will not be inserted into 
                         //meaning it is not a payitem
                         const payitem_id = oldPayitemsNameToPayitemIDMap(key);
@@ -113,12 +128,15 @@ const useUploadPayrun = () => {
 
             setPayslipsPayables(payslipPayablesData);
             setPayslipsTotals(payslipTotalsData);
+            setPayrunsDates(payrunDatesData);
+
+            console.log('payrunDatesData: ', payrunDatesData);
+
+
             addToast("Successfully parsd data", "success");
-
-            console.log('parsed data payslip: ', payslipPayablesData);
-            console.log('parsed data totals: ', payslipTotalsData);
-
         } catch (error) {
+            console.log("upload error: ", error);
+
             addToast(`Failed to process file: ${error.message}`, "error");
         }
         finally {
@@ -153,10 +171,12 @@ const useUploadPayrun = () => {
         try {
             const cleanedPayables = sanitizedPayslips(payslipsPayables);
             const cleanedTotals = sanitizedPayslips(payslipsTotals);
+            const cleanedPayrunDates = sanitizedPayslips(payrunsDates);
 
             const payload = {
                 payslips_payables: cleanedPayables,
                 payslips_totals: cleanedTotals,
+                payruns_dates: cleanedPayrunDates,
                 payrun_start_date: options.date_from,
                 payrun_end_date: options.date_to,
                 payment_date: options.payment_date,
@@ -165,6 +185,7 @@ const useUploadPayrun = () => {
                 status: options.payrun_status,
                 payrun_type: options.payrun_type,
             }
+
             await saveUploadedPayrun(company.company_id, payload);
             addToast("Successfully saved uploaded payrun", "success");
             await handleFetchPayruns();
@@ -190,6 +211,8 @@ const useUploadPayrun = () => {
         handleClosePayrun,
         handleInputChange,
         uploadPayrunFile,
+
+        payrunsDates, setPayrunsDates,
     };
 };
 
