@@ -36,7 +36,7 @@ const PayrunPage = () => {
         return <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
     };
 
-    const PayrunSection = ({ title, payruns, sectionKey, icon: Icon }) => (
+    const PayrunSection = ({ title, payruns, sectionKey, icon: Icon, downloadAllLastPay }) => (
         <div>
             <button
                 onClick={() => toggleSection(sectionKey)}
@@ -46,10 +46,20 @@ const PayrunPage = () => {
                     <Icon className="w-5 h-5 text-teal-600" />
                     <p>{title}</p>
                 </span>
-                <ChevronDownIcon
-                    className={`w-5 h-5 text-gray-600 transition-transform duration-300 ${expandedSections[sectionKey] ? 'rotate-180' : ''
-                        }`}
-                />
+                <div className="flex gap-x-2">
+                    {downloadAllLastPay &&
+                        <button
+                            onClick={downloadAllLastPay}
+                            className=" text-gray-400 rounded-full px-3 py-1 text-xs hover:cursor-pointer hover:text-teal-600"
+                        >
+                            Download All
+                        </button>
+                    }
+                    <ChevronDownIcon
+                        className={`w-5 h-5 text-gray-600 transition-transform duration-300 hover:cursor-pointer ${expandedSections[sectionKey] ? 'rotate-180' : ''
+                            }`}
+                    />
+                </div>
             </button>
 
             {expandedSections[sectionKey] && (
@@ -59,8 +69,8 @@ const PayrunPage = () => {
                             key={idx}
                             payrun={payrun}
                             idx={idx}
-                            oncClickCard={handleClickPayrun}
-                            onDelete={sectionKey !== 'last' ? handleDeleteOnePayrun : undefined}
+                            oncClickCard={() => handleClickPayrun(payrun.payrun_id, payrun.payrun_type)}
+                            onDelete={handleDeleteOnePayrun}
                             onNavigateSendPayslip={handleNavigateSendPayslip}
                             onDownloadPayslips={handleDownloadPayslipsExcel}
                             hasDeleteAccess={hasDeleteAccess}
@@ -96,6 +106,7 @@ const PayrunPage = () => {
                                 payruns={lastPayruns}
                                 sectionKey="last"
                                 icon={BanknotesIcon}
+                                downloadAllLastPay={() => { }}
                             />
                         </div>
                 }
