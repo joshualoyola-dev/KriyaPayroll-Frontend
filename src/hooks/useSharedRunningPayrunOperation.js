@@ -119,6 +119,28 @@ const useSharedRunningPayrunOperation = () => {
     }, [options.employee_ids]);
 
 
+    //extract the employee id from the first
+    const getEmployeeForLastPayrunFromPayslips = () => {
+        try {
+            const employee_id = Object.keys(payslips)[0];
+            const employee = employees.find(e => e.employee_id === employee_id);
+            setEmployeeForLastPay(employee);
+        } catch (error) {
+            console.log(error.message);
+            addToast("Failed to find the employee for last pay", "error");
+        }
+    }
+
+    useEffect(() => {
+        if (!payslips) return;
+        if (!payrun) return;
+        if (payrun.payrun_type !== 'LAST') return;
+
+        getEmployeeForLastPayrunFromPayslips();
+    }, [payrun, payslips]);
+
+
+
     const handleFetchPayrunLogs = async () => {
         setLogsLoading(true);
         try {

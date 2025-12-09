@@ -169,8 +169,6 @@ const OptionGenerate = () => {
 
                 {/* Employee Selection */}
                 {(String(payrunType).toUpperCase() === 'SPECIAL' || String(payrunType).toUpperCase() === 'LAST') && <EmployeeSelection />}
-
-
             </form>
 
             {/* Selected Payitems */}
