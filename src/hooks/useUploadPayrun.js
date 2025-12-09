@@ -105,9 +105,14 @@ const useUploadPayrun = () => {
                             payslipTotalsData[employeeId]['net_salary'] = Number(value);
                         }
 
-                        if (key && key === "Date Hired") {
-                            console.log('date hired: ', value);
 
+                        if (key && key === "payrun_start_date") {
+                            payrunDatesData[employeeId]['payrun_start_date'] = String(value);
+                        }
+                        if (key && key === "payrun_end_date") {
+                            payrunDatesData[employeeId]['payrun_end_date'] = String(value);
+                        }
+                        if (key && key === "Date Hired") {
                             payrunDatesData[employeeId]['date_hired'] = String(value);
                         }
                         if (key && key === "Date Resigned") {
@@ -171,12 +176,12 @@ const useUploadPayrun = () => {
         try {
             const cleanedPayables = sanitizedPayslips(payslipsPayables);
             const cleanedTotals = sanitizedPayslips(payslipsTotals);
-            const cleanedPayrunDates = sanitizedPayslips(payrunsDates);
+            // const cleanedPayrunDates = sanitizedPayslips(payrunsDates);
 
             const payload = {
                 payslips_payables: cleanedPayables,
                 payslips_totals: cleanedTotals,
-                payruns_dates: cleanedPayrunDates,
+                payruns_dates: payrunsDates,
                 payrun_start_date: options.date_from,
                 payrun_end_date: options.date_to,
                 payment_date: options.payment_date,

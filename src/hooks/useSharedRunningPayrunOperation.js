@@ -3,7 +3,7 @@ import { usePayitemContext } from "../contexts/PayitemProvider";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { validateDailyRecordOfOneEmployee } from "../services/attendance.service";
-import { convertToISO8601 } from "../utility/datetime.utility";
+import { convertToISO8601, formatDateToWords } from "../utility/datetime.utility";
 import { generatePayrun, getPayrun, getPayrunPayslipPayables, getPayslipsTotals, saveEdit, savePayrunDraft, updateStatus } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -252,7 +252,7 @@ const useSharedRunningPayrunOperation = () => {
                 payrun_start_date: options.date_from,
                 payrun_end_date: options.date_to,
                 payment_date: options.payment_date,
-                payrun_title: `${payrunType.toUpperCase()} PAYRUN: ${options.date_from} - ${options.date_to}`,
+                payrun_title: `${String(payrunType).toUpperCase() === 'LAST' ? employeeForLastPay.last_name : payrunType.toUpperCase()}: ${formatDateToWords(options.date_from)} to ${formatDateToWords(options.date_to)}`,
                 generated_by: localStorage.getItem('system_user_id'),
                 status: 'DRAFT',
             };

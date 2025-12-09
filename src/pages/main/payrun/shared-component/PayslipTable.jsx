@@ -49,7 +49,13 @@ const PayslipTable = ({ data, setData, totals = [], startEndDates = [] }) => {
                             startEndDates && Object.keys(startEndDates).length > 0 &&
                             <>
                                 <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap">
-                                    Date Started
+                                    Payrun Start Date
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap">
+                                    Payrun End Date
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap">
+                                    Date Hired
                                 </th>
                                 <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap">
                                     Date Ended
@@ -102,6 +108,14 @@ const PayslipTable = ({ data, setData, totals = [], startEndDates = [] }) => {
                             {
                                 startEndDates && Object.keys(startEndDates).length > 0 &&
                                 <>
+                                    <td className={`border border-gray-300 px-4 py-2 
+                                        ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
+                                        {startEndDates[employee_id].payrun_start_date}
+                                    </td>
+                                    <td className={`border border-gray-300 px-4 py-2 
+                                        ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
+                                        {startEndDates[employee_id].payrun_end_date}
+                                    </td>
                                     <td className={`border border-gray-300 px-4 py-2 
                                         ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
                                         {startEndDates[employee_id].date_hired}
