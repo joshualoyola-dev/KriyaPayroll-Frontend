@@ -1,6 +1,6 @@
 import { ChevronDownIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
-import { convertToISO8601 } from "../../../../utility/datetime.utility";
+import { convertToISO8601, formatDateToWords } from "../../../../utility/datetime.utility";
 import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import env from "../../../../configs/env.config";
 import Tooltip from "../../../../components/Tooltip";
@@ -20,7 +20,8 @@ const OptionEdit = () => {
         toggleLogs, handleToggleLogs,
         logs,
         calculateTaxWithheld,
-        handleToggleCalculateTaxWithhelds
+        handleToggleCalculateTaxWithhelds,
+        employeeForLastPay,
     } = useSharedRunningPayrunOperationContext();
 
     const isForApproval = payrun.status === "FOR_APPROVAL";
@@ -126,9 +127,20 @@ const OptionEdit = () => {
                     </div>
                 </div>
             </div>
+            {employeeForLastPay && (
+                <div className="pt-4 border-t border-gray-200 mt-2">
+                    <p className="text-xs font-medium text-gray-700 mb-2">Employee for Last Payroll:</p>
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-800">
+                        <span className="font-semibold">{employeeForLastPay.first_name} {employeeForLastPay.last_name}</span> |
+                        <span>Employee ID: {employeeForLastPay.employee_id}</span> |
+                        <span>Date Hired: {formatDateToWords(employeeForLastPay.date_hired)}</span> |
+                        <span>Date End: {employeeForLastPay.date_end ? formatDateToWords(employeeForLastPay.date_end) : 'None'}</span>
+                    </div>
+                </div>
+            )}
 
             {/* Add Payitem control - at the bottom with proper spacing */}
-            <div className="flex items-center justify-end pt-4 border-t border-gray-200">
+            <div className="flex items-center justify-end pt-4 border-t mt-4 border-gray-200">
                 <div className="flex items-center gap-2">
                     <label className="text-sm font-medium text-gray-700">Add Pay Item:</label>
                     <select

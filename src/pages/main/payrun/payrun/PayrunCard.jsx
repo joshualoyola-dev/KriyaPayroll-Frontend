@@ -51,8 +51,9 @@ const PayrunCard = ({ payrun, idx, oncClickCard, onDelete, onNavigateSendPayslip
                 </span>
                 <div className="flex-1">
                     <h3 className="font-medium text-gray-900 text-sm">
-                        {formatDateToWords(payrun.payrun_start_date)} to {formatDateToWords(payrun.payrun_end_date)}
+                        {payrun.payrun_type === 'LAST' ? payrun.payrun_title : formatDateToWords(payrun.payrun_start_date)} to {formatDateToWords(payrun.payrun_end_date)}
                     </h3>
+
                     <p className="text-xs text-gray-500 mt-1">
                         Type: Regular Payrun
                     </p>

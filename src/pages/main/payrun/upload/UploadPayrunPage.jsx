@@ -5,7 +5,7 @@ import PayslipTable from "../shared-component/PayslipTable";
 import ErrorModal from "./ErrorModal";
 
 const UploadPayrunPage = () => {
-    const { payslipsPayables, setPayslipsPayables, missingEmpIds, isLoading, payslipsTotals } = useUploadPayrunContext();
+    const { payslipsPayables, setPayslipsPayables, missingEmpIds, isLoading, payslipsTotals, payrunsDates } = useUploadPayrunContext();
     return (
         <>
             <div className="pb-4">
@@ -14,7 +14,12 @@ const UploadPayrunPage = () => {
             <div className="overflow-x-auto">
                 {payslipsPayables.length === 0
                     ? <div></div>
-                    : <PayslipTable data={payslipsPayables} setData={setPayslipsPayables} totals={payslipsTotals} />
+                    : <PayslipTable
+                        data={payslipsPayables}
+                        setData={setPayslipsPayables}
+                        totals={payslipsTotals}
+                        startEndDates={payrunsDates ? payrunsDates : {}}
+                    />
                 }
             </div>
             {missingEmpIds.length > 0 && <ErrorModal />}

@@ -38,8 +38,8 @@ const usePayrun = () => {
         }
     };
 
-    const handleClickPayrun = (payrun_id) => {
-        navigate(`/payrun/regular?payrun_id=${payrun_id}`);
+    const handleClickPayrun = (payrun_id, payrun_type) => {
+        navigate(`/payrun/${String(payrun_type).toLocaleLowerCase()}?payrun_id=${payrun_id}`);
     };
 
     useEffect(() => {
