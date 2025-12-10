@@ -8,6 +8,7 @@ const useUser = () => {
     const [loading, setLoading] = useState(false);
     const [isUsersLoading, setIsUsersLoading] = useState(false);
 
+
     const { token } = useAuthContext();
 
     const fetchUserInfo = async () => {
@@ -45,6 +46,13 @@ const useUser = () => {
     };
 
 
+    const mapUserIdToName = (user_id) => {
+        const userToMap = users.find(u => u.user_id === user_id);
+        if (!userToMap) return user_id;
+
+        return `${user?.first_name} ${user?.last_name}`;
+    };
+
     useEffect(() => {
         if (!token) return;
 
@@ -62,7 +70,8 @@ const useUser = () => {
         users, setUsers,
         user, setUser,
         loading, setLoading,
-        isUsersLoading, setIsUsersLoading
+        isUsersLoading, setIsUsersLoading,
+        mapUserIdToName
     };
 }
 
