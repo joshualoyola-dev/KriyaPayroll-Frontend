@@ -20,7 +20,7 @@ const PayrunLogs = ({ logs }) => {
                                 {mapEmployeeIdToEmployeeName(log.performed_by) !== 'N/A' ? mapEmployeeIdToEmployeeName(log.performed_by) : log.performed_by}
                             </p>
                             <span className="text-xs text-gray-600 flex-1">
-                                {log.action}
+                                {new Date(log.created_at).toLocaleString()}
                             </span>
                         </div>
                         <p className="text-gray-400 text-xs mt-1">{log.created_at}</p>
