@@ -25,7 +25,8 @@ const useCompareNetPay = () => {
 
             setPayruns(fetchedPayruns);
 
-            const firstTwoIds = fetchedPayruns.slice(0, 1).map(p => p.payrun_id);
+            const firstTwoIds = fetchedPayruns.filter(p => p.payrun_type === 'REGULAR').slice(0, 2).map(p => p.payrun_id);
+
             setSelectedPayruns(firstTwoIds);
         } catch (error) {
             addToast(`Failed to fetch payruns: ${error.message}`, "error");
