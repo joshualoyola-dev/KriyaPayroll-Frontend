@@ -50,7 +50,7 @@ const useUser = () => {
         const userToMap = users.find(u => u.user_id === user_id);
         if (!userToMap) return user_id;
 
-        return `${user?.first_name} ${user?.last_name}`;
+        return `${userToMap?.first_name} ${userToMap?.last_name}`;
     };
 
     useEffect(() => {
