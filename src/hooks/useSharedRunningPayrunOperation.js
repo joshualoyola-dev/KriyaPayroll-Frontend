@@ -20,6 +20,10 @@ const formData = {
         { 'payitem-id-02': "Basic Pay" },
     ], //payitem_id : pay_item_name in the column
     employee_ids: [],
+
+    ytd_from: '2025-01-01',  //we'll generalize this into ytd - can be used for 13th month pay
+    ytd_to: '2025-12-31',
+    ytd_export_by_method: 'PAYMENT',
 };
 
 const useSharedRunningPayrunOperation = () => {
@@ -248,7 +252,9 @@ const useSharedRunningPayrunOperation = () => {
                     payrun_end_date: options.date_to,
                     employee_ids: options.employee_ids, //if empty, means include all active in payrun
                     payrun_type: payrunType.toUpperCase(),
-
+                    ytd_from: options.ytd_from,
+                    ytd_to: options.ytd_to,
+                    ytd_export_by_method: options.ytd_export_by_method,
                 }
             );
             setPayslips(result.data.payslips);
