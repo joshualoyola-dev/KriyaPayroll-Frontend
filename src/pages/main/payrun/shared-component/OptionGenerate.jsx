@@ -169,6 +169,60 @@ const OptionGenerate = () => {
 
                 {/* Employee Selection */}
                 {(String(payrunType).toUpperCase() === 'SPECIAL' || String(payrunType).toUpperCase() === 'LAST') && <EmployeeSelection />}
+
+                {/* YTD Selection */}
+                {
+                    options.pay_items.some(payitem_id => {
+                        const id = Object.keys(payitem_id)[0];
+                        return id === 'payitem-id-14' || id === 'payitem-id-15';
+                    }) && (
+                        <div className="col-span-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* YTD From */}
+                            <div className="space-y-2">
+                                <label className="block text-xs font-medium text-gray-700">
+                                    YTD Date From (e.g., 13th bonus)
+                                </label>
+                                <input
+                                    type="date"
+                                    value={options.ytd_from}
+                                    onChange={(e) => handleInputChange('ytd_from', e.target.value)}
+                                    className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                                    required
+                                />
+                            </div>
+
+                            {/* YTD To */}
+                            <div className="space-y-2">
+                                <label className="block text-xs font-medium text-gray-700">
+                                    YTD Date To (e.g., 13th bonus)
+                                </label>
+                                <input
+                                    type="date"
+                                    value={options.ytd_to}
+                                    onChange={(e) => handleInputChange('ytd_to', e.target.value)}
+                                    className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                                    required
+                                />
+                            </div>
+
+                            {/* YTD Export Method */}
+                            <div className="space-y-2">
+                                <label className="block text-xs font-medium text-gray-700">
+                                    YTD Export Method (lower & upper bound of YtD)
+                                </label>
+                                <select
+                                    value={options.ytd_export_by_method}
+                                    onChange={(e) => handleInputChange('ytd_export_by_method', e.target.value)}
+                                    className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                                    required
+                                >
+                                    <option value="PAYMENT">Use Payment Date</option>
+                                    <option value="PERIOD">Use Payrun start and end period</option>
+                                </select>
+                            </div>
+                        </div>
+                    )
+                }
             </form>
 
             {/* Selected Payitems */}
