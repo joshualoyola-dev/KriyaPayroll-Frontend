@@ -31,7 +31,7 @@ const useDailyRecordsAnalytics = () => {
         setCountsLoading(true);
 
         try {
-            const result = await fetchDailyRecordsCount(debouncedQuery_from, debouncedQuery_to, debouncedQuery_is_active);
+            const result = await fetchDailyRecordsCount(debouncedQuery_from, debouncedQuery_to, debouncedQuery_is_active, company.company_id);
             setCounts(result.data.counts);
         } catch (error) {
             addToast(`Failed to fetch daily records analytics: ${error.message}`, "error");

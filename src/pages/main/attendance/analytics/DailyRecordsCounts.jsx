@@ -7,7 +7,7 @@ import CountsTable from "./CountsTable";
 
 export const DailyRecordsCounts = () => {
     const { handleOptionChange, handleResetOption, options, countsLoading, counts } = useDailyRecordsAnalyticsContext();
-    const columns = ["employee_id", "employee_name", "attendance", "absence", "leave", "overtime", "restday"];
+    const columns = ["employee_id", "employee_name", "attendance", "absence", "leave", "overtime", "approved_overtime", "unapproved_overtime", "restday"];
 
     return (
         <div className="flex flex-col space-y-4 p-4 bg-white rounded-2xl border border-gray-200">
