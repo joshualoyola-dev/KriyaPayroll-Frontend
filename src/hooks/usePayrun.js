@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
-import { deleteOnePayrun, getCompanyPayruns, getPayrun, getPayrunPayslipPayables, getPayslips, getPayslipsDraft } from "../services/payrun.service";
+import { deleteOnePayrun, getAllLastPayrunSummaries, getCompanyPayruns, getPayrun, getPayrunPayslipPayables, getPayslips, getPayslipsDraft } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
-import { downloadPayablesAndTotals } from "../utility/excel.utility";
+import { downloadExcelLastPayrunSummary, downloadPayablesAndTotals } from "../utility/excel.utility";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { usePayitemContext } from "../contexts/PayitemProvider";
 
@@ -94,6 +94,22 @@ const usePayrun = () => {
         }
     };
 
+    const handleDownloadAllLastPayrunsSummary = async () => {
+        setIsDownloading(true);
+
+        try {
+            const result = await getAllLastPayrunSummaries(company.company_id);
+            const last_payrun_summaries = result.data.last_payrun_summaries;
+            downloadExcelLastPayrunSummary(last_payrun_summaries, 'All Last Pay Summaries', 'Last Payrun Summaries');
+        } catch (error) {
+            console.log(error);
+            addToast("Failed to download all last payruns summaries", "error");
+        }
+        finally {
+            setIsDownloading(false);
+        }
+    };
+
     return {
         payruns, setPayruns,
         handleFetchPayruns,
@@ -103,7 +119,8 @@ const usePayrun = () => {
         handleDeleteOnePayrun,
         handleNavigateSendPayslip,
         handleDownloadPayslipsExcel,
-        isDownloading, setIsDownloading
+        isDownloading, setIsDownloading,
+        handleDownloadAllLastPayrunsSummary
     };
 };
 
