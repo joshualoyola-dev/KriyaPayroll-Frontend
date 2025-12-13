@@ -10,7 +10,7 @@ import env from "../../../../configs/env.config";
 import NoAccess from "../../../../components/NoAccess";
 
 const PayrunPage = () => {
-    const { payruns, isPayrunLoading, handleClickPayrun, handleDeleteOnePayrun, deleteLoading, handleNavigateSendPayslip, handleDownloadPayslipsExcel, isDownloading } = usePayrunContext();
+    const { payruns, isPayrunLoading, handleClickPayrun, handleDeleteOnePayrun, deleteLoading, handleNavigateSendPayslip, handleDownloadPayslipsExcel, isDownloading, handleDownloadAllLastPayrunsSummary } = usePayrunContext();
 
     const [expandedSections, setExpandedSections] = useState({
         regular: true,
@@ -106,7 +106,7 @@ const PayrunPage = () => {
                                 payruns={lastPayruns}
                                 sectionKey="last"
                                 icon={BanknotesIcon}
-                                downloadAllLastPay={() => { }}
+                                downloadAllLastPay={handleDownloadAllLastPayrunsSummary}
                             />
                         </div>
                 }
