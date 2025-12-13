@@ -181,3 +181,64 @@ export const convertExcelTimeToHHMM = (value) => {
     // Format as HH:MM
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 };
+
+
+
+/**
+ * Downloads payrun-level employee summary from backend response
+ *
+ * @param {Array} data - Backend response array
+ * @param {string} filename - Excel file name (without extension)
+ * @param {string} sheetName - Sheet name
+ */
+export const downloadExcelLastPayrunSummary = (
+    data,
+    filename = 'Payrun-Detailed-Report',
+    sheetName = 'Payrun Report'
+) => {
+    try {
+        if (!Array.isArray(data) || data.length === 0) {
+            console.error('No data to export');
+            return;
+        }
+
+        const formatDate = (date) =>
+            date ? new Date(date).toISOString().split('T')[0] : '';
+
+        const rows = data.map(item => ({
+            'Employee ID': item.employee_id || '',
+            'Employee Name': `${item.first_name || ''} ${item.last_name || ''}`.trim(),
+            'Work Email': item.work_email || '',
+            'Payrun Start Date': formatDate(item.payrun_start_date),
+            'Payrun End Date': formatDate(item.payrun_end_date),
+            'Payment Date': formatDate(item.payment_date),
+            'Payrun Status': item.payrun_status || '',
+            'Total Earnings': Number(item.total_earnings) || 0,
+            'Total Deductions': Number(item.total_deductions) || 0,
+            'Total Taxes': Number(item.total_taxes) || 0,
+            'Net Salary': Number(item.net_salary) || 0,
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(rows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+        // Auto-size columns
+        worksheet['!cols'] = Object.keys(rows[0]).map(key => ({
+            wch: Math.max(key.length + 2, 18),
+        }));
+
+        const excelBuffer = XLSX.write(workbook, {
+            bookType: 'xlsx',
+            type: 'array',
+        });
+
+        const blob = new Blob([excelBuffer], {
+            type: 'application/octet-stream',
+        });
+
+        saveAs(blob, `${filename}.xlsx`);
+    } catch (error) {
+        console.error('Error generating Excel file:', error);
+    }
+};
