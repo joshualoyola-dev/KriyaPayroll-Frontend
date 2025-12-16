@@ -1,7 +1,7 @@
 import Question from "../../../components/Question";
 import UnderDevelopment from "../../../components/UnderDevelopment";
 import { useCompanyContext } from "../../../contexts/CompanyProvider";
-import { DailyRecordsCounts } from "../attendance/analytics/DailyRecordsCounts";
+import { DailyRecordsCounts } from "./daily-records/DailyRecordsCounts";
 import CompareNetPay from "./netpay/CompareNetPay";
 
 
