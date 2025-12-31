@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
-import { deleteOnePayrun, getAllLastPayrunSummaries, getCompanyPayruns, getPayrun, getPayrunPayslipPayables, getPayslips, getPayslipsDraft } from "../services/payrun.service";
+import { deleteOnePayrun, getAllLastPayrunSummaries, getCompanyPayruns, getEmployeeWithNoLastPay, getPayrun, getPayrunPayslipPayables, getPayslips, getPayslipsDraft } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { downloadExcelLastPayrunSummary, downloadPayablesAndTotals } from "../utility/excel.utility";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
@@ -12,6 +12,8 @@ const usePayrun = () => {
     const [isPayrunLoading, setIsPayrunLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [employeesWithNoLastPay, setEmployeesWithNoLastPay] = useState([]);
+    const [employeeLoading, setEmployeeLoading] = useState(false); // this is for employee with no payrun record
     const navigate = useNavigate();
 
     const { addToast } = useToastContext();
@@ -110,6 +112,48 @@ const usePayrun = () => {
         }
     };
 
+    const getInactiveEmployeeWithNoLastPayrunRecord = async () => {
+        setEmployeeLoading(true);
+        try {
+            const response = await getEmployeeWithNoLastPay(company.company_id);
+            console.log('employees with no last payruns:', response);
+            const { data: employees } = response.data;
+
+            const modified = employees.map(employee => {
+                if (employee.date_end) {
+                    const releaseDate = new Date(employee.date_end);
+                    releaseDate.setDate(releaseDate.getDate() + 30);
+
+                    return {
+                        ...employee,
+                        release_date: releaseDate
+                    };
+                }
+
+                return {
+                    ...employee,
+                    release_date: null
+                };
+            });
+
+            setEmployeesWithNoLastPay(modified);
+        } catch (error) {
+            console.log(error);
+            addToast("Failed to fetch inactive employees with no last payrun record", "error");
+        }
+        finally {
+            setEmployeeLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!company) return;
+
+        if (location.pathname === '/dashboard') {
+            getInactiveEmployeeWithNoLastPayrunRecord();
+        }
+    }, [company, location.pathname]);
+
     return {
         payruns, setPayruns,
         handleFetchPayruns,
@@ -120,7 +164,10 @@ const usePayrun = () => {
         handleNavigateSendPayslip,
         handleDownloadPayslipsExcel,
         isDownloading, setIsDownloading,
-        handleDownloadAllLastPayrunsSummary
+        handleDownloadAllLastPayrunsSummary,
+
+        employeesWithNoLastPay,
+        employeeLoading,
     };
 };
 
