@@ -67,3 +67,7 @@ export const getSalariesPerPayrun = async (company_id, payrun_ids) => {
 export const getAllLastPayrunSummaries = async (company_id) => {
     return await payroll_api.get(`/api/v1/payruns/${company_id}/last/get-all-summary`)
 }
+
+export const getEmployeeWithNoLastPay = async (company_id) => {
+    return await payroll_api.get(`/api/v1/payruns/${company_id}/last/missing-payruns`);
+}
