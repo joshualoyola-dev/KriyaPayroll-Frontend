@@ -11,7 +11,7 @@ import EmployeeCard from "./EmployeeCard";
 import EmployeeTable from "./EmployeeTable";
 
 const EmployeePage = () => {
-    const { query, setQuery, employee, setEmployee, handleShowAddModal, showAddModal, showAddSalaryForm, setShowAddSalaryForm, handleChangeEmploymentStatus, uploadEmployeeFile, isUploading, isEmployeesLoading, isEmployeeLoading } = useEmployeeContext();
+    const { query, setQuery, employee, setEmployee, handleShowAddModal, showAddModal, showAddSalaryForm, setShowAddSalaryForm, handleChangeEmploymentStatus, uploadEmployeeFile, isUploading, isEmployeesLoading, isEmployeeLoading, isEditEmployee, toggleEdit, } = useEmployeeContext();
 
     const hasAccess = userHasFeatureAccess(env.VITE_PAYROLL_EMPLOYEE_MANAGEMENT);
 
@@ -109,6 +109,8 @@ const EmployeePage = () => {
                             setShowAddSalaryForm={setShowAddSalaryForm}
                             showAddSalaryForm={showAddSalaryForm}
                             handleChangeEmploymentStatus={handleChangeEmploymentStatus}
+                            isEditEmployee={isEditEmployee}
+                            toggleEditEmployee={toggleEdit}
                         />
                     </div>
                 </div>

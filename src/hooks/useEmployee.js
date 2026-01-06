@@ -1,7 +1,7 @@
 // export default useEmployee;
 import { useEffect, useState } from "react";
 import { useCompanyContext } from "../contexts/CompanyProvider";
-import { addEmployeeSalary, createEmployee, fetchEmployeeById, fetchEmployeesByCompanyId, fetchEmployeesByCompanyIdAndQuery, updateEmploymentStatus } from "../services/employee.service";
+import { addEmployeeSalary, createEmployee, fetchEmployeeById, fetchEmployeesByCompanyId, fetchEmployeesByCompanyIdAndQuery, updateEmployeeInfo, updateEmploymentStatus } from "../services/employee.service";
 import { useToastContext } from "../contexts/ToastProvider";
 import useDebounce from "./useDebounce";
 import * as XLSX from 'xlsx';
@@ -34,6 +34,21 @@ const formData = {
     is_active: true,
 
 };
+
+const updateFormData = {
+    employee_id: '',
+    first_name: '',
+    middle_name: null,
+    last_name: '',
+    personal_email: '',
+    work_email: '',
+    job_title: '',
+    department: '',
+    employement_status: true,
+
+    date_hired: null,
+    date_end: null,
+}
 
 // Helper function to format date to ISO format (YYYY-MM-DD)
 const formatToISODate = (dateValue) => {
@@ -96,6 +111,7 @@ const useEmployee = () => {
     const [isAddSalaryLoading, setIsAddSalaryLoading] = useState(false);
     const [isAddEmployeeLoading, setIsAddEmployeeLoading] = useState(false);
     const [activeEmployees, setActiveEmployees] = useState([]);
+    const [isEditEmployee, setIsEditEmployee] = useState(false);
 
     const { addToast } = useToastContext();
     const debouncedQuery = useDebounce(query, 800);
@@ -105,8 +121,11 @@ const useEmployee = () => {
     const [employeesFormData, setEmployeesFormData] = useState([
         { ...formData, id: Date.now() } // Add unique id for each row
     ]);
+    const [employeeUpdateFormData, setEmployeeUpdateFormData] = useState({ ...updateFormData });
 
     const [salaryFormData, setSalaryFormData] = useState({ ...formData });
+
+
 
     const fetchEmployees = async () => {
         if (!employees.length) setIsEmployeesLoading(true);
@@ -152,7 +171,20 @@ const useEmployee = () => {
         try {
             const result = await fetchEmployeeById(employee_id);
             setEmployee(result.data.employee);
-            console.log('fetched employee info: ', result);
+            setEmployeeUpdateFormData({
+                employee_id: result.data.employee.employee_id,
+                first_name: result.data.employee.first_name,
+                middle_name: result.data.employee.middle_name,
+                last_name: result.data.employee.last_name,
+                personal_email: result.data.employee.personal_email,
+                work_email: result.data.employee.work_email,
+                job_title: result.data.employee.job_title,
+                department: result.data.employee.department,
+                employement_status: result.data.employee.employement_status,
+
+                date_hired: result.data.employee.date_hired,
+                date_end: result.data.employee.date_end,
+            });
         } catch (error) {
             console.log('error', error);
             addToast("Failed to fetch employee information", error);
@@ -527,6 +559,39 @@ const useEmployee = () => {
         return `${emp.first_name} ${emp.last_name}`
     };
 
+    const toggleEdit = () => {
+        setIsEditEmployee(!isEditEmployee);
+    };
+
+    const updateEmployeeInformation = async () => {
+
+        try {
+            const payload = {
+                ...employeeUpdateFormData,
+                employement_status: employeeUpdateFormData.employement_status === "true" ? true : false,
+                date_hired: formatToISODate(employeeUpdateFormData.date_hired),
+                date_end: employeeUpdateFormData.date_end ? formatToISODate(employeeUpdateFormData.date_end) : null,
+            };
+
+            const response = await updateEmployeeInfo(payload.employee_id, payload);
+            console.log('updated employee info: ', response);
+
+            //then reset form
+            setEmployeeUpdateFormData({ ...updateFormData });
+
+            //call refetch
+            handleFetchEmployeeInfo(employee.employee_id);
+
+            //trigger fetch of employees to update tables
+            await handleReloadEmployees();
+
+            setIsEditEmployee(false);
+        } catch (error) {
+            console.log(error);
+            addToast("Failed to update the employee information", "error");
+        }
+    };
+
     return {
         employees, setEmployees,
         employee, setEmployee,
@@ -558,7 +623,13 @@ const useEmployee = () => {
         isAddSalaryLoading, setIsAddSalaryLoading,
         handleChangeEmploymentStatus,
 
-        mapEmployeeIdToEmployeeName
+        mapEmployeeIdToEmployeeName,
+
+        isEditEmployee, setIsEditEmployee,
+        toggleEdit,
+
+        employeeUpdateFormData, setEmployeeUpdateFormData,
+        updateEmployeeInformation
     };
 };
 
