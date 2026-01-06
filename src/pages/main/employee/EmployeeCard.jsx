@@ -1,10 +1,11 @@
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { format } from "date-fns";
 import AddSalaryForm from "./AddSalaryForm";
-import { PlusCircleIcon } from "@heroicons/react/24/solid";
+import { PencilIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
 import { getYYYYMMDDPartOfUTCDate } from "../../../utility/datetime.utility";
+import UpdateEmployeeInfo from "./UpdateEmployeeInfo";
 
-const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSalaryForm, handleChangeEmploymentStatus }) => {
+const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSalaryForm, handleChangeEmploymentStatus, isEditEmployee, toggleEditEmployee }) => {
     if (!employee) {
         return null;
     }
@@ -42,7 +43,14 @@ const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSala
                 </button>
                 {/* Header */}
                 <div className="pr-8 flex-shrink-0">
-                    <h2 className="text-xl font-semibold text-gray-800 break-words">{fullName}</h2>
+                    <div className="flex space-x-2">
+                        <h2 className="text-xl font-semibold text-gray-800 break-words">{fullName}</h2>
+                        <button
+                            onClick={toggleEditEmployee}
+                        >
+                            <PencilIcon className="w-4 h-4 text-gray-500 hover:cursor-pointer" />
+                        </button>
+                    </div>
                     <p className="text-gray-600 break-words">
                         {job_title} • {department}
                     </p>
@@ -67,67 +75,70 @@ const EmployeeCard = ({ employee, setEmployee, showAddSalaryForm, setShowAddSala
                     </select>
                 </div>
 
-                <div className="max-w-md mx-auto mt-4 flex-shrink-0">
-                    {/* Contact Info */}
-                    <div>
-                        <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3 text-teal-600">Contact</h3>
-                        <div className="grid grid-cols-2 gap-3 bg-gray-50 rounded-lg p-3">
-                            <div>
-                                <p className="text-xs text-gray-600">Work</p>
-                                <p className="text-sm text-gray-800 break-all font-medium">{work_email}</p>
+                {isEditEmployee
+                    ?
+                    <UpdateEmployeeInfo />
+                    :
+                    <div className="max-w-md mx-auto mt-4 flex-shrink-0">
+                        {/* Contact Info */}
+                        <div>
+                            <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3 text-teal-600">Contact</h3>
+                            <div className="grid grid-cols-2 gap-3 bg-gray-50 rounded-lg p-3">
+                                <div>
+                                    <p className="text-xs text-gray-600">Work</p>
+                                    <p className="text-sm text-gray-800 break-all font-medium">{work_email}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-600">Personal</p>
+                                    <p className="text-sm text-gray-800 break-all font-medium">{personal_email}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-xs text-gray-600">Personal</p>
-                                <p className="text-sm text-gray-800 break-all font-medium">{personal_email}</p>
+                        </div>
+
+                        {/* Employment Info */}
+                        <div>
+                            <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3 text-teal-600">Employment</h3>
+                            <div className="grid grid-cols-2 gap-3 bg-gray-50 rounded-lg p-3">
+                                <div>
+                                    <p className="text-xs text-gray-600">Date Hired</p>
+                                    <p className="text-sm text-gray-800 font-medium">{getYYYYMMDDPartOfUTCDate(date_hired)}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-600">Date End</p>
+                                    <p className="text-sm text-gray-800 font-medium">{date_end ? getYYYYMMDDPartOfUTCDate(date_end) : "None"}</p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        {/* Shift Info */}
+                        <div>
+                            <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3 text-teal-600">Shift Schedule</h3>
+                            <div className="grid grid-cols-2 gap-3 bg-gray-50 rounded-lg p-3">
+                                <div>
+                                    <p className="text-xs text-gray-600">Shift Start</p>
+                                    <p className="text-sm text-gray-800 font-medium">{EmployeeShift.shift_start}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-600">Shift End</p>
+                                    <p className="text-sm text-gray-800 font-medium">{EmployeeShift.shift_end}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-600">Break Start</p>
+                                    <p className="text-sm text-gray-800 font-medium">{EmployeeShift.break_start}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-600">Break End</p>
+                                    <p className="text-sm text-gray-800 font-medium">{EmployeeShift.break_end}</p>
+                                </div>
+                                <div className="col-span-2">
+                                    <p className="text-xs text-gray-600">Hours</p>
+                                    <p className="text-sm text-gray-800 font-medium">{EmployeeShift.shift_hours}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    {/* Employment Info */}
-                    <div>
-                        <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3 text-teal-600">Employment</h3>
-                        <div className="grid grid-cols-2 gap-3 bg-gray-50 rounded-lg p-3">
-                            <div>
-                                <p className="text-xs text-gray-600">Date Hired</p>
-                                <p className="text-sm text-gray-800 font-medium">{getYYYYMMDDPartOfUTCDate(date_hired)}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-gray-600">Date End</p>
-                                <p className="text-sm text-gray-800 font-medium">{date_end ? getYYYYMMDDPartOfUTCDate(date_end) : "None"}</p>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    {/* Shift Info */}
-                    <div>
-                        <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3 text-teal-600">Shift Schedule</h3>
-                        <div className="grid grid-cols-2 gap-3 bg-gray-50 rounded-lg p-3">
-                            <div>
-                                <p className="text-xs text-gray-600">Shift Start</p>
-                                <p className="text-sm text-gray-800 font-medium">{EmployeeShift.shift_start}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-gray-600">Shift End</p>
-                                <p className="text-sm text-gray-800 font-medium">{EmployeeShift.shift_end}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-gray-600">Break Start</p>
-                                <p className="text-sm text-gray-800 font-medium">{EmployeeShift.break_start}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-gray-600">Break End</p>
-                                <p className="text-sm text-gray-800 font-medium">{EmployeeShift.break_end}</p>
-                            </div>
-                            <div className="col-span-2">
-                                <p className="text-xs text-gray-600">Hours</p>
-                                <p className="text-sm text-gray-800 font-medium">{EmployeeShift.shift_hours}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
+                }
 
                 {/* Salary History - Scrollable */}
                 <div className="flex-1 overflow-y-auto min-h-0">
