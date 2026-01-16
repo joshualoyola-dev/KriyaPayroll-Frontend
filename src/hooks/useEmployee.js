@@ -112,6 +112,7 @@ const useEmployee = () => {
     const [isAddEmployeeLoading, setIsAddEmployeeLoading] = useState(false);
     const [activeEmployees, setActiveEmployees] = useState([]);
     const [isEditEmployee, setIsEditEmployee] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
 
     const { addToast } = useToastContext();
     const debouncedQuery = useDebounce(query, 800);
@@ -564,11 +565,11 @@ const useEmployee = () => {
     };
 
     const updateEmployeeInformation = async () => {
-
+        setIsUpdating(true);
         try {
             const payload = {
                 ...employeeUpdateFormData,
-                employement_status: employeeUpdateFormData.employement_status === "true" ? true : false,
+                employement_status: employeeUpdateFormData.employement_status,
                 date_hired: formatToISODate(employeeUpdateFormData.date_hired),
                 date_end: employeeUpdateFormData.date_end ? formatToISODate(employeeUpdateFormData.date_end) : null,
             };
@@ -589,6 +590,9 @@ const useEmployee = () => {
         } catch (error) {
             console.log(error);
             addToast("Failed to update the employee information", "error");
+        }
+        finally {
+            setIsUpdating(false);
         }
     };
 
@@ -629,7 +633,8 @@ const useEmployee = () => {
         toggleEdit,
 
         employeeUpdateFormData, setEmployeeUpdateFormData,
-        updateEmployeeInformation
+        updateEmployeeInformation,
+        isUpdating, setIsUpdating
     };
 };
 
