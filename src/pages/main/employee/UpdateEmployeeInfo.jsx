@@ -6,6 +6,7 @@ const UpdateEmployeeInfo = () => {
         employeeUpdateFormData,
         setEmployeeUpdateFormData,
         toggleEdit,
+        isUpdating,
     } = useEmployeeContext();
 
     const handleSubmit = async (e) => {
@@ -136,13 +137,18 @@ const UpdateEmployeeInfo = () => {
                     <select
                         name="employement_status"
                         value={employeeUpdateFormData.employement_status}
-                        onChange={handleChange}
+                        onChange={(e) =>
+                            setEmployeeUpdateFormData((prev) => ({
+                                ...prev,
+                                employement_status: e.target.value === "true",
+                            }))
+                        }
                         className={inputClass}
-                        required
                     >
                         <option value="true">Active</option>
                         <option value="false">Inactive</option>
                     </select>
+
                 </div>
 
                 <div>
@@ -178,9 +184,10 @@ const UpdateEmployeeInfo = () => {
                 </button>
                 <button
                     type="submit"
-                    className="rounded-full bg-teal-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-teal-700 hover:cursor-pointer"
+                    className="rounded-full bg-teal-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-teal-700 hover:cursor-pointer disabled:opacity-50"
+                    disabled={isUpdating}
                 >
-                    Save Changes
+                    {isUpdating ? "Loading" : "Save Changes"}
                 </button>
             </div>
         </form>
