@@ -27,8 +27,3 @@ export const updateAttendance = async (company_id, employee_attendance_id, formD
 export const deleteAttendance = async (company_id, employee_attendance_id) => {
     return await payroll_api.delete(`/api/v1/daily-records/companies/${company_id}/attendances/${employee_attendance_id}`);
 }
-
-
-export const validateDailyRecordOfOneEmployee = async (employee_id, from, to) => {
-    return await payroll_api.get(`/api/v1/daily-records/validate/${employee_id}?from=${from}&to=${to}`)
-};  

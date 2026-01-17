@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { usePayitemContext } from "../contexts/PayitemProvider";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
-import { validateDailyRecordOfOneEmployee } from "../services/attendance.service";
 import { convertToISO8601, formatDateToWords } from "../utility/datetime.utility";
 import { generatePayrun, getPayrun, getPayrunPayslipPayables, getPayslipsTotals, saveEdit, savePayrunDraft, updateStatus } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
@@ -29,7 +28,6 @@ const formData = {
 const useSharedRunningPayrunOperation = () => {
     const [payrun, setPayrun] = useState(null);
     const [options, setOptions] = useState({ ...formData }); //case 1, 2, 3
-    const [isValidating, setIsValidating] = useState(false); //case 1,
     const [payslips, setPayslips] = useState([]); //case: 1, 2, 3
     const [payslipsTotal, setPayslipTotal] = useState([]);
     const [oldPayslips, setOldPayslips] = useState([]);
@@ -71,7 +69,7 @@ const useSharedRunningPayrunOperation = () => {
             setOldPayslips(resultPayables.data.payslips);
 
             // get payslips totals
-            const resultPayablesTotals = await getPayslipsTotals(resultPayrun.data.payrun.payrun_id, resultPayrun.data.payrun.status);
+            const resultPayablesTotals = await getPayslipsTotals(company.company_id, resultPayrun.data.payrun.payrun_id, resultPayrun.data.payrun.status);
             setPayslipTotal(resultPayablesTotals.data.totals);
 
             //reset the tax withheld option
@@ -148,7 +146,7 @@ const useSharedRunningPayrunOperation = () => {
     const handleFetchPayrunLogs = async () => {
         setLogsLoading(true);
         try {
-            const results = await fetchPayrunLogs(payrun.payrun_id);
+            const results = await fetchPayrunLogs(company.company_id, payrun.payrun_id);
 
             //we need to map the performed_by value to actual name
             const logsPerformedIdsMappedToName = results.data.logs.map(log => ({
@@ -213,30 +211,6 @@ const useSharedRunningPayrunOperation = () => {
                 Object.keys(item)[0] !== payitemId
             )
         }));
-    };
-
-    const validateEmployeesDailyRecordAgainstPayrunPeriod = async () => {
-        setIsValidating(true);
-        for (const employee of activeEmployees) {
-            try {
-                const result = await validateDailyRecordOfOneEmployee(
-                    employee.employee_id,
-                    convertToISO8601(options.date_from),
-                    convertToISO8601(options.date_to)
-                );
-
-                if (!result.data.valid) {
-                    addToast(`Employee ${employee.employee_id}'s doesn't match number of valid payrun days`, "error");
-                    setIsValidating(false);
-                    return false;
-                }
-            } catch (error) {
-                console.log(error);
-                addToast(`Error occured in validating employee's daily record: ${employee.employee_id}`, "error");
-            }
-        }
-        setIsValidating(false);
-        return true;
     };
 
     const handleGenerate = async () => {
@@ -404,10 +378,6 @@ const useSharedRunningPayrunOperation = () => {
         handleInputChange, handlePayitemChange, removePayitem,
 
         handleGenerate,
-
-        //validate
-        isValidating, setIsValidating,
-        validateEmployeesDailyRecordAgainstPayrunPeriod,
 
         //payslip
         payslips, setPayslips,

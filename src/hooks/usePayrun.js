@@ -80,9 +80,9 @@ const usePayrun = () => {
 
             let resultPayslips;
             if (resultPayrun.data.payrun.status === 'APPROVED') {
-                resultPayslips = await getPayslips(payrun_id);
+                resultPayslips = await getPayslips(company.company_id, payrun_id);
             } else {
-                resultPayslips = await getPayslipsDraft(payrun_id);
+                resultPayslips = await getPayslipsDraft(company.company_id, payrun_id);
             }
 
             const fileName = resultPayrun.data.payrun.payrun_title ?? 'Payslips';

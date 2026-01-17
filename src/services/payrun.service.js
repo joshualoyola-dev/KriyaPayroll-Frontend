@@ -36,12 +36,12 @@ export const deleteOnePayrun = async (company_id, payrun_id) => {
     return await payroll_api.delete(`/api/v1/payruns/${company_id}/${payrun_id}`);
 };
 
-export const getPayslipsDraft = async (payrun_id) => {
-    return await payroll_api.get(`/api/v1/payruns/${payrun_id}/payslips/draft`);
+export const getPayslipsDraft = async (company_id, payrun_id) => {
+    return await payroll_api.get(`/api/v1/payruns/${company_id}/${payrun_id}/payslips/draft`);
 };
 
-export const getPayslips = async (payrun_id) => {
-    return await payroll_api.get(`/api/v1/payruns/${payrun_id}/payslips/approved`);
+export const getPayslips = async (company_id, payrun_id) => {
+    return await payroll_api.get(`/api/v1/payruns/${company_id}/${payrun_id}/payslips/approved`);
 };
 
 export const sendOnePayslip = async (company_id, employee_id, payrun_id, payslip_id) => {
@@ -56,8 +56,8 @@ export const saveUploadedPayrun = async (company_id, formData) => {
     return await payroll_api.post(`/api/v1/payruns/${company_id}/upload/save`, formData);
 };
 
-export const getPayslipsTotals = async (payrun_id, payrun_status) => {
-    return await payroll_api.get(`/api/v1/payruns/payslips/totals/${payrun_id}?payrun_status=${payrun_status}`)
+export const getPayslipsTotals = async (company_id, payrun_id, payrun_status) => {
+    return await payroll_api.get(`/api/v1/payruns/${company_id}/payslips/totals/${payrun_id}?payrun_status=${payrun_status}`)
 }
 
 export const getSalariesPerPayrun = async (company_id, payrun_ids) => {
