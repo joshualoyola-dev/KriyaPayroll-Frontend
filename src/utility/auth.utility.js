@@ -2,7 +2,14 @@ import { jwtDecode } from "jwt-decode";
 
 
 export const getToken = () => {
-    return localStorage.getItem("token");
+
+    const hris_token = localStorage.getItem("token");
+    const payroll_token = localStorage.getItem("companyAccessToken");
+
+
+    return {
+        hris_token, payroll_token
+    }
 }
 
 export const isTokenExpired = (token) => {
@@ -17,7 +24,11 @@ export const isTokenExpired = (token) => {
 }
 
 export const removeLocalVariables = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("system_user_id");
+    localStorage.clear();
     return;
 }
+
+export const forceLogout = () => {
+    localStorage.clear();
+    window.location.href = "/auth/login";
+};

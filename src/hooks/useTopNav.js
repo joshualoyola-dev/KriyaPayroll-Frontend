@@ -5,9 +5,7 @@ const useTopNav = () => {
 
     const handleLogout = () => {
         console.log("Logging out...");
-        localStorage.removeItem("token");
-        localStorage.removeItem("system_user_id");
-        localStorage.removeItem("service_features_access");
+        localStorage.clear();
         window.location.href = "/";
     };
 
