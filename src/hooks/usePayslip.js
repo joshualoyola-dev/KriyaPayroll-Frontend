@@ -41,7 +41,7 @@ const usePayslip = () => {
     const handleFetchPayslips = async (payrun_id) => {
         setIsPayslipsLoading(true);
         try {
-            const result = await getPayslips(payrun_id);
+            const result = await getPayslips(company.company_id, payrun_id);
             console.log('payslips content for sending: ', result);
             setPayslips(result.data.payslips);
             // Auto-select all employees initially

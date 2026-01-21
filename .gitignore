@@ -26,3 +26,5 @@ dist-ssr
 
 #fucking env. Stupid boilerplate
 .env
+.env.development
+.env.production
