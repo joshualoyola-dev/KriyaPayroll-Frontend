@@ -12,10 +12,8 @@ export const fetchEmployeesByCompanyIdAndQuery = async (company_id, query) => {
     return await payroll_api.get(`/api/v1/employees?company_id=${company_id}&query=${query}`);
 };
 
-
-
-export const fetchEmployeeById = async (employee_id) => {
-    return await payroll_api.get(`/api/v1/employees/${employee_id}`);
+export const fetchEmployeeById = async (company_id, employee_id) => {
+    return await payroll_api.get(`/api/v1/employees/${employee_id}?company_id=${company_id}`);
 };
 
 export const createEmployee = async (company_id, formData) => {
@@ -26,8 +24,8 @@ export const updateEmployee = async (employee_id, formData) => {
     return await payroll_api.patch(`/api/v1/employees/${employee_id}`, formData);
 };
 
-export const updateEmployeeInfo = async (employee_id, formData) => {
-    return await payroll_api.patch(`/api/v1/employees/${employee_id}`, formData);
+export const updateEmployeeInfo = async (company_id, employee_id, formData) => {
+    return await payroll_api.patch(`/api/v1/employees/${employee_id}?company_id=${company_id}`, formData);
 };
 
 export const addEmployeeSalary = async (company_id, employee_id, formData) => {

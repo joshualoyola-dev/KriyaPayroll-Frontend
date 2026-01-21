@@ -4,9 +4,12 @@ import getErrorMessage, { getResponseErrorMessage } from "../utility/error.utili
 import { jwtDecode } from "jwt-decode";
 import { useToastContext } from "../contexts/ToastProvider";
 import { useNavigate } from "react-router-dom";
+import { getCompanyAccessToken } from "../services/user.service";
 
 const useAuth = () => {
     const [token, setToken] = useState(null);
+    const [companyAccessToken, setCompanyAccessToken] = useState(null);
+
     const [formData, setFormData] = useState({
         user_email: '',
         password: '',
@@ -21,10 +24,10 @@ const useAuth = () => {
     const handleLogin = async () => {
         setIsLoading(true);
         try {
+            //fetch token from hris
             const response = await loginUser(formData);
             const { token } = response.data;
 
-            //decode the token
             const decoded = jwtDecode(token);
 
             localStorage.setItem("system_user_id", decoded.system_user_id);
@@ -33,10 +36,17 @@ const useAuth = () => {
 
             setToken(token);
 
+            // fetch token from payroll
+            const { data: companyToken } = await getCompanyAccessToken();
+
+            setCompanyAccessToken(companyToken);
+
+            localStorage.setItem('companyAccessToken', companyToken);
+
             navigate('/dashboard');
         } catch (error) {
             console.log('error: ', error);
-            setError("Registration failed");
+            setError("Login failed");
             addToast(getResponseErrorMessage(error), "error");
         }
         finally {
@@ -46,8 +56,13 @@ const useAuth = () => {
 
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
+        const storedCompanyAccessToken = localStorage.getItem('companyAccessToken');
         if (storedToken) {
             setToken(storedToken);
+        }
+
+        if (storedCompanyAccessToken) {
+            setCompanyAccessToken(storedCompanyAccessToken);
         }
 
         setIsLoading(false);

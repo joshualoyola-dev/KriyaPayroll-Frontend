@@ -170,7 +170,7 @@ const useEmployee = () => {
     const handleFetchEmployeeInfo = async (employee_id) => {
         setIsEmployeeLoading(true);
         try {
-            const result = await fetchEmployeeById(employee_id);
+            const result = await fetchEmployeeById(company.company_id, employee_id);
             setEmployee(result.data.employee);
             setEmployeeUpdateFormData({
                 employee_id: result.data.employee.employee_id,
@@ -574,7 +574,7 @@ const useEmployee = () => {
                 date_end: employeeUpdateFormData.date_end ? formatToISODate(employeeUpdateFormData.date_end) : null,
             };
 
-            const response = await updateEmployeeInfo(payload.employee_id, payload);
+            const response = await updateEmployeeInfo(company.company_id, payload.employee_id, payload);
             console.log('updated employee info: ', response);
 
             //then reset form
