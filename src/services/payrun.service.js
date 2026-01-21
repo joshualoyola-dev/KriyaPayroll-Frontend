@@ -61,7 +61,7 @@ export const getPayslipsTotals = async (company_id, payrun_id, payrun_status) =>
 }
 
 export const getSalariesPerPayrun = async (company_id, payrun_ids) => {
-    return await payroll_api.get(`/api/v1/payruns/:company_id/net-salaries-per-payrun?payrun_ids=${payrun_ids}`);
+    return await payroll_api.get(`/api/v1/payruns/${company_id}/net-salaries-per-payrun?payrun_ids=${payrun_ids}`);
 };
 
 export const getAllLastPayrunSummaries = async (company_id) => {
