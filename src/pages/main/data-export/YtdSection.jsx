@@ -47,10 +47,39 @@ const YtdSection = () => {
                             onChange={(e) => setDateRangeFormData((prev) => ({ ...prev, active_employees: e.target.value }))}
                             className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm"
                         >
-                            <option value={0}>All employees (active & inactive)</option>
-                            <option value={1}>Active employees only</option>
+                            <option value={false}>All employees (active & inactive)</option>
+                            <option value={true}>Active employees only</option>
                         </select>
                     </div>
+
+                    <div className="flex flex-col">
+                        <label className="mb-1 text-xs font-medium text-gray-700">Export method</label>
+                        <select
+                            value={dateRangeFormData.payrun_payment_or_period}
+                            onChange={(e) => setDateRangeFormData((prev) => ({ ...prev, payrun_payment_or_period: e.target.value }))}
+                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm"
+                        >
+                            <option value={`PAYMENT`}>Payment </option>
+                            <option value={`PERIOD`}>Payrun Period</option>
+                        </select>
+                    </div>
+
+
+                    <div className="flex flex-col">
+                        <label className="mb-1 text-xs font-medium text-gray-700">Payrun Status</label>
+                        <select
+                            value={dateRangeFormData.payrun_status}
+                            onChange={(e) => setDateRangeFormData((prev) => ({ ...prev, payrun_status: [e.target.value] }))}
+                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm"
+                        >
+                            <option value={`APPROVED`}>Approved </option>
+                            <option value={`DRAFT`}>Draft</option>
+                            <option value={`FOR_APPROVAL`}>For approval</option>
+                            <option value={`REJECTED`}>Rejected</option>
+
+                        </select>
+                    </div>
+
 
                     <button
                         type="submit"
