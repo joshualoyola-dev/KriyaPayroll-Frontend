@@ -32,7 +32,14 @@ const useYtd = () => {
         try {
             const date_start = convertToISO8601(dateRangeFormData.date_start);
             const date_end = convertToISO8601(dateRangeFormData.date_end);
-            const response = await fetchYearToDate(company.company_id, date_start, date_end, dateRangeFormData.active_employees, dateRangeFormData.payrun_payment_or_period);
+            const response = await fetchYearToDate(
+                company.company_id,
+                date_start,
+                date_end,
+                dateRangeFormData.active_employees,
+                dateRangeFormData.payrun_payment_or_period,
+                dateRangeFormData.payrun_status
+            );
             setYtds(response.data.ytds);
         } catch (error) {
             console.log(error);
