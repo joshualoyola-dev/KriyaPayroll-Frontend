@@ -101,8 +101,14 @@ const usePayrun = () => {
 
         try {
             const result = await getAllLastPayrunSummaries(company.company_id);
-            const last_payrun_summaries = result.data.last_payrun_summaries;
-            downloadExcelLastPayrunSummary(last_payrun_summaries, 'All Last Pay Summaries', 'Last Payrun Summaries');
+            const { last_payrun_summaries, payables } = result.data.data;
+            downloadExcelLastPayrunSummary(
+                payables,
+                last_payrun_summaries,
+                mapPayitemIdToPayitemName,
+                'All Last Pay Summaries',
+                'Last Payrun Summaries'
+            );
         } catch (error) {
             console.log(error);
             addToast("Failed to download all last payruns summaries", "error");
