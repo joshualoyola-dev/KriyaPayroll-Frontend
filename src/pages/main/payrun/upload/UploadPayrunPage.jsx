@@ -5,7 +5,14 @@ import PayslipTable from "../shared-component/PayslipTable";
 import ErrorModal from "./ErrorModal";
 
 const UploadPayrunPage = () => {
-    const { payslipsPayables, setPayslipsPayables, missingEmpIds, isLoading, payslipsTotals, payrunsDates } = useUploadPayrunContext();
+    const { payslipsPayables,
+        setPayslipsPayables,
+        missingEmpIds,
+        isLoading,
+        payslipsTotals,
+        payrunsDates,
+        options
+    } = useUploadPayrunContext();
     return (
         <>
             <div className="pb-4">
@@ -19,6 +26,7 @@ const UploadPayrunPage = () => {
                         setData={setPayslipsPayables}
                         totals={payslipsTotals}
                         startEndDates={payrunsDates ? payrunsDates : {}}
+                        payrunType={options.payrun_type}
                     />
                 }
             </div>

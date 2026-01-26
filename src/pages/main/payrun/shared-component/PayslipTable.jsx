@@ -2,7 +2,13 @@ import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { formatNumber } from "../../../../utility/number.utility";
 
-const PayslipTable = ({ data, setData, totals = [], startEndDates = [] }) => {
+const PayslipTable = ({
+    data,
+    setData,
+    totals = [],
+    startEndDates = [],
+    payrunType,
+}) => {
     const employee_ids = Object.keys(data).sort((a, b) => {
         const numA = parseInt(a.split("-").pop(), 10);
         const numB = parseInt(b.split("-").pop(), 10);
@@ -46,7 +52,7 @@ const PayslipTable = ({ data, setData, totals = [], startEndDates = [] }) => {
                             Employee Id
                         </th>
                         {
-                            startEndDates && Object.keys(startEndDates).length > 0 &&
+                            (payrunType === 'LAST' && Object.keys(startEndDates).length) > 0 &&
                             <>
                                 <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap">
                                     Payrun Start Date
@@ -106,7 +112,7 @@ const PayslipTable = ({ data, setData, totals = [], startEndDates = [] }) => {
                             </td>
 
                             {
-                                startEndDates && Object.keys(startEndDates).length > 0 &&
+                                (payrunType === 'LAST' && Object.keys(startEndDates).length > 0) &&
                                 <>
                                     <td className={`border border-gray-300 px-4 py-2 
                                         ${index % 2 === 0 ? "bg-red-200" : "bg-red-300"}`}>
