@@ -126,7 +126,10 @@ const useUploadPayrun = () => {
                         //meaning it is not a payitem
                         const payitem_id = oldPayitemsNameToPayitemIDMap(key);
                         if (!payitem_id) return;
-                        payslipPayablesData[employeeId][payitem_id] = Number(value);
+
+                        //so as not to overrite the previous value
+                        const prevVal = payslipPayablesData[employeeId][payitem_id] || 0;
+                        payslipPayablesData[employeeId][payitem_id] = Number(value) + Number(prevVal);
                     }
                 });
             });
