@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useDebounce from "./useDebounce";
 import { useToastContext } from "../contexts/ToastProvider";
 import { fetchDailyRecordsCount } from "../services/analytic.service";
@@ -27,11 +27,15 @@ const useDailyRecordsAnalytics = () => {
     const { company } = useCompanyContext();
     const location = useLocation();
 
-    const handleFetchAnalyticsCount = async () => {
+    const handleFetchAnalyticsCount = useCallback(async () => {
         setCountsLoading(true);
 
         try {
-            const result = await fetchDailyRecordsCount(debouncedQuery_from, debouncedQuery_to, debouncedQuery_is_active, company.company_id);
+            const result = await fetchDailyRecordsCount(
+                debouncedQuery_from,
+                debouncedQuery_to,
+                debouncedQuery_is_active,
+                company.company_id);
             setCounts(result.data.counts);
         } catch (error) {
             addToast(`Failed to fetch daily records analytics: ${error.message}`, "error");
@@ -39,15 +43,15 @@ const useDailyRecordsAnalytics = () => {
         finally {
             setCountsLoading(false);
         }
-    };
+    }, [debouncedQuery_from, debouncedQuery_to, debouncedQuery_is_active, company]);
 
     useEffect(() => {
         if (!company) return;
 
-        if (location.pathname === '/dashboard') {
-            handleFetchAnalyticsCount();
-        }
-    }, [location.pathname, company, debouncedQuery_from, debouncedQuery_to, debouncedQuery_is_active]);
+        if (!location.pathname === '/dashboard') return;
+
+        handleFetchAnalyticsCount();
+    }, [location.pathname, handleFetchAnalyticsCount]);
 
 
     //reset option
