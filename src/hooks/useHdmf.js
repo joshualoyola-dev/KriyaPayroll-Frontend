@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useToastContext } from "../contexts/ToastProvider";
 import { fetchHdmfs, updateHdmfRecord } from "../services/contribution.service"; // Add update service
 import { useUserContext } from "../contexts/UserProvider";
 import { convertToISO8601 } from "../utility/datetime.utility";
 import { useLocation } from "react-router-dom";
+import { useContributionContext } from "../contexts/ContributionProvider";
 
 const useHdmf = () => {
     const [hdmfs, setHdmfs] = useState([]);
@@ -13,7 +14,9 @@ const useHdmf = () => {
     const { user } = useUserContext();
     const location = useLocation();
 
-    const handleFetchHdmfs = async () => {
+    const { selectedTab } = useContributionContext();
+
+    const handleFetchHdmfs = useCallback(async () => {
         setHdmfsLoading(true);
 
         try {
@@ -33,7 +36,7 @@ const useHdmf = () => {
         } finally {
             setHdmfsLoading(false);
         }
-    };
+    }, []);
 
     const handleUpdateHdmf = async (id, updatedData) => {
         try {
@@ -59,11 +62,12 @@ const useHdmf = () => {
 
     useEffect(() => {
         if (!user) return;
+        if (selectedTab.id !== 'hdmf') return;
+        if (location.pathname !== '/configuration/contribution') return;
+        if (hdmfs.length > 0) return;
 
-        if (location.pathname === '/configuration/contribution') {
-            handleFetchHdmfs();
-        }
-    }, [user, location.pathname]);
+        handleFetchHdmfs();
+    }, [user, location.pathname, selectedTab]);
 
     return {
         hdmfs,
