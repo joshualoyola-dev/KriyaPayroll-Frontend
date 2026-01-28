@@ -1,6 +1,7 @@
 
 
 import { useCompareNetPayContext } from "../../../../contexts/CompareNetPayProvider";
+import { usePayrunContext } from "../../../../contexts/PayrunProvider";
 import { formatDateToWords } from "../../../../utility/datetime.utility";
 import ComparisonGraph from "./ComparisonGraph";
 
@@ -8,11 +9,11 @@ const CompareNetPay = () => {
     const {
         selectedPayruns,
         handleSelectPayruns,
-        payrunsloading,
-        payruns,
         handleRemoveSelectedPayruns,
         netSalariesPerPayrun
     } = useCompareNetPayContext();
+    const { payruns } = usePayrunContext();
+
 
     return (
         <div className="flex flex-col space-y-4 p-4 bg-white rounded-2xl border border-gray-200 mb-4">
@@ -25,7 +26,7 @@ const CompareNetPay = () => {
 
             {/* Payrun Selection */}
             <div>
-                {payrunsloading ? (
+                {!payruns ? (
                     <div className="w-full h-10 rounded-full bg-gray-200 animate-pulse"></div>
                 ) : (
                     <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0">
@@ -51,6 +52,8 @@ const CompareNetPay = () => {
                         </select>
                     </div>
                 )}
+
+
             </div>
 
             {/* Selected Payruns */}

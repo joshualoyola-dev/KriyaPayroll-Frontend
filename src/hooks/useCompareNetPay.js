@@ -1,53 +1,30 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useCompanyContext } from "../contexts/CompanyProvider";
-import { getCompanyPayruns, getSalariesPerPayrun } from "../services/payrun.service";
+import { getSalariesPerPayrun } from "../services/payrun.service";
 import { useToastContext } from "../contexts/ToastProvider";
-import { useLocation } from "react-router-dom";
 import { formatDateToWords } from "../utility/datetime.utility";
+import { usePayrunContext } from "../contexts/PayrunProvider";
 
 const useCompareNetPay = () => {
     const [selectedPayruns, setSelectedPayruns] = useState([]); // payrun_id's
-    const [payruns, setPayruns] = useState([]);
-    const [payrunsloading, setpayrunsLoading] = useState(false);
     const [netSalariesPerPayrun, setNetSalariesPerPayrun] = useState([]);
     const [salariesLoading, setSalariesLoading] = useState(false);
 
-    const location = useLocation();
+    const { payruns } = usePayrunContext();
     const { company } = useCompanyContext();
     const { addToast } = useToastContext();
 
-    const handleFechPayruns = async () => {
-        setpayrunsLoading(true);
-        try {
-            const result = await getCompanyPayruns(company.company_id);
-            const fetchedPayruns = result.data.payruns;
-            console.log('payruns: ', fetchedPayruns);
-
-            setPayruns(fetchedPayruns);
-
-            const firstTwoIds = fetchedPayruns.filter(p => p.payrun_type === 'REGULAR').slice(0, 2).map(p => p.payrun_id);
-
-            setSelectedPayruns(firstTwoIds);
-        } catch (error) {
-            addToast(`Failed to fetch payruns: ${error.message}`, "error");
-        }
-        finally {
-            setpayrunsLoading(false);
-        }
-    };
-
     useEffect(() => {
-        if (!company) return;
-        if (location.pathname !== '/dashboard') return;
+        if (!payruns) return;
 
-        handleFechPayruns();
-    }, [location.pathname, company]);
+        const firstTwoIds = payruns.filter(p => p.payrun_type === 'REGULAR').slice(0, 2).map(p => p.payrun_id);
+        setSelectedPayruns(firstTwoIds);
+    }, []);
 
-    const handlefetchPayrunNetSalaries = async () => {
+    const handlefetchPayrunNetSalaries = useCallback(async () => {
         setSalariesLoading(true);
         try {
             const result = await getSalariesPerPayrun(company.company_id, selectedPayruns.join(','));
-            console.log('net salaries per payrun result: ', result);
             setNetSalariesPerPayrun(result.data.netSalariesPerPayrun);
         } catch (error) {
             addToast(`Failed to fetch payruns salaries: ${error.message}`, "error");
@@ -55,15 +32,14 @@ const useCompareNetPay = () => {
         finally {
             setSalariesLoading(false);
         }
-    };
+    }, [selectedPayruns]);
 
     useEffect(() => {
         if (!company) return;
-        if (location.pathname !== '/dashboard') return;
         if (selectedPayruns.length === 0) return;
 
         handlefetchPayrunNetSalaries();
-    }, [selectedPayruns]);
+    }, [handlefetchPayrunNetSalaries]);
 
     const handleSelectPayruns = (e) => {
         const payrun_id = e.target.value;
@@ -87,7 +63,6 @@ const useCompareNetPay = () => {
         handleRemoveSelectedPayruns,
         selectedPayruns, setSelectedPayruns,
         payruns,
-        payrunsloading,
         netSalariesPerPayrun, setNetSalariesPerPayrun,
         handlefetchPayrunNetSalaries,
         salariesLoading, setSalariesLoading,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
 import { deleteOnePayrun, getAllLastPayrunSummaries, getCompanyPayruns, getEmployeeWithNoLastPay, getPayrun, getPayrunPayslipPayables, getPayslips, getPayslipsDraft } from "../services/payrun.service";
@@ -22,14 +22,11 @@ const usePayrun = () => {
     const { mapPayitemIdToPayitemName } = usePayitemContext();
     const location = useLocation();
 
-    const handleFetchPayruns = async () => {
+    const handleFetchPayruns = useCallback(async () => {
         setIsPayrunLoading(true);
 
         try {
             const result = await getCompanyPayruns(company.company_id);
-            console.log('payruns: ', result);
-            console.log('payruns on data: ', result.data.payruns);
-
             setPayruns(result.data.payruns);
         } catch (error) {
             console.log('fetch payrun error: ', error);
@@ -38,7 +35,7 @@ const usePayrun = () => {
         finally {
             setIsPayrunLoading(false);
         }
-    };
+    }, [company]);
 
     const handleClickPayrun = (payrun_id, payrun_type) => {
         navigate(`/payrun/${String(payrun_type).toLocaleLowerCase()}?payrun_id=${payrun_id}&payrun_type=${String(payrun_type).toLocaleLowerCase()}`);
@@ -46,11 +43,8 @@ const usePayrun = () => {
 
     useEffect(() => {
         if (!company) return;
-
-        if (location.pathname === '/payrun') {
-            handleFetchPayruns();
-        }
-    }, [company, location.pathname]);
+        handleFetchPayruns();
+    }, [handleFetchPayruns]);
 
 
     const handleDeleteOnePayrun = async (payrun_id) => {
