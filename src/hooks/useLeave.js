@@ -75,7 +75,7 @@ const useLeave = () => {
             handleFetchLeaves();
         }
 
-    }, [company, location.pathname, handleFetchLeaves]);
+    }, [location.pathname, handleFetchLeaves]);
 
     // Modal related function
     const handleShowLeaveModal = () => {

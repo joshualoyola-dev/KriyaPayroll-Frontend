@@ -59,7 +59,7 @@ const useHoliday = () => {
         finally {
             setAttendancesLoading(false);
         }
-    }, [company, selectedHoliday]);
+    }, [selectedHoliday]);
 
     useEffect(() => {
         if (!selectedHoliday) return;

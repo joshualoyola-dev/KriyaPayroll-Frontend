@@ -82,7 +82,7 @@ const useOvertime = () => {
             handleFetchOvertimes();
         }
 
-    }, [company, location.pathname, handleFetchOvertimes]); // Fixed: Added dependency array
+    }, [location.pathname, handleFetchOvertimes]); // Fixed: Added dependency array
 
     // Modal related function
     const handleShowOvertimeModal = () => {

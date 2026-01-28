@@ -83,7 +83,7 @@ const useAttendance = () => {
             handleFetchAttendances();
         }
 
-    }, [company, location.pathname, handleFetchAttendances]);
+    }, [location.pathname, handleFetchAttendances]);
 
     const handleRowClick = (data, row) => {
         console.log('clicked: ', data);

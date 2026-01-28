@@ -71,7 +71,7 @@ const useAbsence = () => {
             handleFetchAbsences();
         }
 
-    }, [company, location.pathname, handleFetchAbsences]);
+    }, [location.pathname, handleFetchAbsences]);
 
     const handleShowAbsenceModal = () => {
         setShowAbsenceModal(!showAbsenceModal);
