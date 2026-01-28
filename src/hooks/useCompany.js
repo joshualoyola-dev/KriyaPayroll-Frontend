@@ -128,19 +128,14 @@ const useCompany = () => {
         }
     }, [company]);
 
-    const handleFetchCompanyPayrunConfigurations = async () => {
+    const handleFetchCompanyPayrunConfigurations = useCallback(async () => {
         //fetch company configurations
         try {
             const result1 = await fetchCompanyWorkingDays(company.company_id);
-            console.log('working days: ', result1);
             const result2 = await fetchCompanyPayrollFrequency(company.company_id);
-            console.log('payroll freq: ', result2);
             const result3 = await fetchCompanyNDRate(company.company_id);
-            console.log('nd: ', result3);
             const result4 = await fetchCompanyRegularOTRate(company.company_id);
-            console.log('regular ot rate: ', result4);
             const result5 = await fetchCompanyRestdayRate(company.company_id);
-            console.log('restday rate: ', result5);
 
             setWorkingDays(result1.data.number_of_days);
             setPayrollFrequency(result2.data.frequency);
@@ -151,7 +146,7 @@ const useCompany = () => {
             console.log(error);
             addToast("Failed to fetch company configurations", "error");
         }
-    };
+    }, [company]);
 
     useEffect(() => {
         if (!company) return;
@@ -159,13 +154,13 @@ const useCompany = () => {
         if (location.pathname === '/configuration/company-configuration') {
             handleFetchCompanyPayrunConfigurations();
         }
-    }, [company, location.pathname]);
+    }, [location.pathname, handleFetchCompanyPayrunConfigurations]);
 
-    const handleFetchCompanyFullDetail = async (companyId) => {
-        if (!companyId) return;
+    const handleFetchCompanyFullDetail = useCallback(async () => {
+        if (!company) return;
         setIsCompanyFullDetailLoading(true);
         try {
-            const result = await getCompanyFullDetail(companyId);
+            const result = await getCompanyFullDetail(company.company_id);
             setCompanyFullDetail(result.data.company);
         } catch (error) {
             console.log(error);
@@ -173,16 +168,16 @@ const useCompany = () => {
         } finally {
             setIsCompanyFullDetailLoading(false);
         }
-    };
+    }, [company]);
 
     //get companies full detail
     useEffect(() => {
-        if (company?.company_id) {
-            handleFetchCompanyFullDetail(company.company_id);
-        } else {
-            setCompanyFullDetail(null); // clear out if no company
-        }
-    }, [company]);
+        if (!company) {
+            setCompanyFullDetail(null);
+            return;
+        };
+        handleFetchCompanyFullDetail(company.company_id);
+    }, [handleFetchCompanyFullDetail]);
 
     const changeSelectedCompany = useCallback((selected) => {
         setCompany(selected);
@@ -258,32 +253,32 @@ const useCompany = () => {
     );
 
     // add user to editors
-    const addEditor = (user) => {
+    const addEditor = useCallback((user) => {
         if (!companyFormData.editors.some((u) => u.user_id === user.user_id)) {
             setCompanyFormData({
                 ...companyFormData,
                 editors: [...companyFormData.editors, user],
             });
         }
-    };
+    }, [companyFormData]);
 
     // add user to approvers
-    const addApprover = (user) => {
+    const addApprover = useCallback((user) => {
         if (!companyFormData.approvers.some((u) => u.user_id === user.user_id)) {
             setCompanyFormData({
                 ...companyFormData,
                 approvers: [...companyFormData.approvers, user],
             });
         }
-    };
+    }, [companyFormData]);
 
     // remove user from editors/approvers
-    const removeUser = (type, id) => {
+    const removeUser = useCallback((type, id) => {
         setCompanyFormData({
             ...companyFormData,
             [type]: companyFormData[type].filter((u) => u.user_id !== id),
         });
-    };
+    }, [companyFormData]);
 
     //update company
     const handleUpdateCompany = () => {
