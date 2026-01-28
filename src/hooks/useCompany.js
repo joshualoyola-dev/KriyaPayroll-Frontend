@@ -94,8 +94,6 @@ const useCompany = () => {
             }
 
             setCompany(selected ?? null);
-            console.log('selected', selected);
-
         } catch (error) {
             console.error("Failed to fetch companies:", error);
             setCompanies([]);
@@ -146,15 +144,14 @@ const useCompany = () => {
             console.log(error);
             addToast("Failed to fetch company configurations", "error");
         }
-    }, [company]);
+    }, []);
 
     useEffect(() => {
         if (!company) return;
+        if (location.pathname !== '/configuration/company-configuration') return;
+        handleFetchCompanyPayrunConfigurations();
 
-        if (location.pathname === '/configuration/company-configuration') {
-            handleFetchCompanyPayrunConfigurations();
-        }
-    }, [location.pathname, handleFetchCompanyPayrunConfigurations]);
+    }, [company, location.pathname, handleFetchCompanyPayrunConfigurations]);
 
     const handleFetchCompanyFullDetail = useCallback(async () => {
         if (!company) return;
@@ -168,7 +165,7 @@ const useCompany = () => {
         } finally {
             setIsCompanyFullDetailLoading(false);
         }
-    }, [company]);
+    }, []);
 
     //get companies full detail
     useEffect(() => {
@@ -177,7 +174,7 @@ const useCompany = () => {
             return;
         };
         handleFetchCompanyFullDetail(company.company_id);
-    }, [handleFetchCompanyFullDetail]);
+    }, [company, handleFetchCompanyFullDetail]);
 
     const changeSelectedCompany = useCallback((selected) => {
         setCompany(selected);
