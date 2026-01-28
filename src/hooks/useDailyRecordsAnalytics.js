@@ -27,28 +27,51 @@ const useDailyRecordsAnalytics = () => {
     const { company } = useCompanyContext();
     const location = useLocation();
 
-    const handleFetchAnalyticsCount = useCallback(async () => {
-        setCountsLoading(true);
+    // const handleFetchAnalyticsCount = useCallback(async () => {
+    //     setCountsLoading(true);
+    //     try {
+    //         const result = await fetchDailyRecordsCount(
+    //             debouncedQuery_from,
+    //             debouncedQuery_to,
+    //             debouncedQuery_is_active,
+    //             company.company_id);
+    //         setCounts(result.data.counts);
+    //     } catch (error) {
+    //         addToast(`Failed to fetch daily records analytics: ${error.message}`, "error");
+    //     }
+    //     finally {
+    //         setCountsLoading(false);
+    //     }
+    // }, [debouncedQuery_from, debouncedQuery_to, debouncedQuery_is_active]);
 
+    const handleFetchAnalyticsCount = useCallback(async () => {
+        if (!company) return; // early return
+        setCountsLoading(true);
         try {
             const result = await fetchDailyRecordsCount(
                 debouncedQuery_from,
                 debouncedQuery_to,
                 debouncedQuery_is_active,
-                company.company_id);
+                company.company_id
+            );
             setCounts(result.data.counts);
         } catch (error) {
             addToast(`Failed to fetch daily records analytics: ${error.message}`, "error");
-        }
-        finally {
+        } finally {
             setCountsLoading(false);
         }
-    }, [debouncedQuery_from, debouncedQuery_to, debouncedQuery_is_active, company]);
+    }, [
+        debouncedQuery_from,
+        debouncedQuery_to,
+        debouncedQuery_is_active,
+        company,
+        addToast
+    ]);
+
 
     useEffect(() => {
         if (!company) return;
-
-        if (!location.pathname === '/dashboard') return;
+        if (location.pathname !== '/dashboard') return;
 
         handleFetchAnalyticsCount();
     }, [location.pathname, handleFetchAnalyticsCount]);
@@ -56,9 +79,8 @@ const useDailyRecordsAnalytics = () => {
 
     //reset option
     const handleResetOption = () => {
-        setOptions({ ...options });
+        setOptions({ ...formData });
     };
-
     //handle option change
     const handleOptionChange = (field, value) => {
         setOptions(prev => ({
