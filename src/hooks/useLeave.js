@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useToastContext } from "../contexts/ToastProvider";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { deleteOneLeave, fetchLeaves, addOneLeave } from "../services/leave.service";
@@ -47,7 +47,7 @@ const useLeave = () => {
     const { company } = useCompanyContext();
     const location = useLocation();
 
-    const handleFetchLeaves = async () => {
+    const handleFetchLeaves = useCallback(async () => {
         setIsLeavesLoading(true);
 
         try {
@@ -66,7 +66,7 @@ const useLeave = () => {
         } finally {
             setIsLeavesLoading(false);
         }
-    };
+    }, [company, debouncedQuery_employee_id, debouncedQuery_from, debouncedQuery_to, limit]);
 
     useEffect(() => {
         if (!company) return;
@@ -75,7 +75,7 @@ const useLeave = () => {
             handleFetchLeaves();
         }
 
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit, location.pathname]);
+    }, [company, location.pathname, handleFetchLeaves]);
 
     // Modal related function
     const handleShowLeaveModal = () => {

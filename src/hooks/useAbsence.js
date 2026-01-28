@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { addOneAbsence, deleteOneAbsence, fetchAbsences } from "../services/absence.service";
@@ -43,7 +43,7 @@ const useAbsence = () => {
     const { addToast } = useToastContext();
     const location = useLocation();
 
-    const handleFetchAbsences = async () => {
+    const handleFetchAbsences = useCallback(async () => {
         setIsAbsencesLoading(true);
 
         try {
@@ -62,7 +62,7 @@ const useAbsence = () => {
         finally {
             setIsAbsencesLoading(false);
         }
-    };
+    }, [company, debouncedQuery_employee_id, debouncedQuery_from, debouncedQuery_to, limit]);
 
     useEffect(() => {
         if (!company) return;
@@ -71,7 +71,7 @@ const useAbsence = () => {
             handleFetchAbsences();
         }
 
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit, location.pathname]);
+    }, [company, location.pathname, handleFetchAbsences]);
 
     const handleShowAbsenceModal = () => {
         setShowAbsenceModal(!showAbsenceModal);

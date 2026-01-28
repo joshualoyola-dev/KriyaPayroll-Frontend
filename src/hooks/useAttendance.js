@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
@@ -53,7 +53,7 @@ const useAttendance = () => {
     const debouncedQuery_to = useDebounce(filters.to, 800);
     const debouncedQuery_from = useDebounce(filters.from, 800);
 
-    const handleFetchAttendances = async () => {
+    const handleFetchAttendances = useCallback(async () => {
         setIsAttendancesLoading(true);
 
         try {
@@ -74,7 +74,7 @@ const useAttendance = () => {
         } finally {
             setIsAttendancesLoading(false);
         }
-    };
+    }, [company, debouncedQuery_employee_id, debouncedQuery_from, debouncedQuery_to, limit]);
 
     useEffect(() => {
         if (!company) return;
@@ -83,7 +83,7 @@ const useAttendance = () => {
             handleFetchAttendances();
         }
 
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit, location.pathname]);
+    }, [company, location.pathname, handleFetchAttendances]);
 
     const handleRowClick = (data, row) => {
         console.log('clicked: ', data);
