@@ -112,7 +112,7 @@ const usePayrun = () => {
         }
     };
 
-    const getInactiveEmployeeWithNoLastPayrunRecord = async () => {
+    const getInactiveEmployeeWithNoLastPayrunRecord = useCallback(async () => {
         setEmployeeLoading(true);
         try {
             const response = await getEmployeeWithNoLastPay(company.company_id);
@@ -144,15 +144,15 @@ const usePayrun = () => {
         finally {
             setEmployeeLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         if (!company) return;
+        if (location.pathname !== '/dashboard') return;
+        if (employeesWithNoLastPay.length > 0) return;
 
-        if (location.pathname === '/dashboard') {
-            getInactiveEmployeeWithNoLastPayrunRecord();
-        }
-    }, [company, location.pathname]);
+        getInactiveEmployeeWithNoLastPayrunRecord();
+    }, [location.pathname, getInactiveEmployeeWithNoLastPayrunRecord]);
 
     return {
         payruns, setPayruns,
