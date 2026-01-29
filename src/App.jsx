@@ -42,6 +42,8 @@ import { PayrunProvider } from "./contexts/PayrunProvider"
 import SendPayslipPage from "./pages/main/payrun/payrun/SendPayslipPage"
 import { PayslipProvider } from "./contexts/PayslipProvider"
 import DataExportPage from "./pages/main/data-export/DataExportPage"
+import DataExportDraftPage from "./pages/main/data-export/DataExportDraftPage"
+import DataExportHistoryPage from "./pages/main/data-export/DataExportHistoryPage"
 import { ExportProvider } from "./contexts/ExportProvider"
 import { YtdProvider } from "./contexts/YtdProvider"
 import { SharedRunningPayrunOperationProvider } from "./contexts/SharedRunningPayrunOperationProvider"
@@ -115,6 +117,8 @@ function App() {
                                                                 <Route path="/configuration/contribution" element={<ContributionPage />} />
 
                                                                 <Route path="/data-export" element={<DataExportPage />} />
+                                                                <Route path="/data-export/draft" element={<DataExportDraftPage />} />
+                                                                <Route path="/data-export/history" element={<DataExportHistoryPage />} />
                                                               </Route>
                                                             </Route>
                                                           </Routes>

@@ -30,6 +30,8 @@ const useTopNav = () => {
         "/configuration/recurring-pay": "Recurring Pay",
         "/configuration/contribution": "Contributions",
         "/data-export": "Data Export",
+        "/data-export/draft": "Data Export Draft",
+        "/data-export/history": "Data Export History",
     };
 
     return {

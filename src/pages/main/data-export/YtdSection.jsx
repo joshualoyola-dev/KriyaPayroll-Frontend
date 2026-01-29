@@ -60,7 +60,7 @@ const YtdSection = () => {
                     </button>
                 </form>
 
-                {/* Download button */}
+                {/* Actions (same as 1601c) */}
                 {
                     ytds.length === 0
                         ? <></>
@@ -72,6 +72,20 @@ const YtdSection = () => {
                             >
                                 Download
                             </button>
+                            <div className="mt-2 flex gap-2">
+                                <button
+                                    type="button"
+                                    className="rounded-xl bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700"
+                                >
+                                    Generate a PDF
+                                </button>
+                                <button
+                                    type="button"
+                                    className="rounded-xl bg-orange-500 px-3 py-1 text-xs font-medium text-white hover:bg-orange-600"
+                                >
+                                    Save as Draft
+                                </button>
+                            </div>
                         </div>
                 }
 

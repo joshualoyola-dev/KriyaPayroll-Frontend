@@ -3,6 +3,8 @@ import env from "../../../configs/env.config";
 import { useExportContext } from "../../../contexts/ExportProvider";
 import { userHasFeatureAccess } from "../../../utility/access-controll.utility";
 import YtdSection from "./YtdSection";
+import Section2316 from "./Section2316";
+import Section1601c from "./Section1601c";
 
 const DataExportPage = () => {
     const { selectedExport, handleChangeSelection } = useExportContext();
@@ -28,6 +30,8 @@ const DataExportPage = () => {
                 </div>
             </div>
             {selectedExport === "ytd" && <YtdSection />}
+            {selectedExport === "2316" && <Section2316 />}
+            {selectedExport === "1601c" && <Section1601c />}
         </div>
     );
 };

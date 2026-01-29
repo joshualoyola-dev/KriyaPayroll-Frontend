@@ -73,6 +73,13 @@ const Sidebar = () => {
             title: null,
             items: [{ label: "Data export", path: "/data-export" }],
         },
+        {
+            title: null,
+            items: [
+                { label: "Data Export Draft", path: "/data-export/draft" },
+                { label: "Data Export History", path: "/data-export/history" },
+            ],
+        },
     ];
 
     return (
