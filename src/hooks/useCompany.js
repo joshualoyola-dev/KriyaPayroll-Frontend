@@ -33,8 +33,8 @@ const initialFormData = {
     company_tin: "",
     business_type: "",
 
-    editors: [], // {first_name, last_name, user_id}
-    approvers: [], // {first_name, last_name, user_id}
+    editors: [],
+    approvers: [],
 };
 
 const convertToStringIds = (editors, approvers) => {
@@ -71,7 +71,7 @@ const useCompany = () => {
     const { token } = useAuthContext();
     const location = useLocation();
 
-    const fetchCompanies = async () => {
+    const fetchCompanies = useCallback(async () => {
         setLoading(true);
         try {
             const response = await getCompaniesService();
@@ -101,13 +101,13 @@ const useCompany = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
 
     useEffect(() => {
         if (!token) return;
         fetchCompanies();
-    }, [token]);
+    }, [fetchCompanies]);
 
     useEffect(() => {
         if (company) {
