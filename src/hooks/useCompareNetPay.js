@@ -19,7 +19,7 @@ const useCompareNetPay = () => {
 
         const firstTwoIds = payruns.filter(p => p.payrun_type === 'REGULAR').slice(0, 2).map(p => p.payrun_id);
         setSelectedPayruns(firstTwoIds);
-    }, []);
+    }, [payruns]);
 
     const handlefetchPayrunNetSalaries = useCallback(async () => {
         setSalariesLoading(true);

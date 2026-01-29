@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import useDebounce from "./useDebounce";
 import { useToastContext } from "../contexts/ToastProvider";
 import { fetchDailyRecordsCount } from "../services/analytic.service";
@@ -27,25 +27,23 @@ const useDailyRecordsAnalytics = () => {
     const { company } = useCompanyContext();
     const location = useLocation();
 
-    // const handleFetchAnalyticsCount = useCallback(async () => {
-    //     setCountsLoading(true);
-    //     try {
-    //         const result = await fetchDailyRecordsCount(
-    //             debouncedQuery_from,
-    //             debouncedQuery_to,
-    //             debouncedQuery_is_active,
-    //             company.company_id);
-    //         setCounts(result.data.counts);
-    //     } catch (error) {
-    //         addToast(`Failed to fetch daily records analytics: ${error.message}`, "error");
-    //     }
-    //     finally {
-    //         setCountsLoading(false);
-    //     }
-    // }, [debouncedQuery_from, debouncedQuery_to, debouncedQuery_is_active]);
+    const lastFetchedOptions = useRef({
+        from: null,
+        to: null,
+        is_active: null,
+    });
 
     const handleFetchAnalyticsCount = useCallback(async () => {
-        if (!company) return; // early return
+        if (!company) return;
+
+        if (
+            lastFetchedOptions.current.from === debouncedQuery_from &&
+            lastFetchedOptions.current.to === debouncedQuery_to &&
+            lastFetchedOptions.current.is_active === debouncedQuery_is_active
+        ) {
+            return;
+        }
+
         setCountsLoading(true);
         try {
             const result = await fetchDailyRecordsCount(
@@ -55,18 +53,20 @@ const useDailyRecordsAnalytics = () => {
                 company.company_id
             );
             setCounts(result.data.counts);
+
+            // Save the last fetched options
+            lastFetchedOptions.current = {
+                from: debouncedQuery_from,
+                to: debouncedQuery_to,
+                is_active: debouncedQuery_is_active,
+            };
         } catch (error) {
             addToast(`Failed to fetch daily records analytics: ${error.message}`, "error");
         } finally {
             setCountsLoading(false);
         }
-    }, [
-        debouncedQuery_from,
-        debouncedQuery_to,
-        debouncedQuery_is_active,
-        company,
-        addToast
-    ]);
+    }, [debouncedQuery_from, debouncedQuery_to, debouncedQuery_is_active, company]);
+
 
 
     useEffect(() => {
