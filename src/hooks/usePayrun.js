@@ -201,8 +201,10 @@ const usePayrun = () => {
 
 
     const mapPayrunIdToReadableName = (payrun_id) => {
+        if (!payruns) return '';
         const payrun = payruns.find(p => p.payrun_id === payrun_id);
-        return `${formatDateToWords(payrun.payrun_start_date)} to ${formatDateToWords(payrun.payrun_end_date)}`
+        if (!payrun) return '';
+        return `${formatDateToWords(payrun.payrun_start_date)} to ${formatDateToWords(payrun.payrun_end_date)}`;
     };
 
     return {
