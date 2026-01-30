@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
 import { deleteOnePayrun, getAllLastPayrunSummaries, getCompanyPayruns, getEmployeeWithNoLastPay, getPayrun, getPayrunPayslipPayables, getPayslips, getPayslipsDraft } from "../services/payrun.service";
@@ -6,6 +6,10 @@ import { useCompanyContext } from "../contexts/CompanyProvider";
 import { downloadExcelLastPayrunSummary, downloadPayablesAndTotals } from "../utility/excel.utility";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { usePayitemContext } from "../contexts/PayitemProvider";
+import { getSalariesPerPayrun } from "../services/payrun.service";
+import { formatDateToWords } from "../utility/datetime.utility";
+
+
 
 const usePayrun = () => {
     const [payruns, setPayruns] = useState([]);
@@ -14,6 +18,12 @@ const usePayrun = () => {
     const [isDownloading, setIsDownloading] = useState(false);
     const [employeesWithNoLastPay, setEmployeesWithNoLastPay] = useState([]);
     const [employeeLoading, setEmployeeLoading] = useState(false); // this is for employee with no payrun record
+
+    const [selectedPayruns, setSelectedPayruns] = useState([]); // payrun_id's
+    const [netSalariesPerPayrun, setNetSalariesPerPayrun] = useState([]);
+    const [salariesLoading, setSalariesLoading] = useState(false);
+
+
     const navigate = useNavigate();
 
     const { addToast } = useToastContext();
@@ -22,14 +32,11 @@ const usePayrun = () => {
     const { mapPayitemIdToPayitemName } = usePayitemContext();
     const location = useLocation();
 
-    const handleFetchPayruns = async () => {
+    const handleFetchPayruns = useCallback(async () => {
         setIsPayrunLoading(true);
 
         try {
             const result = await getCompanyPayruns(company.company_id);
-            console.log('payruns: ', result);
-            console.log('payruns on data: ', result.data.payruns);
-
             setPayruns(result.data.payruns);
         } catch (error) {
             console.log('fetch payrun error: ', error);
@@ -38,7 +45,7 @@ const usePayrun = () => {
         finally {
             setIsPayrunLoading(false);
         }
-    };
+    }, [company]);
 
     const handleClickPayrun = (payrun_id, payrun_type) => {
         navigate(`/payrun/${String(payrun_type).toLocaleLowerCase()}?payrun_id=${payrun_id}&payrun_type=${String(payrun_type).toLocaleLowerCase()}`);
@@ -46,12 +53,8 @@ const usePayrun = () => {
 
     useEffect(() => {
         if (!company) return;
-
-        if (location.pathname === '/payrun') {
-            handleFetchPayruns();
-        }
-    }, [company, location.pathname]);
-
+        handleFetchPayruns();
+    }, [handleFetchPayruns]);
 
     const handleDeleteOnePayrun = async (payrun_id) => {
         setDeleteLoading(true);
@@ -101,8 +104,14 @@ const usePayrun = () => {
 
         try {
             const result = await getAllLastPayrunSummaries(company.company_id);
-            const last_payrun_summaries = result.data.last_payrun_summaries;
-            downloadExcelLastPayrunSummary(last_payrun_summaries, 'All Last Pay Summaries', 'Last Payrun Summaries');
+            const { last_payrun_summaries, payables } = result.data.data;
+            downloadExcelLastPayrunSummary(
+                payables,
+                last_payrun_summaries,
+                mapPayitemIdToPayitemName,
+                'All Last Pay Summaries',
+                'Last Payrun Summaries'
+            );
         } catch (error) {
             console.log(error);
             addToast("Failed to download all last payruns summaries", "error");
@@ -112,7 +121,7 @@ const usePayrun = () => {
         }
     };
 
-    const getInactiveEmployeeWithNoLastPayrunRecord = async () => {
+    const getInactiveEmployeeWithNoLastPayrunRecord = useCallback(async () => {
         setEmployeeLoading(true);
         try {
             const response = await getEmployeeWithNoLastPay(company.company_id);
@@ -144,15 +153,59 @@ const usePayrun = () => {
         finally {
             setEmployeeLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         if (!company) return;
+        if (location.pathname !== '/dashboard') return;
+        if (employeesWithNoLastPay.length > 0) return;
 
-        if (location.pathname === '/dashboard') {
-            getInactiveEmployeeWithNoLastPayrunRecord();
+        getInactiveEmployeeWithNoLastPayrunRecord();
+    }, [location.pathname, getInactiveEmployeeWithNoLastPayrunRecord]);
+
+    useEffect(() => {
+        if (!payruns) return;
+
+        const firstTwoIds = payruns.filter(p => p.payrun_type === 'REGULAR').slice(0, 2).map(p => p.payrun_id);
+        setSelectedPayruns(firstTwoIds);
+    }, [payruns, company]);
+
+    const handlefetchPayrunNetSalaries = useCallback(async () => {
+        setSalariesLoading(true);
+        try {
+            const result = await getSalariesPerPayrun(company.company_id, selectedPayruns.join(','));
+            setNetSalariesPerPayrun(result.data.netSalariesPerPayrun);
+        } catch (error) {
+            addToast(`Failed to fetch payruns salaries: ${error.message}`, "error");
         }
-    }, [company, location.pathname]);
+        finally {
+            setSalariesLoading(false);
+        }
+    }, [selectedPayruns]);
+
+    useEffect(() => {
+        if (!company) return;
+        if (selectedPayruns.length === 0) return;
+
+        handlefetchPayrunNetSalaries();
+    }, [handlefetchPayrunNetSalaries]);
+
+    const handleSelectPayruns = (e) => {
+        const payrun_id = e.target.value;
+        setSelectedPayruns(prev => [...prev, payrun_id]);
+    };
+
+    const handleRemoveSelectedPayruns = (payrun_id) => {
+        setSelectedPayruns(prev => prev.filter(id => id !== payrun_id));
+    };
+
+
+    const mapPayrunIdToReadableName = (payrun_id) => {
+        if (!payruns) return '';
+        const payrun = payruns.find(p => p.payrun_id === payrun_id);
+        if (!payrun) return '';
+        return `${formatDateToWords(payrun.payrun_start_date)} to ${formatDateToWords(payrun.payrun_end_date)}`;
+    };
 
     return {
         payruns, setPayruns,
@@ -168,6 +221,15 @@ const usePayrun = () => {
 
         employeesWithNoLastPay,
         employeeLoading,
+
+
+        handleSelectPayruns,
+        handleRemoveSelectedPayruns,
+        selectedPayruns, setSelectedPayruns,
+        netSalariesPerPayrun, setNetSalariesPerPayrun,
+        handlefetchPayrunNetSalaries,
+        salariesLoading, setSalariesLoading,
+        mapPayrunIdToReadableName
     };
 };
 

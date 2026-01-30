@@ -182,8 +182,6 @@ export const convertExcelTimeToHHMM = (value) => {
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 };
 
-
-
 /**
  * Downloads payrun-level employee summary from backend response
  *
@@ -192,53 +190,61 @@ export const convertExcelTimeToHHMM = (value) => {
  * @param {string} sheetName - Sheet name
  */
 export const downloadExcelLastPayrunSummary = (
-    data,
-    filename = 'Payrun-Detailed-Report',
-    sheetName = 'Payrun Report'
+    data, // payables
+    summaries, //summaries such as name, net pay, etc
+    mapPayitemIdToPayitemName,
+    filename,
+    sheetName,
 ) => {
-    try {
-        if (!Array.isArray(data) || data.length === 0) {
-            console.error('No data to export');
-            return;
-        }
+
+    const allInnerKeys = Array.from(
+        new Set(Object.values(data).flatMap(inner => Object.keys(inner)))
+    );
+    const employeeIds = Object.keys(data);
+
+    const rows = [];
+
+    for (const empId of employeeIds) {
+
+        //find the employee record on summaries
+        const summary = summaries.find(s => s.employee_id === empId);
 
         const formatDate = (date) =>
             date ? new Date(date).toISOString().split('T')[0] : '';
 
-        const rows = data.map(item => ({
-            'Employee ID': item.employee_id || '',
-            'Employee Name': `${item.first_name || ''} ${item.last_name || ''}`.trim(),
-            'Work Email': item.work_email || '',
-            'Payrun Start Date': formatDate(item.payrun_start_date),
-            'Payrun End Date': formatDate(item.payrun_end_date),
-            'Payment Date': formatDate(item.payment_date),
-            'Payrun Status': item.payrun_status || '',
-            'Total Earnings': Number(item.total_earnings) || 0,
-            'Total Deductions': Number(item.total_deductions) || 0,
-            'Total Taxes': Number(item.total_taxes) || 0,
-            'Net Salary': Number(item.net_salary) || 0,
-        }));
+        const row = {
+            'Employee ID': summary.employee_id || '',
+            'Employee Name': `${summary.first_name || ''} ${summary.last_name || ''}`.trim(),
+            'Work Email': summary.work_email || '',
+            'Payrun Start Date': formatDate(summary.payrun_start_date),
+            'Payrun End Date': formatDate(summary.payrun_end_date),
+            'Payment Date': formatDate(summary.payment_date),
+            'Payrun Status': summary.payrun_status || '',
+            // 'Total Earnings': Number(summary.total_earnings) || 0,
+            // 'Total Deductions': Number(summary.total_deductions) || 0,
+            // 'Total Taxes': Number(summary.total_taxes) || 0,
+            // 'Net Salary': Number(summary.net_salary) || 0,
+        };
 
-        const worksheet = XLSX.utils.json_to_sheet(rows);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+        for (const payItemId of allInnerKeys) {
+            const payItemName = mapPayitemIdToPayitemName(payItemId) || payItemId;
+            row[payItemName] = data[empId]?.[payItemId] != null ? Number(data[empId]?.[payItemId]) : 0;
+        }
 
-        // Auto-size columns
-        worksheet['!cols'] = Object.keys(rows[0]).map(key => ({
-            wch: Math.max(key.length + 2, 18),
-        }));
+        row['Total Earnings'] = Number(summary.total_earnings) || 0;
+        row['Total Deductions'] = Number(summary.total_deductions) || 0;
+        row['Total Taxes'] = Number(summary.total_taxes) || 0;
+        row['Net Salary'] = Number(summary.net_salary) || 0;
 
-        const excelBuffer = XLSX.write(workbook, {
-            bookType: 'xlsx',
-            type: 'array',
-        });
-
-        const blob = new Blob([excelBuffer], {
-            type: 'application/octet-stream',
-        });
-
-        saveAs(blob, `${filename}.xlsx`);
-    } catch (error) {
-        console.error('Error generating Excel file:', error);
+        rows.push(row);
     }
+
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+    //  Download as Excel
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(blob, `${filename}.xlsx`);
 };

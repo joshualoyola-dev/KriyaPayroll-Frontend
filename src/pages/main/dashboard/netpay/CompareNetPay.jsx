@@ -1,18 +1,15 @@
-
-
-import { useCompareNetPayContext } from "../../../../contexts/CompareNetPayProvider";
+import { usePayrunContext } from "../../../../contexts/PayrunProvider";
 import { formatDateToWords } from "../../../../utility/datetime.utility";
 import ComparisonGraph from "./ComparisonGraph";
 
 const CompareNetPay = () => {
     const {
+        payruns,
         selectedPayruns,
         handleSelectPayruns,
-        payrunsloading,
-        payruns,
         handleRemoveSelectedPayruns,
         netSalariesPerPayrun
-    } = useCompareNetPayContext();
+    } = usePayrunContext();
 
     return (
         <div className="flex flex-col space-y-4 p-4 bg-white rounded-2xl border border-gray-200 mb-4">
@@ -25,7 +22,7 @@ const CompareNetPay = () => {
 
             {/* Payrun Selection */}
             <div>
-                {payrunsloading ? (
+                {!payruns ? (
                     <div className="w-full h-10 rounded-full bg-gray-200 animate-pulse"></div>
                 ) : (
                     <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0">
@@ -58,28 +55,30 @@ const CompareNetPay = () => {
                 <p className="text-sm text-gray-600">Selected Payruns</p>
                 <div className="flex flex-wrap gap-2">
                     {selectedPayruns.map((payrun_id, idx) => {
-                        const payrun = payruns.find(payrun => payrun.payrun_id === payrun_id);
+                        const payrun = payruns.find(p => p.payrun_id === payrun_id);
+
+                        if (!payrun) return null;
+
                         return (
-                            <div
-                                key={idx}
-                                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs border border-gray-500 text-gray-500`}
-                            >
+                            <div key={idx} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs border border-gray-500 text-gray-500">
                                 <span className="font-medium truncate">
-                                    {formatDateToWords(payrun.payrun_start_date)}–{formatDateToWords(payrun.payrun_end_date)}
+                                    {formatDateToWords(payrun.payrun_start_date)}–
+                                    {formatDateToWords(payrun.payrun_end_date)}
                                 </span>
                                 <span className="opacity-75">
                                     {payrun.status} • {payrun.payrun_type}
                                 </span>
                                 <button
                                     onClick={() => handleRemoveSelectedPayruns(payrun_id)}
-                                    className="ml-2 focus:outline-none font-medium hover hover:cursor-pointer"
+                                    className="ml-2 focus:outline-none font-medium hover:cursor-pointer"
                                     type="button"
                                 >
                                     ×
                                 </button>
                             </div>
-                        )
+                        );
                     })}
+
                 </div>
             </div>
 
