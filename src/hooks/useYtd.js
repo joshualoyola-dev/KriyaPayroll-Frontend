@@ -10,7 +10,10 @@ import { downloadExcelMatrix } from "../utility/excel.utility";
 const formData = {
     date_start: '',
     date_end: '',
-    active_employees: 0, //default: get all active and inactive employees
+    active_employees: true,
+    payrun_payment_or_period: 'PAYMENT',
+    payrun_status: ['APPROVED'],
+    employee_ids: [],
 };
 
 const useYtd = () => {
@@ -30,7 +33,15 @@ const useYtd = () => {
         try {
             const date_start = convertToISO8601(dateRangeFormData.date_start);
             const date_end = convertToISO8601(dateRangeFormData.date_end);
-            const response = await fetchYearToDate(company.company_id, date_start, date_end, dateRangeFormData.active_employees);
+            const response = await fetchYearToDate(
+                company.company_id,
+                date_start,
+                date_end,
+                dateRangeFormData.active_employees,
+                dateRangeFormData.payrun_payment_or_period,
+                dateRangeFormData.payrun_status,
+                dateRangeFormData.employee_ids,
+            );
             setYtds(response.data.ytds);
         } catch (error) {
             console.log(error);
