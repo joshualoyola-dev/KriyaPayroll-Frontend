@@ -6,6 +6,10 @@ import { useCompanyContext } from "../contexts/CompanyProvider";
 import { downloadExcelLastPayrunSummary, downloadPayablesAndTotals } from "../utility/excel.utility";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { usePayitemContext } from "../contexts/PayitemProvider";
+import { getSalariesPerPayrun } from "../services/payrun.service";
+import { formatDateToWords } from "../utility/datetime.utility";
+
+
 
 const usePayrun = () => {
     const [payruns, setPayruns] = useState([]);
@@ -14,6 +18,12 @@ const usePayrun = () => {
     const [isDownloading, setIsDownloading] = useState(false);
     const [employeesWithNoLastPay, setEmployeesWithNoLastPay] = useState([]);
     const [employeeLoading, setEmployeeLoading] = useState(false); // this is for employee with no payrun record
+
+    const [selectedPayruns, setSelectedPayruns] = useState([]); // payrun_id's
+    const [netSalariesPerPayrun, setNetSalariesPerPayrun] = useState([]);
+    const [salariesLoading, setSalariesLoading] = useState(false);
+
+
     const navigate = useNavigate();
 
     const { addToast } = useToastContext();
@@ -45,7 +55,6 @@ const usePayrun = () => {
         if (!company) return;
         handleFetchPayruns();
     }, [handleFetchPayruns]);
-
 
     const handleDeleteOnePayrun = async (payrun_id) => {
         setDeleteLoading(true);
@@ -154,6 +163,48 @@ const usePayrun = () => {
         getInactiveEmployeeWithNoLastPayrunRecord();
     }, [location.pathname, getInactiveEmployeeWithNoLastPayrunRecord]);
 
+    useEffect(() => {
+        if (!payruns) return;
+
+        const firstTwoIds = payruns.filter(p => p.payrun_type === 'REGULAR').slice(0, 2).map(p => p.payrun_id);
+        setSelectedPayruns(firstTwoIds);
+    }, [payruns, company]);
+
+    const handlefetchPayrunNetSalaries = useCallback(async () => {
+        setSalariesLoading(true);
+        try {
+            const result = await getSalariesPerPayrun(company.company_id, selectedPayruns.join(','));
+            setNetSalariesPerPayrun(result.data.netSalariesPerPayrun);
+        } catch (error) {
+            addToast(`Failed to fetch payruns salaries: ${error.message}`, "error");
+        }
+        finally {
+            setSalariesLoading(false);
+        }
+    }, [selectedPayruns]);
+
+    useEffect(() => {
+        if (!company) return;
+        if (selectedPayruns.length === 0) return;
+
+        handlefetchPayrunNetSalaries();
+    }, [handlefetchPayrunNetSalaries]);
+
+    const handleSelectPayruns = (e) => {
+        const payrun_id = e.target.value;
+        setSelectedPayruns(prev => [...prev, payrun_id]);
+    };
+
+    const handleRemoveSelectedPayruns = (payrun_id) => {
+        setSelectedPayruns(prev => prev.filter(id => id !== payrun_id));
+    };
+
+
+    const mapPayrunIdToReadableName = (payrun_id) => {
+        const payrun = payruns.find(p => p.payrun_id === payrun_id);
+        return `${formatDateToWords(payrun.payrun_start_date)} to ${formatDateToWords(payrun.payrun_end_date)}`
+    };
+
     return {
         payruns, setPayruns,
         handleFetchPayruns,
@@ -168,6 +219,15 @@ const usePayrun = () => {
 
         employeesWithNoLastPay,
         employeeLoading,
+
+
+        handleSelectPayruns,
+        handleRemoveSelectedPayruns,
+        selectedPayruns, setSelectedPayruns,
+        netSalariesPerPayrun, setNetSalariesPerPayrun,
+        handlefetchPayrunNetSalaries,
+        salariesLoading, setSalariesLoading,
+        mapPayrunIdToReadableName
     };
 };
 
