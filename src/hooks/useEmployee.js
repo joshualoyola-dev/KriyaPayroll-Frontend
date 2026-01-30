@@ -1,5 +1,5 @@
 // export default useEmployee;
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { addEmployeeSalary, createEmployee, fetchEmployeeById, fetchEmployeesByCompanyId, fetchEmployeesByCompanyIdAndQuery, updateEmployeeInfo, updateEmploymentStatus } from "../services/employee.service";
 import { useToastContext } from "../contexts/ToastProvider";
@@ -7,6 +7,8 @@ import useDebounce from "./useDebounce";
 import * as XLSX from 'xlsx';
 import { convertExcelTimeToHHMM } from "../utility/excel.utility";
 import { useLocation } from "react-router-dom";
+import { formatToISODate } from "../utility/datetime.utility";
+import { validateEmployeeData } from "../validations/employee.validation";
 
 const formData = {
     employee_id: '',
@@ -50,53 +52,7 @@ const updateFormData = {
     date_end: null,
 }
 
-// Helper function to format date to ISO format (YYYY-MM-DD)
-const formatToISODate = (dateValue) => {
-    if (!dateValue) return null;
 
-    // If it's already a string in YYYY-MM-DD format, return as-is
-    if (typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
-        return dateValue;
-    }
-
-    // If it's a Date object or parseable string, convert to YYYY-MM-DD
-    const date = new Date(dateValue);
-    if (!isNaN(date.getTime())) {
-        return date.toISOString().slice(0, 10);
-    }
-
-    return null;
-};
-
-// Helper function to validate required date fields
-const validateEmployeeData = (employee) => {
-    const errors = [];
-
-    // Check required text fields
-    if (!employee.first_name?.trim()) errors.push("First name is required");
-    if (!employee.last_name?.trim()) errors.push("Last name is required");
-    if (!employee.personal_email?.trim()) errors.push("Personal email is required");
-    if (!employee.work_email?.trim()) errors.push("Work email is required");
-    if (!employee.job_title?.trim()) errors.push("Job title is required");
-    if (!employee.department?.trim()) errors.push("Department is required");
-
-    // Check required date fields
-    if (!employee.date_hired) errors.push("Date hired is required");
-    if (!employee.date) errors.push("Base pay start date is required");
-    if (!employee.change_type?.trim()) errors.push("Change type is required");
-
-
-    //shifts 
-    if (!employee.shift_start?.trim()) errors.push("Shift start time is required");
-    if (!employee.shift_end?.trim()) errors.push("Shift end time is required");
-    if (!employee.shift_hours || employee.shift_hours <= 0) errors.push("Shift hours is required and must be greater than 0");
-
-
-    // Check required numeric fields
-    if (!employee.base_pay || employee.base_pay <= 0) errors.push("Base pay is required and must be greater than 0");
-
-    return errors;
-};
 
 const useEmployee = () => {
     const { company } = useCompanyContext();
@@ -118,6 +74,17 @@ const useEmployee = () => {
     const debouncedQuery = useDebounce(query, 800);
     const location = useLocation();
 
+    const employeeIdToEmployeeMap = useMemo(() => {
+        const map = new Map();
+
+        for (const emp of employees) {
+            map.set(emp.employee_id, `${emp.first_name} ${emp.last_name}`);
+        }
+
+
+        return map;
+    }, [employees]);
+
     // Fix: Use useState correctly for employeesFormData
     const [employeesFormData, setEmployeesFormData] = useState([
         { ...formData, id: Date.now() } // Add unique id for each row
@@ -126,9 +93,7 @@ const useEmployee = () => {
 
     const [salaryFormData, setSalaryFormData] = useState({ ...formData });
 
-
-
-    const fetchEmployees = async () => {
+    const fetchEmployees = useCallback(async () => {
         if (!employees.length) setIsEmployeesLoading(true);
         try {
             let result;
@@ -145,11 +110,12 @@ const useEmployee = () => {
         } finally {
             setIsEmployeesLoading(false);
         }
-    };
+    }, [company, debouncedQuery]);
 
     useEffect(() => {
-        if (company) fetchEmployees();
-    }, [company, debouncedQuery]);
+        if (!company) return;
+        fetchEmployees();
+    }, [fetchEmployees]);
 
     useEffect(() => {
         if (!employees) return;
@@ -552,13 +518,9 @@ const useEmployee = () => {
     }
 
 
-    const mapEmployeeIdToEmployeeName = (employee_id) => {
-        const emp = employees.find(obj => obj['employee_id'] === employee_id);
-
-        if (!emp) return "N/A";
-
-        return `${emp.first_name} ${emp.last_name}`
-    };
+    const mapEmployeeIdToEmployeeName = useCallback((employee_id) => {
+        return employeeIdToEmployeeMap.get(employee_id) ?? "N/A";
+    }, [employeeIdToEmployeeMap])
 
     const toggleEdit = () => {
         setIsEditEmployee(!isEditEmployee);

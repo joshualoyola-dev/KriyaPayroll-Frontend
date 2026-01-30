@@ -4,6 +4,7 @@ import { useUserContext } from "../contexts/UserProvider";
 import { fetchPhics, updatePhicRecord } from "../services/contribution.service";
 import { convertToISO8601 } from "../utility/datetime.utility";
 import { useLocation } from "react-router-dom";
+import { useContributionContext } from "../contexts/ContributionProvider";
 
 const usePhic = () => {
     const [phics, setPhics] = useState([]);
@@ -12,6 +13,8 @@ const usePhic = () => {
     const { addToast } = useToastContext();
     const { user } = useUserContext();
     const location = useLocation();
+
+    const { selectedTab } = useContributionContext();
 
     const handleFetchPhics = async () => {
         setPhicsLoading(true);
@@ -56,11 +59,12 @@ const usePhic = () => {
 
     useEffect(() => {
         if (!user) return;
+        if (selectedTab.id !== 'phic') return;
+        if (location.pathname !== '/configuration/contribution') return;
+        if (phics.length > 0) return;
 
-        if (location.pathname === '/configuration/contribution') {
-            handleFetchPhics();
-        }
-    }, [user, location.pathname]);
+        handleFetchPhics();
+    }, [user, location.pathname, selectedTab]);
 
     return {
         phics, setPhics,

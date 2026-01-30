@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePayitemContext } from "../contexts/PayitemProvider";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
@@ -54,7 +54,7 @@ const useSharedRunningPayrunOperation = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const initializePayrun = async (payrun_id) => {
+    const initializePayrun = useCallback(async (payrun_id) => {
         setIsInitializing(true);
         try {
             //trigger the fetch of existing payrun
@@ -81,7 +81,7 @@ const useSharedRunningPayrunOperation = () => {
         finally {
             setIsInitializing(false);
         }
-    };
+    }, [company]);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -92,13 +92,12 @@ const useSharedRunningPayrunOperation = () => {
             setPayrunType(payrun_type);
         }
 
-        if (!company) {
-            return;
-        }
-        if (payrun_id) {
-            initializePayrun(payrun_id);
-        }
-    }, [location.search, company]);
+        if (!company) return;
+        if (location.pathname !== '/payrun/regular' && location.pathname !== '/payrun/special' && location.pathname !== '/payrun/last') return;
+        if (!payrun_id) return;
+
+        initializePayrun(payrun_id);
+    }, [location.search, location.pathname]);
 
     const getEmployeeForLastPayrun = () => {
         try {
