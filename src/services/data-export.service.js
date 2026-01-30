@@ -7,7 +7,9 @@ export const fetchYearToDate = async (
     active_employees,
     payrun_payment_or_period,
     payrun_status,
+    employee_ids,
 ) => {
     const payrunStatusQuery = payrun_status.join('&payrun_status=');
-    return await payroll_api.get(`/api/v1/data-exports/company/${company_id}/ytds?date_start=${date_start}&date_end=${date_end}&active_employees=${active_employees}&payrun_payment_or_period=${payrun_payment_or_period}&payrun_status=${payrunStatusQuery}`);
+    const employeeIdsQuery = employee_ids.join('&employee_ids=');
+    return await payroll_api.get(`/api/v1/data-exports/company/${company_id}/ytds?date_start=${date_start}&date_end=${date_end}&active_employees=${active_employees}&payrun_payment_or_period=${payrun_payment_or_period}&payrun_status=${payrunStatusQuery}&employee_ids=${employeeIdsQuery}`);
 };

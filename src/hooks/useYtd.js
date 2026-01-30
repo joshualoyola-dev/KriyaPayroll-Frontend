@@ -13,6 +13,7 @@ const formData = {
     active_employees: true,
     payrun_payment_or_period: 'PAYMENT',
     payrun_status: ['APPROVED'],
+    employee_ids: [],
 };
 
 const useYtd = () => {
@@ -38,7 +39,8 @@ const useYtd = () => {
                 date_end,
                 dateRangeFormData.active_employees,
                 dateRangeFormData.payrun_payment_or_period,
-                dateRangeFormData.payrun_status
+                dateRangeFormData.payrun_status,
+                dateRangeFormData.employee_ids,
             );
             setYtds(response.data.ytds);
         } catch (error) {
