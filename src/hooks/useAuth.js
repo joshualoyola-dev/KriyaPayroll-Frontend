@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { loginUser } from "../services/auth.service";
 import getErrorMessage, { getResponseErrorMessage } from "../utility/error.utility";
 import { jwtDecode } from "jwt-decode";
@@ -21,7 +21,7 @@ const useAuth = () => {
     const { addToast } = useToastContext();
     const navigate = useNavigate();
 
-    const handleLogin = async () => {
+    const handleLogin = useCallback(async () => {
         setIsLoading(true);
         try {
             //fetch token from hris
@@ -52,7 +52,7 @@ const useAuth = () => {
         finally {
             setIsLoading(false);
         }
-    };
+    }, [formData, navigate, addToast]);
 
     useEffect(() => {
         const storedToken = localStorage.getItem('token');

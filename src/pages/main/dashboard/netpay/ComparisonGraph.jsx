@@ -9,11 +9,11 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
-import { useCompareNetPayContext } from "../../../../contexts/CompareNetPayProvider";
+import { usePayrunContext } from "../../../../contexts/PayrunProvider";
 
 const ComparisonGraph = ({ netSalariesPerPayrun = {} }) => {
     const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
-    const { mapPayrunIdToReadableName } = useCompareNetPayContext();
+    const { mapPayrunIdToReadableName } = usePayrunContext();
 
     // Transform the data structure
     const transformData = () => {

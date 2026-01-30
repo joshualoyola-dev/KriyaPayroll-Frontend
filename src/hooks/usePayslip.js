@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
 import { getPayrun, getPayslips, sendMultiplePayslip } from "../services/payrun.service";
@@ -21,13 +21,11 @@ const usePayslip = () => {
     const { addToast } = useToastContext();
     const { company } = useCompanyContext();
     const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
-    const { mapPayitemIdToPayitemName } = usePayitemContext();
 
-    const handleFetchPayrun = async (company_id, payrun_id) => {
+    const handleFetchPayrun = useCallback(async (company_id, payrun_id) => {
         setIsPayrunLoading(true);
         try {
             const result = await getPayrun(company_id, payrun_id);
-            console.log('payrun from sending payslip: ', result);
             setPayrun(result.data.payrun);
         } catch (error) {
             console.log(error);
@@ -36,13 +34,12 @@ const usePayslip = () => {
         finally {
             setIsPayrunLoading(false);
         }
-    };
+    }, []);
 
-    const handleFetchPayslips = async (payrun_id) => {
+    const handleFetchPayslips = useCallback(async (payrun_id) => {
         setIsPayslipsLoading(true);
         try {
             const result = await getPayslips(company.company_id, payrun_id);
-            console.log('payslips content for sending: ', result);
             setPayslips(result.data.payslips);
             // Auto-select all employees initially
             setSelectedEmployeeIds(result.data.payslips.map(p => p.employee_id));
@@ -53,7 +50,7 @@ const usePayslip = () => {
         finally {
             setIsPayslipsLoading(false);
         }
-    }
+    }, [])
 
     const handleToggleEmployee = (employee_id) => {
         setSelectedEmployeeIds(prev =>
@@ -86,7 +83,6 @@ const usePayslip = () => {
             const result = await sendMultiplePayslip(company.company_id, payrun.payrun_id, payload);
 
             if (result.data.failed_pdf_count > 0 || result.data.failed_emails_count) {
-                console.log(`Failed to generate payslip: ${result.data.failed_pdf_count}. Failed to send emails: ${result.data.failed_emails_count}`);
                 alert(`Failed to generate payslip: ${result.data.failed_pdf_count}. Failed to send emails: ${result.data.failed_emails_count}`);
                 addToast(`Try sending payslips to the failed employees again}`, "error");
                 setSelectedEmployeeIds(result.data.failed_email_ids)
@@ -109,12 +105,13 @@ const usePayslip = () => {
         const payrun_id = params.get("payrun_id");
 
         if (!company) return;
+        if (location.pathname !== '/payrun/send-payslips') return;
 
         if (payrun_id) {
             handleFetchPayslips(payrun_id);
             handleFetchPayrun(company.company_id, payrun_id);
         }
-    }, [location.search, company]);
+    }, [location.pathname, company]);
 
     const handleDownloadPayslips = async () => {
         try {

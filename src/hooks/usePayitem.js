@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { fetchPayitems } from "../services/payitem.service";
@@ -14,8 +14,18 @@ const usePayitem = () => {
     const { addToast } = useToastContext();
     const location = useLocation();
 
+    const payitemIdToPayitemMap = useMemo(() => {
+        const map = new Map();
+
+        for (const p of payitems) {
+            map.set(p.payitem_id, p.payitem_name);
+        }
+
+        return map;
+    }, [payitems]);
+
     //pay-items are same for all company
-    const handleFetchPayitems = async () => {
+    const handleFetchPayitems = useCallback(async () => {
         setPayitemsLoading(true);
 
         try {
@@ -30,18 +40,18 @@ const usePayitem = () => {
         finally {
             setPayitemsLoading(false);
         }
-    };
+    }, []);
 
-    const mapPayitemIdToPayitemName = (payitem_id) => {
-        const payitem = payitems.find(obj => obj['payitem_id'] === payitem_id);
-        if (!payitem) return payitem_id; //it can't be mapped, so it can either be a totals
-        return payitem.payitem_name;
-    };
+    const mapPayitemIdToPayitemName = useCallback((payitem_id) => {
+        const payitem = payitemIdToPayitemMap.get(payitem_id);
+        if (!payitem) return payitem_id;
+        return payitem;
+    })
 
     useEffect(() => {
         if (!company) return;
         handleFetchPayitems();
-    }, [company]);
+    }, [company, handleFetchPayitems]);
 
     //change the filtered payitems based on query
     useEffect(() => {
