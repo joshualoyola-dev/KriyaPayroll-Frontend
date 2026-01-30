@@ -69,7 +69,7 @@ const YtdSection = () => {
                         <select
                             value={dateRangeFormData.active_employees}
                             onChange={(e) => setDateRangeFormData(prev => ({ ...prev, active_employees: e.target.value }))}
-                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm"
+                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:cursor-pointer"
                         >
                             <option value={false}>All employees (active & inactive)</option>
                             <option value={true}>Active employees only</option>
@@ -82,7 +82,7 @@ const YtdSection = () => {
                         <select
                             value={dateRangeFormData.payrun_payment_or_period}
                             onChange={(e) => setDateRangeFormData(prev => ({ ...prev, payrun_payment_or_period: e.target.value }))}
-                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm"
+                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:cursor-pointer"
                         >
                             <option value={`PAYMENT`}>Payment </option>
                             <option value={`PERIOD`}>Payrun Period</option>
@@ -95,13 +95,13 @@ const YtdSection = () => {
                         <button
                             type="button"
                             onClick={() => setDropdownOpen(!dropdownOpen)}
-                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-left text-sm"
+                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-left text-sm hover:cursor-pointer"
                         >
                             Payrun status
                         </button>
 
                         {dropdownOpen && (
-                            <div className="absolute top-full mt-1 w-40 rounded-md border border-gray-300 bg-white shadow-lg z-10">
+                            <div className="absolute top-full mt-1 w-40 rounded-md border border-gray-300 bg-white shadow-lg z-50">
                                 {statuses.map(status => (
                                     <label key={status} className="flex items-center gap-2 px-3 py-1 hover:bg-gray-100 cursor-pointer text-sm">
                                         <input
