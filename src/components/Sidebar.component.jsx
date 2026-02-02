@@ -70,14 +70,11 @@ const Sidebar = () => {
             ],
         },
         {
-            title: null,
-            items: [{ label: "Data export", path: "/data-export" }],
-        },
-        {
-            title: null,
-            items: [
-                { label: "Data Export Draft", path: "/data-export/draft" },
-                { label: "Data Export History", path: "/data-export/history" },
+            title: "Data Forms",
+            items: [{ label: "Data Export", path: "/data-export/" },
+            { label: "YTD History", path: "/data-export/YTD-History" },
+            { label: "1601C History", path: "/data-export/1601c-History" },
+            { label: "2316 History", path: "/data-export/2316-History" }
             ],
         },
     ];

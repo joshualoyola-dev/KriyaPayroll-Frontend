@@ -14,19 +14,44 @@ const DataExportPage = () => {
         return <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
     }
 
+    const getTabClasses = (value) => {
+        const isActive = selectedExport === value;
+        return [
+            "flex-1 rounded-full px-4 py-2 text-sm font-medium border",
+            "transition-colors duration-150",
+            isActive
+                ? "bg-teal-600 text-white border-teal-600 shadow-sm"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50",
+        ].join(" ");
+    };
+
     return (
         <div className="flex flex-col">
-            <div className="flex justify-end mb-3">
-                <div className="flex gap-x-3 justify-center items-center">
-                    <p className="text-xs text-gray-600">Data to Export: </p>
-                    <select
-                        className="px-3 py-1 text-sm bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-medium"
-                        value={selectedExport}
-                        onChange={(e) => handleChangeSelection(e.target.value)}>
-                        <option value="ytd">YTD</option>
-                        <option value="2316">2316</option>
-                        <option value="1601c">1601c</option>
-                    </select>
+            <div className="flex justify-between items-center mb-4">
+                <div className="flex-1 max-w-xl mx-auto">
+                    <div className="flex bg-gray-100 rounded-full p-1 border border-gray-200">
+                        <button
+                            type="button"
+                            className={getTabClasses("ytd")}
+                            onClick={() => handleChangeSelection("ytd")}
+                        >
+                            Year to Date
+                        </button>
+                        <button
+                            type="button"
+                            className={getTabClasses("2316")}
+                            onClick={() => handleChangeSelection("2316")}
+                        >
+                            2316
+                        </button>
+                        <button
+                            type="button"
+                            className={getTabClasses("1601c")}
+                            onClick={() => handleChangeSelection("1601c")}
+                        >
+                            1601C
+                        </button>
+                    </div>
                 </div>
             </div>
             {selectedExport === "ytd" && <YtdSection />}

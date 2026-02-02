@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import LoadingBackground from "../../../components/LoadingBackground";
 import StartIllustration from "../../../components/Start";
 import FixedHeaderTable from "./FixedHeaderTable";
@@ -7,6 +7,7 @@ import { useEmployeeContext } from "../../../contexts/EmployeeProvider";
 import { useToastContext } from "../../../contexts/ToastProvider";
 import { getCompanyPayruns, getPayslipsTotals } from "../../../services/payrun.service";
 import { convertToISO8601 } from "../../../utility/datetime.utility";
+import { fetch1601cColumns } from "../../../services/data-export.service";
 
 const defaultFormData = {
     date_start: "",
@@ -33,90 +34,9 @@ const getMonthAndYear = (dateString) => {
     return { month, year };
 };
 
-const COLUMNS = [
-    { key: "Month", label: "Month" },
-    { key: "Year", label: "Year" },
-    { key: "Sheets Attached", label: "Sheets Attached" },
-    { key: "TIN", label: "TIN" },
-    { key: "RDO Code", label: "RDO Code" },
-    { key: "Agent Name", label: "Agent Name" },
-    { key: "Address", label: "Address" },
-    { key: "Contact No", label: "Contact No" },
-    { key: "Email", label: "Email" },
-    { key: "Specify(13A)", label: "Specify(13A)" },
-    { key: "Amended Return?", label: "Amended Return?" },
-    { key: "Taxes Withheld?", label: "Taxes Withheld?" },
-    { key: "Category", label: "Category" },
-    { key: "Tax Relief", label: "Tax Relief" },
-    { key: "Total Comp (14)", label: "Total Comp (14)" },
-    { key: "Min Wage (15)", label: "Min Wage (15)" },
-    { key: "Holiday Pay (16)", label: "Holiday Pay (16)" },
-    { key: "13th Month (17)", label: "13th Month (17)" },
-    { key: "De Minimis (18)", label: "De Minimis (18)" },
-    { key: "SSS/PHIC (19)", label: "SSS/PHIC (19)" },
-    { key: "Other Non-Tax (20)", label: "Other Non-Tax (20)" },
-    { key: "Total Non-Tax (21)", label: "Total Non-Tax (21)" },
-    { key: "Total Taxable (22)", label: "Total Taxable (22)" },
-    { key: "ess: Exempt (23)", label: "ess: Exempt (23)" },
-    { key: "Net Taxable (24)", label: "Net Taxable (24)" },
-    { key: "Tax Withheld (25)", label: "Tax Withheld (25)" },
-    { key: "Adjustment (26)", label: "Adjustment (26)" },
-    { key: "Tax Remittance (27)", label: "Tax Remittance (27)" },
-    { key: "Prev Remitted (28)", label: "Prev Remitted (28)" },
-    { key: "Other Remit (29)", label: "Other Remit (29)" },
-    { key: "Total Remit (30)", label: "Total Remit (30)" },
-    { key: "Tax Due (31)", label: "Tax Due (31)" },
-    { key: "Surcharge (32)", label: "Surcharge (32)" },
-    { key: "Interest (33)", label: "Interest (33)" },
-    { key: "Compromise (34)", label: "Compromise (34)" },
-    { key: "Total Penalties (35)", label: "Total Penalties (35)" },
-    { key: "Total Amount Due (36)", label: "Total Amount Due (36)" },
-    { key: "Prev Month 1", label: "Prev Month 1" },
-    { key: "Date Paid 1", label: "Date Paid 1" },
-    { key: "Bank 1", label: "Bank 1" },
-    { key: "Ref 1", label: "Ref 1" },
-    { key: "Tax Paid 1", label: "Tax Paid 1" },
-    { key: "Tax Due 1", label: "Tax Due 1" },
-    { key: "Adjustment 1", label: "Adjustment 1" },
-    { key: "Prev Month 2", label: "Prev Month 2" },
-    { key: "Date Paid 2", label: "Date Paid 2" },
-    { key: "Bank 2", label: "Bank 2" },
-    { key: "Ref 2", label: "Ref 2" },
-    { key: "Tax Paid 2", label: "Tax Paid 2" },
-    { key: "Tax Due 2", label: "Tax Due 2" },
-    { key: "Adjustment 2", label: "Adjustment 2" },
-    { key: "Prev Month 3", label: "Prev Month 3" },
-    { key: "Date Paid 3", label: "Date Paid 3" },
-    { key: "Bank 3", label: "Bank 3" },
-    { key: "Ref 3", label: "Ref 3" },
-    { key: "Tax Paid 3", label: "Tax Paid 3" },
-    { key: "Tax Due 3", label: "Tax Due 3" },
-    { key: "Adjustment 3", label: "Adjustment 3" },
-    { key: "Total Adj (Sch)", label: "Total Adj (Sch)" },
-    { key: "Zipcode", label: "Zipcode" },
-    { key: "Payment Type", label: "Payment Type" },
-    { key: "Pay Bank", label: "Pay Bank" },
-    { key: "Pay Number", label: "Pay Number" },
-    { key: "Pay Date", label: "Pay Date" },
-    { key: "Pay Amount", label: "Pay Amount" },
-    { key: "Others", label: "Others" },
-];
-
-const LOCKED_KEYS = new Set([
-    "Total Non-Tax (21)",
-    "Total Taxable (22)",
-    "Net Taxable (24)",
-    "Tax Remittance (27)",
-    "Total Remit (30)",
-    "Tax Due (31)",
-    "Total Penalties (35)",
-    "Total Amount Due (36)",
-    "Total Adj (Sch)",
-]);
-
-const ensureRowShape = (row) => {
+const ensureRowShape = (row, columns) => {
     const shaped = { ...row };
-    for (const col of COLUMNS) {
+    for (const col of columns) {
         if (!(col.key in shaped)) {
             shaped[col.key] = "";
         }
@@ -124,7 +44,7 @@ const ensureRowShape = (row) => {
     return shaped;
 };
 
-const recompute1601cRow = (row) => {
+const recompute1601cRow = (row, columns) => {
     const totalComp = toNumber(row["Total Comp (14)"]);
     const minWage = toNumber(row["Min Wage (15)"]);
     const holidayPay = toNumber(row["Holiday Pay (16)"]);
@@ -171,7 +91,7 @@ const recompute1601cRow = (row) => {
         "Total Penalties (35)": formatMoney(totalPenalties),
         "Total Amount Due (36)": formatMoney(totalAmountDue),
         "Total Adj (Sch)": formatMoney(totalAdjSch),
-    });
+    }, columns);
 };
 
 const Section1601c = () => {
@@ -179,10 +99,37 @@ const Section1601c = () => {
     const [rows, setRows] = useState([]);
     const [generateLoading, setGenerateLoading] = useState(false);
     const [downloadLoading, setDownloadLoading] = useState(false);
+    const [columns, setColumns] = useState([]);
+    const [lockedKeys, setLockedKeys] = useState(new Set());
+    const [zeroDefaultKeys, setZeroDefaultKeys] = useState([]);
+    const [columnsLoading, setColumnsLoading] = useState(false);
 
     const { company } = useCompanyContext();
     const { activeEmployees, employees } = useEmployeeContext();
     const { addToast } = useToastContext();
+
+    useEffect(() => {
+        const loadColumns = async () => {
+            setColumnsLoading(true);
+            try {
+                const res = await fetch1601cColumns();
+                const data = res?.data ?? {};
+                const cols = data.columns ?? [];
+                const locked = data.lockedKeys ?? [];
+                const zeroDefaults = data.zeroDefaultKeys ?? [];
+
+                setColumns(cols);
+                setLockedKeys(new Set(locked));
+                setZeroDefaultKeys(zeroDefaults);
+            } catch (error) {
+                addToast("Failed to load 1601C columns", "error");
+            } finally {
+                setColumnsLoading(false);
+            }
+        };
+
+        loadColumns();
+    }, [addToast]);
 
     const activeEmployeeIdSet = useMemo(() => {
         return new Set((activeEmployees ?? []).map((e) => e.employee_id));
@@ -196,6 +143,10 @@ const Section1601c = () => {
         e.preventDefault();
         setGenerateLoading(true);
         try {
+            if (columns.length === 0) {
+                addToast("Columns are not loaded yet. Please try again shortly.", "warning");
+                return;
+            }
             if (!company?.company_id) {
                 addToast("No company selected", "error");
                 return;
@@ -249,54 +200,23 @@ const Section1601c = () => {
             }
 
             // 3) Build one row aligned with your required header
-            const baseRow = ensureRowShape({
-                // keep these empty/editable; only money is fetched
-                "Month": "",
-                "Year": "",
-                "Sheets Attached": "",
-                "TIN": "",
-                "RDO Code": "",
-                "Agent Name": "",
-                "Address": "",
-                "Contact No": "",
-                "Email": "",
-                "Specify(13A)": "",
-                "Amended Return?": "",
-                "Taxes Withheld?": "",
-                "Category": "",
-                "Tax Relief": "",
+            const baseRow = ensureRowShape(
+                {
+                    // Pull from payrun totals
+                    "Total Comp (14)": formatMoney(summedTotalComp),
+                    "Tax Withheld (25)": formatMoney(summedTaxesWithheld),
+                },
+                columns,
+            );
 
-                // Pull from payrun totals
-                "Total Comp (14)": formatMoney(summedTotalComp),
-                "Tax Withheld (25)": formatMoney(summedTaxesWithheld),
+            // Apply zero defaults from backend config
+            for (const key of zeroDefaultKeys) {
+                if (!(key in baseRow) || baseRow[key] === "" || baseRow[key] == null) {
+                    baseRow[key] = "0";
+                }
+            }
 
-                // Default editable inputs to 0 (so no blanks)
-                "Min Wage (15)": "0",
-                "Holiday Pay (16)": "0",
-                "13th Month (17)": "0",
-                "De Minimis (18)": "0",
-                "SSS/PHIC (19)": "0",
-                "Other Non-Tax (20)": "0",
-                "ess: Exempt (23)": "0",
-                "Adjustment (26)": "0",
-                "Prev Remitted (28)": "0",
-                "Other Remit (29)": "0",
-                "Surcharge (32)": "0",
-                "Interest (33)": "0",
-                "Compromise (34)": "0",
-                "Tax Paid 1": "0",
-                "Tax Due 1": "0",
-                "Adjustment 1": "0",
-                "Tax Paid 2": "0",
-                "Tax Due 2": "0",
-                "Adjustment 2": "0",
-                "Tax Paid 3": "0",
-                "Tax Due 3": "0",
-                "Adjustment 3": "0",
-                "Pay Amount": "0",
-            });
-
-            const computedRow = recompute1601cRow(baseRow);
+            const computedRow = recompute1601cRow(baseRow, columns);
             setRows([computedRow]);
         } finally {
             setGenerateLoading(false);
@@ -318,7 +238,7 @@ const Section1601c = () => {
             const next = [...prev];
             const current = next[rowIdx] ?? {};
 
-            if (LOCKED_KEYS.has(key)) {
+            if (lockedKeys.has(key)) {
                 return prev;
             }
 
@@ -327,7 +247,7 @@ const Section1601c = () => {
                 [key]: value,
             };
 
-            next[rowIdx] = recompute1601cRow(updated);
+            next[rowIdx] = recompute1601cRow(updated, columns);
             return next;
         });
     };
@@ -385,7 +305,7 @@ const Section1601c = () => {
                         <label className="mb-1 text-xs font-medium text-gray-700">Download 1601c</label>
                         <button
                             onClick={handleDownload}
-                            className="rounded-xl bg-orange-600 px-3 py-1 text-sm font-medium text-white hover:bg-orange-700"
+                            className="rounded-xl bg-orange-700 px-3 py-1 text-sm font-medium text-white hover:bg-orange-700"
                         >
                             Download
                         </button>
@@ -414,10 +334,10 @@ const Section1601c = () => {
                     <StartIllustration title="Generate" label="Select data to generate from the selection." />
                 ) : (
                     <FixedHeaderTable
-                        columns={COLUMNS}
+                        columns={columns}
                         rows={rows}
                         onChangeCell={handleChangeCell}
-                        lockedKeys={LOCKED_KEYS}
+                        lockedKeys={lockedKeys}
                     />
                 )}
             </div>
