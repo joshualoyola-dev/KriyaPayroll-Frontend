@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useToastContext } from "../contexts/ToastProvider";
 import { useUserContext } from "../contexts/UserProvider";
 import { fetchWithholdings, updateWithholdings } from "../services/contribution.service";
 import { useLocation } from "react-router-dom";
+import { useContributionContext } from "../contexts/ContributionProvider";
 
 const useWithholding = () => {
     const [withholdings, setWithholdings] = useState([]);
@@ -12,7 +13,9 @@ const useWithholding = () => {
     const { user } = useUserContext();
     const location = useLocation();
 
-    const handleFetchWithholdings = async () => {
+    const { selectedTab } = useContributionContext();
+
+    const handleFetchWithholdings = useCallback(async () => {
         setWithholdingsLoading(true);
 
         try {
@@ -24,7 +27,7 @@ const useWithholding = () => {
         } finally {
             setWithholdingsLoading(false);
         }
-    };
+    }, []);
 
     const handleUpdateWithholding = async (id, updatedData) => {
         const payload = {
@@ -50,10 +53,12 @@ const useWithholding = () => {
 
     useEffect(() => {
         if (!user) return;
-        if (location.pathname === '/configuration/contribution') {
-            handleFetchWithholdings();
-        }
-    }, [user, location.pathname]);
+        if (selectedTab.id !== 'withholding') return;
+        if (location.pathname !== '/configuration/contribution') return;
+        if (withholdings.length > 0) return;
+
+        handleFetchWithholdings();
+    }, [user, location.pathname, selectedTab]);
 
     return {
         withholdings, setWithholdings,

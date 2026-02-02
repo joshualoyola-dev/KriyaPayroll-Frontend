@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { addOneOvertime, deleteOneOvertime, fetchOvertimes } from "../services/overtime.service";
@@ -51,7 +51,7 @@ const useOvertime = () => {
     const { addToast } = useToastContext();
     const location = useLocation();
 
-    const handleFetchOvertimes = async () => {
+    const handleFetchOvertimes = useCallback(async () => {
         setIsOvertimesLoading(true);
 
         console.log('runniing fetchin overtimes: ');
@@ -73,7 +73,7 @@ const useOvertime = () => {
         finally {
             setIsOvertimesLoading(false);
         }
-    };
+    }, [company, debouncedQuery_employee_id, debouncedQuery_from, debouncedQuery_to, limit]);
 
     useEffect(() => {
         if (!company) return;
@@ -82,7 +82,7 @@ const useOvertime = () => {
             handleFetchOvertimes();
         }
 
-    }, [company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit, location.pathname]); // Fixed: Added dependency array
+    }, [location.pathname, handleFetchOvertimes]); // Fixed: Added dependency array
 
     // Modal related function
     const handleShowOvertimeModal = () => {
