@@ -1,15 +1,17 @@
 import { useState, useEffect, useMemo } from "react";
 import { useCompanyContext } from "../contexts/CompanyProvider";
-import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
-import { getCompanyPayruns, getPayslipsTotals } from "../services/payrun.service";
 import { convertToISO8601 } from "../utility/datetime.utility";
-import { fetch1601cColumns } from "../services/data-export.service";
+import { fetch1601cColumns, fetch1601cDataAdvanced } from "../services/data-export.service";
+import { indexTemplateByCode, normalizeTemplateValues } from "../data/data-form.data";
 
 const defaultFormData = {
     date_start: "",
     date_end: "",
-    active_employees: 0,
+    active_employees: true,
+    payrun_payment_or_period: "PAYMENT",
+    payrun_status: ["APPROVED"],
+    employee_ids: [],
 };
 
 const toNumber = (value) => {
@@ -40,10 +42,10 @@ const use1601c = () => {
     const [columns, setColumns] = useState([]);
     const [lockedKeys, setLockedKeys] = useState(new Set());
     const [zeroDefaultKeys, setZeroDefaultKeys] = useState([]);
+    const [template, setTemplate] = useState([]);
     const [columnsLoading, setColumnsLoading] = useState(false);
 
     const { company } = useCompanyContext();
-    const { activeEmployees, employees } = useEmployeeContext();
     const { addToast } = useToastContext();
 
     // Load columns on mount
@@ -56,6 +58,7 @@ const use1601c = () => {
                 setColumns(data.columns ?? []);
                 setLockedKeys(new Set(data.lockedKeys ?? []));
                 setZeroDefaultKeys(data.zeroDefaultKeys ?? []);
+                setTemplate(data.template ?? []);
             } catch (error) {
                 addToast("Failed to load 1601C columns", "error");
             } finally {
@@ -64,9 +67,6 @@ const use1601c = () => {
         };
         loadColumns();
     }, [addToast]);
-
-    const activeEmployeeIdSet = useMemo(() => new Set((activeEmployees ?? []).map(e => e.employee_id)), [activeEmployees]);
-    const employeeIdSet = useMemo(() => new Set((employees ?? []).map(e => e.employee_id)), [employees]);
 
     const recompute1601cRow = (row, columnsList) => {
         const totalComp = toNumber(row["Total Comp (14)"]);
@@ -113,6 +113,68 @@ const use1601c = () => {
         }, columnsList);
     };
 
+    const fillTemplateWithBackend = (tpl, backendRow = {}) => {
+        const next = (tpl ?? []).map((f) => {
+            if (!f?.field_code) return f;
+            if (backendRow[f.field_code] === undefined) return f;
+            return { ...f, value: backendRow[f.field_code] };
+        });
+        return normalizeTemplateValues(next);
+    };
+
+    const templateToRow = (tpl) => {
+        const byCode = indexTemplateByCode(tpl);
+
+        // Map template field_code -> current table column keys
+        const map = {
+            month: "Month",
+            year: "Year",
+            sheets_attached: "Sheets Attached",
+            tin: "TIN",
+            rdo: "RDO Code",
+            agent_name: "Agent Name",
+            address: "Address",
+            contact_no: "Contact No",
+            email: "Email",
+
+            total_compensation: "Total Comp (14)",
+            minimum_wage: "Min Wage (15)",
+            holiday_overtime_night_diff_hazard: "Holiday Pay (16)",
+            thirteenth_month: "13th Month (17)",
+            de_minimis: "De Minimis (18)",
+            mandatory_contributions: "SSS/PHIC (19)",
+            other_non_taxable: "Other Non-Tax (20)",
+            total_taxes_withheld: "Tax Withheld (25)",
+
+            amended_return: "Amended Return?",
+            taxes_withheld_flag: "Taxes Withheld?",
+            tax_relief: "Tax Relief",
+            specify: "Specify(13A)",
+
+            prev_month_1_date: "Prev Month 1",
+            tax_paid_1: "Tax Paid 1",
+            adjustment_1: "Adjustment 1",
+
+            prev_month_2_date: "Prev Month 2",
+            tax_paid_2: "Tax Paid 2",
+            adjustment_2: "Adjustment 2",
+
+            prev_month_3_date: "Prev Month 3",
+            tax_paid_3: "Tax Paid 3",
+            adjustment_3: "Adjustment 3",
+
+            zipcode: "Zipcode",
+        };
+
+        const row = {};
+        for (const [code, colKey] of Object.entries(map)) {
+            const item = byCode.get(code);
+            if (!item) continue;
+            row[colKey] = item.value;
+        }
+        return row;
+    };
+
     const handleGenerate = async (e) => {
         if (e) e.preventDefault();
         setGenerateLoading(true);
@@ -121,44 +183,44 @@ const use1601c = () => {
                 addToast("Columns are not loaded yet.", "warning");
                 return;
             }
+            if (!company?.company_id) {
+                addToast("No company selected", "error");
+                return;
+            }
             const date_start = convertToISO8601(formData.date_start);
             const date_end = convertToISO8601(formData.date_end);
 
-            const payrunsRes = await getCompanyPayruns(company.company_id);
-            const payruns = payrunsRes?.data?.payruns ?? [];
-
-            const start = new Date(date_start);
-            const end = new Date(date_end);
-            const payrunsInRange = payruns.filter((p) => {
-                const d = new Date(p?.payment_date ?? p?.payrun_end_date);
-                return d >= start && d <= end;
-            });
-
-            let summedTotalComp = 0;
-            let summedTaxesWithheld = 0;
-
-            for (const payrun of payrunsInRange) {
-                const totalsRes = await getPayslipsTotals(company.company_id, payrun.payrun_id, payrun.status || "APPROVED");
-                const totalsTable = totalsRes?.data?.totals ?? {};
-
-                for (const [employee_id, totals] of Object.entries(totalsTable)) {
-                    if (Number(formData.active_employees) === 1 && !activeEmployeeIdSet.has(employee_id)) continue;
-                    if (employeeIdSet.size > 0 && !employeeIdSet.has(employee_id)) continue;
-
-                    summedTotalComp += toNumber(totals?.["total_earnings"]);
-                    summedTaxesWithheld += toNumber(totals?.["total_taxes"]);
-                }
+            if (!date_start || !date_end) {
+                addToast("Please select a valid date range", "warning");
+                return;
             }
 
-            const baseRow = ensureRowShape({
-                "Total Comp (14)": formatMoney(summedTotalComp),
-                "Tax Withheld (25)": formatMoney(summedTaxesWithheld),
-            }, columns);
+            // 1) Call backend to compute/fill by field_code
+            const activeEmployeesBool = formData.active_employees ? "true" : "false";
+            const res = await fetch1601cDataAdvanced(
+                company.company_id,
+                date_start,
+                date_end,
+                activeEmployeesBool,
+                formData.payrun_payment_or_period,
+                formData.payrun_status,
+                formData.employee_ids,
+            );
+            const companyRow = res?.data?.data1601c?.[company.company_id] ?? {};
+
+            // 2) Merge backend values into template (then normalize number types)
+            const filledTemplate = fillTemplateWithBackend(template, companyRow);
+
+            // 3) Convert template -> table row keys used by FixedHeaderTable
+            const templateRow = templateToRow(filledTemplate);
+
+            const baseRow = ensureRowShape(templateRow, columns);
 
             for (const key of zeroDefaultKeys) {
-                if (!baseRow[key]) baseRow[key] = "0";
+                if (!baseRow[key] && baseRow[key] !== 0) baseRow[key] = "0";
             }
 
+            // 4) Keep your existing frontend computed columns logic
             setRows([recompute1601cRow(baseRow, columns)]);
         } catch (error) {
             addToast("Error generating report", "error");

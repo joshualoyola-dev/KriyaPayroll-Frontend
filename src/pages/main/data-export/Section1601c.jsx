@@ -1,7 +1,11 @@
+import { useEffect, useRef, useState } from "react";
 import LoadingBackground from "../../../components/LoadingBackground";
 import StartIllustration from "../../../components/Start";
 import FixedHeaderTable from "./FixedHeaderTable";
 import use1601c from "../../../hooks/use1601c"; // Adjust path as needed
+import { useEmployeeContext } from "../../../contexts/EmployeeProvider";
+
+const statuses = ["APPROVED", "DRAFT", "FOR_APPROVAL", "REJECTED"];
 
 const Section1601c = () => {
     const {
@@ -15,6 +19,44 @@ const Section1601c = () => {
         handleDownload,
         handleChangeCell
     } = use1601c();
+
+    const { employees, mapEmployeeIdToEmployeeName } = useEmployeeContext();
+
+    const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+    const [employeeDropdownOpen, setEmployeeDropdownOpen] = useState(false);
+    const statusDropdownRef = useRef(null);
+    const employeeDropdownRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target)) {
+                setStatusDropdownOpen(false);
+            }
+            if (employeeDropdownRef.current && !employeeDropdownRef.current.contains(event.target)) {
+                setEmployeeDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const toggleStatus = (status) => {
+        setFormData((prev) => ({
+            ...prev,
+            payrun_status: prev.payrun_status.includes(status)
+                ? prev.payrun_status.filter((s) => s !== status)
+                : [...prev.payrun_status, status],
+        }));
+    };
+
+    const toggleEmployee = (employee_id) => {
+        setFormData((prev) => ({
+            ...prev,
+            employee_ids: prev.employee_ids.includes(employee_id)
+                ? prev.employee_ids.filter((e) => e !== employee_id)
+                : [...prev.employee_ids, employee_id],
+        }));
+    };
 
     return (
         <div className="flex flex-col">
@@ -44,12 +86,95 @@ const Section1601c = () => {
                         <label className="mb-1 text-xs font-medium text-gray-700">Employees</label>
                         <select
                             value={formData.active_employees}
-                            onChange={(e) => setFormData((prev) => ({ ...prev, active_employees: e.target.value }))}
-                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm"
+                            onChange={(e) => setFormData((prev) => ({ ...prev, active_employees: e.target.value === "true" }))}
+                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:cursor-pointer"
                         >
-                            <option value={0}>All employees (active & inactive)</option>
-                            <option value={1}>Active employees only</option>
+                            <option value={false}>All employees (active & inactive)</option>
+                            <option value={true}>Active employees only</option>
                         </select>
+                    </div>
+
+                    {/* Export method */}
+                    <div className="flex flex-col">
+                        <label className="mb-1 text-xs font-medium text-gray-700">Export method</label>
+                        <select
+                            value={formData.payrun_payment_or_period}
+                            onChange={(e) =>
+                                setFormData((prev) => ({ ...prev, payrun_payment_or_period: e.target.value }))
+                            }
+                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:cursor-pointer"
+                        >
+                            <option value={"PAYMENT"}>Payment</option>
+                            <option value={"PERIOD"}>Payrun Period</option>
+                        </select>
+                    </div>
+
+                    {/* Payrun Status Dropdown */}
+                    <div className="relative flex flex-col" ref={statusDropdownRef}>
+                        <label className="mb-1 text-xs font-medium text-gray-700">Payrun Status</label>
+                        <button
+                            type="button"
+                            onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
+                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-left text-sm hover:cursor-pointer"
+                        >
+                            Payrun status
+                        </button>
+
+                        {statusDropdownOpen && (
+                            <div className="absolute top-full mt-1 w-40 rounded-md border border-gray-300 bg-white shadow-lg z-50">
+                                {statuses.map((status) => (
+                                    <label
+                                        key={status}
+                                        className="flex items-center gap-2 px-3 py-1 hover:bg-gray-100 cursor-pointer text-sm"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.payrun_status.includes(status)}
+                                            onChange={() => toggleStatus(status)}
+                                        />
+                                        {status}
+                                    </label>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Employee Selection */}
+                    <div className="relative flex flex-col" ref={employeeDropdownRef}>
+                        <label className="mb-1 text-xs font-medium text-gray-700">Employee Selection</label>
+                        <button
+                            type="button"
+                            onClick={() => setEmployeeDropdownOpen(!employeeDropdownOpen)}
+                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-left text-sm hover:cursor-pointer"
+                        >
+                            Select Employee
+                        </button>
+
+                        {employeeDropdownOpen && (
+                            <div className="absolute top-full mt-1 w-56 max-h-80 overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg z-50">
+                                <div className="px-3 py-2 text-xs italic text-gray-500 border-b border-gray-200">
+                                    By default, all active or inactive employees are included. Selecting employees
+                                    will fetch 1601C totals for them only.
+                                </div>
+
+                                <div className="divide-y divide-gray-100">
+                                    {employees.map((employee, idx) => (
+                                        <label
+                                            key={idx}
+                                            className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.employee_ids.includes(employee.employee_id)}
+                                                onChange={() => toggleEmployee(employee.employee_id)}
+                                                className="h-4 w-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
+                                            />
+                                            {mapEmployeeIdToEmployeeName(employee.employee_id)}
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <button
