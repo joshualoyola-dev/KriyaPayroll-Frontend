@@ -188,7 +188,7 @@ const YtdSection = () => {
                 </form>
 
                 {/* Download button */}
-                {ytds.length > 0 && (
+                {Object.keys(ytds).length > 0 && (
                     <div className="flex flex-col">
                         <label className="mb-1 text-xs font-medium text-gray-700">Download YTD</label>
                         <button
@@ -199,6 +199,7 @@ const YtdSection = () => {
                         </button>
                     </div>
                 )}
+
             </div>
 
             {/* Data table */}
