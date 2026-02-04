@@ -4,6 +4,7 @@ import StartIllustration from "../../../components/Start";
 import { useYtdContext } from "../../../contexts/YtdProvider";
 import DataExportTable from "./Table";
 import { useEmployeeContext } from "../../../contexts/EmployeeProvider";
+import Tooltip from "../../../components/Tooltip";
 
 const statuses = ['APPROVED', 'DRAFT', 'FOR_APPROVAL', 'REJECTED'];
 
@@ -82,17 +83,20 @@ const YtdSection = () => {
                         />
                     </div>
 
-                    {/* Employees */}
+                    {/* Active only at export date or All at export period*/}
                     <div className="flex flex-col">
-                        <label className="mb-1 text-xs font-medium text-gray-700">Employees</label>
-                        <select
-                            value={dateRangeFormData.active_employees}
-                            onChange={(e) => setDateRangeFormData(prev => ({ ...prev, active_employees: e.target.value }))}
-                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:cursor-pointer"
+                        <Tooltip text={`Filter to active employees only when the export was made. 
+                           When active, use case include 13th month pay YTD.
+                           When false, use case include export on all payslips made between defined period, from which we can derive the total per payitems `}
                         >
-                            <option value={false}>All employees (active & inactive)</option>
-                            <option value={true}>Active employees only</option>
-                        </select>
+                            <label className="mb-1 text-xs font-medium text-gray-700">Active Employees only</label>
+                        </Tooltip>
+                        <input
+                            type="checkbox"
+                            checked={dateRangeFormData.active_employees}
+                            onChange={(e) => setDateRangeFormData(prev => ({ ...prev, active_employees: !dateRangeFormData.active_employees }))}
+                            className="w-40 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm hover:cursor-pointer"
+                        />
                     </div>
 
                     {/* Export method */}
