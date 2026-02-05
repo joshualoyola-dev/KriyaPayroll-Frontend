@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { DATA_EXPORT_FORM_TYPES, getHistoryPath, getAddNewPath } from "../configs/data-export.config";
 
 const useTopNav = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -8,6 +9,16 @@ const useTopNav = () => {
         localStorage.clear();
         window.location.href = "/";
     };
+
+    // Data Export pages show their title in the page content only; leave TopNav blank for those routes
+    const dataExportPaths = useMemo(() => {
+        const map = {};
+        DATA_EXPORT_FORM_TYPES.forEach((form) => {
+            map[getHistoryPath(form.id)] = "";
+            map[getAddNewPath(form.id)] = "";
+        });
+        return map;
+    }, []);
 
     const paths = {
         "/dashboard": "Dashboard",
@@ -29,9 +40,7 @@ const useTopNav = () => {
         "/configuration/company-configuration": "Company Configuration",
         "/configuration/recurring-pay": "Recurring Pay",
         "/configuration/contribution": "Contributions",
-        "/data-export": "Data Export",
-        "/data-export/draft": "Data Export Draft",
-        "/data-export/history": "Data Export History",
+        ...dataExportPaths,
     };
 
     return {

@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom"
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom"
 import LoginPage from "./pages/auth/LoginPage"
 import DashboardPage from "./pages/main/dashboard/Dashboard.page"
 import HomePage from "./pages/home/HomePage"
@@ -41,9 +41,8 @@ import { SssProvider } from "./contexts/SssProvider"
 import { PayrunProvider } from "./contexts/PayrunProvider"
 import SendPayslipPage from "./pages/main/payrun/payrun/SendPayslipPage"
 import { PayslipProvider } from "./contexts/PayslipProvider"
-import DataExportPage from "./pages/main/data-export/DataExportPage"
-import DataExportDraftPage from "./pages/main/data-export/DataExportDraftPage"
 import DataExportHistoryPage from "./pages/main/data-export/DataExportHistoryPage"
+import DataExportAddNewPage from "./pages/main/data-export/DataExportAddNewPage"
 import { ExportProvider } from "./contexts/ExportProvider"
 import { YtdProvider } from "./contexts/YtdProvider"
 import { SharedRunningPayrunOperationProvider } from "./contexts/SharedRunningPayrunOperationProvider"
@@ -114,7 +113,13 @@ function App() {
                                                               <Route path="/configuration/recurring-pay" element={<RecurringPayPage />} />
                                                               <Route path="/configuration/contribution" element={<ContributionPage />} />
 
-                                                              <Route path="/data-export" element={<DataExportPage />} />
+                                                              <Route path="/data-export" element={<Navigate to="/data-export/ytd" replace />} />
+                                                              <Route path="/data-export/ytd" element={<DataExportHistoryPage />} />
+                                                              <Route path="/data-export/2316" element={<DataExportHistoryPage />} />
+                                                              <Route path="/data-export/1601c" element={<DataExportHistoryPage />} />
+                                                              <Route path="/data-export/ytd/new" element={<DataExportAddNewPage />} />
+                                                              <Route path="/data-export/2316/new" element={<DataExportAddNewPage />} />
+                                                              <Route path="/data-export/1601c/new" element={<DataExportAddNewPage />} />
                                                             </Route>
                                                           </Route>
                                                         </Routes>

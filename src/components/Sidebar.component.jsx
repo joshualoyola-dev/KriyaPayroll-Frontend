@@ -2,10 +2,12 @@ import { RocketLaunchIcon, ChevronDownIcon, ChevronRightIcon } from "@heroicons/
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import CompanySelection from "./CompanySelection";
+import { DATA_EXPORT_FORM_TYPES, getHistoryPath } from "../configs/data-export.config";
 
 const Sidebar = () => {
     const location = useLocation();
-    const isActive = (path) => location.pathname === path;
+    const pathname = location.pathname;
+    const isActive = (path) => pathname === path || (path !== "/" && pathname.startsWith(path + "/"));
 
     // State to track which sections are collapsed
     const [collapsedSections, setCollapsedSections] = useState(new Set());
@@ -71,11 +73,10 @@ const Sidebar = () => {
         },
         {
             title: "Data Forms",
-            items: [{ label: "Data Export", path: "/data-export/" },
-            { label: "YTD History", path: "/data-export/YTD-History" },
-            { label: "1601C History", path: "/data-export/1601c-History" },
-            { label: "2316 History", path: "/data-export/2316-History" }
-            ],
+            items: DATA_EXPORT_FORM_TYPES.map((form) => ({
+                label: form.label,
+                path: getHistoryPath(form.id),
+            })),
         },
     ];
 
