@@ -5,6 +5,7 @@ import { convertToISO8601 } from "../utility/datetime.utility";
 import { fetch1601cColumns, fetch1601cDataAdvanced } from "../services/data-export.service";
 import { indexTemplateByCode, normalizeTemplateValues } from "../data/data-form.data";
 
+
 const defaultFormData = {
     date_start: "",
     date_end: "",
@@ -53,7 +54,7 @@ const use1601c = () => {
         const loadColumns = async () => {
             setColumnsLoading(true);
             try {
-                const res = await fetch1601cColumns();
+                const res = await fetch1601cData();
                 const data = res?.data ?? {};
                 setColumns(data.columns ?? []);
                 setLockedKeys(new Set(data.lockedKeys ?? []));

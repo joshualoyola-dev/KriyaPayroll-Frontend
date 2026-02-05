@@ -4,7 +4,6 @@ import StartIllustration from "../../../components/Start";
 import FixedHeaderTable from "./FixedHeaderTable";
 import use1601c from "../../../hooks/use1601c"; // Adjust path as needed
 import { useEmployeeContext } from "../../../contexts/EmployeeProvider";
-import {mockSum1601c, mockSum1601cDiv} from '../../../utility/data-test';
 
 const statuses = ["APPROVED", "DRAFT", "FOR_APPROVAL", "REJECTED"];
 
@@ -27,7 +26,6 @@ const Section1601c = () => {
     const [employeeDropdownOpen, setEmployeeDropdownOpen] = useState(false);
     const statusDropdownRef = useRef(null);
     const employeeDropdownRef = useRef(null);
-
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -60,7 +58,6 @@ const Section1601c = () => {
         }));
     };
 
-    console.log(mockSum1601c);
     return (
         <div className="flex flex-col">
             <div className="flex items-end justify-between gap-4 p-3">
@@ -209,7 +206,7 @@ const Section1601c = () => {
                     </div>
                 )}
             </div>
-                {mockSum1601cDiv()}
+
             <div>
                 {rows.length === 0 ? (
                     <StartIllustration title="Generate" label="Select data to generate from the selection." />

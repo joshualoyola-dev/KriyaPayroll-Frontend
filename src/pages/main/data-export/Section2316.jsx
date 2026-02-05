@@ -35,7 +35,6 @@ const Section2316 = () => {
     const statusDropdownRef = useRef(null);
     const employeeDropdownRef = useRef(null);
 
-    console.log(mockSum2316);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
