@@ -23,7 +23,7 @@ export type FormTemplateField = Readonly<{
 
 // this is for FORM 1601-C
 export const FORM_1601C_TEMPLATE = [
-  { field_code: 'generated', field_name: 'Generated?', field_type: 'string', value: 'Yes' },
+  { field_code: 'is_generated', field_name: 'Generated?', field_type: 'string', value: 'Yes' },
 
   // PART I – BASIC INFO
   { field_code: 'month', field_name: 'Month', field_type: 'string', value: '' },

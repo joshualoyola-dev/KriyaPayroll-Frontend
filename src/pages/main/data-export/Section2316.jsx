@@ -7,6 +7,7 @@ import { useToastContext } from "../../../contexts/ToastProvider";
 import { useEmployeeContext } from "../../../contexts/EmployeeProvider";
 import { convertToISO8601 } from "../../../utility/datetime.utility";
 import { fetch2316Data } from "../../../services/data-export.service";
+import {mockSum2316, mockSum2316Div} from '../../../utility/data-test';
 
 const statuses = ["APPROVED", "DRAFT", "FOR_APPROVAL", "REJECTED"];
 
@@ -33,6 +34,8 @@ const Section2316 = () => {
     const [employeeDropdownOpen, setEmployeeDropdownOpen] = useState(false);
     const statusDropdownRef = useRef(null);
     const employeeDropdownRef = useRef(null);
+
+    console.log(mockSum2316);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -260,6 +263,8 @@ const Section2316 = () => {
                     </div>
                 )}
             </div>
+
+            {mockSum2316Div()}
 
             {/* Data table */}
             <div>
