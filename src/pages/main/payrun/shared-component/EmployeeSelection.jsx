@@ -2,8 +2,9 @@ import { PlusCircleIcon } from "@heroicons/react/16/solid";
 import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
 import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
+import { useEffect, useRef } from "react";
 
-export default function EmployeeSelection() {
+const EmployeeSelection = () => {
     const {
         options,
         handleEmployeeIdsChange,
@@ -12,9 +13,26 @@ export default function EmployeeSelection() {
     } = useSharedRunningPayrunOperationContext();
 
     const { employees } = useEmployeeContext();
+    const dropdownRef = useRef(null);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                if (toggleEmployeeSelections) {
+                    handleToggleEmployeeSelections(); // close dropdown
+                }
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [toggleEmployeeSelections, handleToggleEmployeeSelections]);
 
     return (
-        <div className="space-y-2 relative w-full max-w-xs">
+        <div className="space-y-2 relative w-full max-w-xs" ref={dropdownRef}>
             <label className="block text-xs font-medium text-gray-700">
                 Employees
             </label>
@@ -77,3 +95,6 @@ export default function EmployeeSelection() {
         </div>
     );
 }
+
+
+export default EmployeeSelection;

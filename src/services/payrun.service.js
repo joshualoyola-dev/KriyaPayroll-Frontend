@@ -20,12 +20,8 @@ export const savePayrunDraft = async (company_id, formData, payrun_type) => {
     return await payroll_api.post(`/api/v1/payruns/${company_id}/${payrun_type}/save-draft`, formData);
 };
 
-export const saveEdit = async (company_id, payrun_id, formData, compute_tax_witheld = null, payrun_type) => {
-    return await payroll_api.post(`/api/v1/payruns/${company_id}/${payrun_type}/save-edit/${payrun_id}?compute_tax_witheld=${compute_tax_witheld}`, formData);
-};
-
-export const saveEditAndCalculateTaxWitheld = async (company_id, payrun_id, formData) => {
-    return await payroll_api.post(`/api/v1/payruns/${company_id}/regular/save-edit/${payrun_id}/calculate-tax-witheld`, formData);
+export const saveEdit = async (company_id, payrun_id, formData, payrun_type) => {
+    return await payroll_api.post(`/api/v1/payruns/${company_id}/${payrun_type}/save-edit/${payrun_id}`, formData);
 };
 
 export const updateStatus = async (company_id, payrun_id, formData) => {
