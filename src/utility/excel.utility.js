@@ -248,3 +248,25 @@ export const downloadExcelLastPayrunSummary = (
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(blob, `${filename}.xlsx`);
 };
+
+/**
+ * Downloads 1601C table data as Excel.
+ * @param {Array<{ key: string, label: string }>} columns - Column definitions
+ * @param {Array<Record<string, string | number>>} rows - Row data keyed by column key
+ * @param {string} [filename='1601c-export'] - Filename without extension
+ * @param {string} [sheetName='1601C'] - Sheet name
+ */
+export const downloadExcel1601c = (columns, rows, filename = '1601c-export', sheetName = '1601C') => {
+    if (!Array.isArray(columns) || columns.length === 0 || !Array.isArray(rows) || rows.length === 0) {
+        return;
+    }
+    const headerRow = columns.map((col) => col.label);
+    const dataRows = rows.map((row) => columns.map((col) => row[col.key] ?? ''));
+    const aoa = [headerRow, ...dataRows];
+    const worksheet = XLSX.utils.aoa_to_sheet(aoa);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(blob, `${filename}.xlsx`);
+};

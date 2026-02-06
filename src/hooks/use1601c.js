@@ -4,6 +4,7 @@ import { useToastContext } from "../contexts/ToastProvider";
 import { convertToISO8601 } from "../utility/datetime.utility";
 import { fetch1601cColumns, fetch1601cDataAdvanced } from "../services/data-export.service";
 import { indexTemplateByCode, normalizeTemplateValues } from "../data/data-form.data";
+import { downloadExcel1601c } from "../utility/excel.utility";
 
 const defaultFormData = {
     date_start: "",
@@ -127,10 +128,12 @@ const use1601c = () => {
 
         // Map template field_code -> current table column keys
         const map = {
+            generated: "Generated?",
             month: "Month",
             year: "Year",
             sheets_attached: "Sheets Attached",
             tin: "TIN",
+            company_tin: "TIN",
             rdo: "RDO Code",
             company_name: "Agent Name",
             company_address: "Address",
@@ -144,6 +147,8 @@ const use1601c = () => {
             de_minimis: "De Minimis (18)",
             mandatory_contributions: "SSS/PHIC (19)",
             other_non_taxable: "Other Non-Tax (20)",
+            less_exempt: "ess: Exempt (23)",
+            tax_withheld: "Tax Withheld (25)",
             total_taxes_withheld: "Tax Withheld (25)",
 
             amended_return: "Amended Return?",
@@ -151,17 +156,37 @@ const use1601c = () => {
             tax_relief: "Tax Relief",
             specify: "Specify(13A)",
 
-            prev_month_1_date: "Prev Month 1",
+            prev_month_1: "Prev Month 1",
+            date_paid_1: "Date Paid 1",
+            bank_1: "Bank 1",
+            ref_1: "Ref 1",
             tax_paid_1: "Tax Paid 1",
+            tax_due_1: "Tax Due 1",
             adjustment_1: "Adjustment 1",
 
-            prev_month_2_date: "Prev Month 2",
+            prev_month_2: "Prev Month 2",
+            date_paid_2: "Date Paid 2",
+            bank_2: "Bank 2",
+            ref_2: "Ref 2",
             tax_paid_2: "Tax Paid 2",
+            tax_due_2: "Tax Due 2",
             adjustment_2: "Adjustment 2",
 
-            prev_month_3_date: "Prev Month 3",
+            prev_month_3: "Prev Month 3",
+            date_paid_3: "Date Paid 3",
+            bank_3: "Bank 3",
+            ref_3: "Ref 3",
             tax_paid_3: "Tax Paid 3",
+            tax_due_3: "Tax Due 3",
             adjustment_3: "Adjustment 3",
+
+            total_adjustment: "Total Adj (Sch)",
+            payment_type: "Payment Type",
+            pay_bank: "Pay Bank",
+            pay_number: "Pay Number",
+            pay_date: "Pay Date",
+            pay_amount: "Pay Amount",
+            others: "Others",
 
             zipcode: "Zipcode",
         };
@@ -238,10 +263,18 @@ const use1601c = () => {
         });
     };
 
-    const handleDownload = async () => {
+    const handleDownload = () => {
         setDownloadLoading(true);
         try {
-            // Logic for download goes here
+            if (!columns?.length || !rows?.length) {
+                addToast("No data to download. Generate first.", "warning");
+                return;
+            }
+            const filename = `1601c-export-${formData.date_start || "date"}-${formData.date_end || "date"}`.replace(/\//g, "-");
+            downloadExcel1601c(columns, rows, filename, "1601C");
+            addToast("1601C Excel downloaded.", "success");
+        } catch (err) {
+            addToast(err?.message || "Download failed", "error");
         } finally {
             setDownloadLoading(false);
         }

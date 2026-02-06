@@ -7,6 +7,7 @@ import env from "../../../configs/env.config";
 import { userHasFeatureAccess } from "../../../utility/access-controll.utility";
 import { getFormTypeById, getHistoryPath } from "../../../configs/data-export.config";
 import DataExportGenerateForm from "./DataExportGenerateForm";
+import FixedHeaderTable from "./FixedHeaderTable";
 import { useYtdContext } from "../../../contexts/YtdProvider";
 import use1601c from "../../../hooks/use1601c";
 import { useCompanyContext } from "../../../contexts/CompanyProvider";
@@ -69,7 +70,7 @@ const DataExportAddNewPage = () => {
 
     const handleSubmit1601c = async () => {
         await hook1601c.handleGenerate();
-        handleSuccess();
+        addToast("1601C data generated from payrun.", "success");
     };
 
     const handleSubmit2316 = async () => {
@@ -222,21 +223,77 @@ const DataExportAddNewPage = () => {
     const formProps = getFormProps();
     if (!formProps) return null;
 
+    const is1601c = formTypeFromPath === "1601c";
+    const show1601cTable = is1601c && hook1601c.rows?.length > 0;
+
     return (
         <>
             <div className="w-full max-w-full">
                 <h1 className="text-xl font-bold text-gray-900 mb-4">
                     Add New — {formTypeConfig.historyTitle.replace(" History", "")}
                 </h1>
-                <DataExportGenerateForm {...formProps} />
-                <div className="mt-8">
-                    <StartIllustration
-                        title="Generate"
-                        label="Select data to generate from the selection."
-                    />
+                <div className="flex flex-wrap items-end justify-between gap-4">
+                    <DataExportGenerateForm {...formProps} />
+                    {show1601cTable && (
+                        <div className="flex flex-col gap-2">
+                            <label className="text-xs font-medium text-gray-700">Download 1601c</label>
+                            <button
+                                type="button"
+                                onClick={hook1601c.handleDownload}
+                                disabled={hook1601c.downloadLoading}
+                                className="rounded-xl bg-orange-700 px-4 py-2 text-sm font-medium text-white hover:bg-orange-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {hook1601c.downloadLoading ? "Downloading..." : "Download"}
+                            </button>
+                            <div className="flex flex-col gap-1.5 mt-1">
+                                <button
+                                    type="button"
+                                    className="rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+                                >
+                                    Generate a PDF
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate(getHistoryPath("1601c"), { replace: true })}
+                                    className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+                                >
+                                    Save as Draft
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
+                {is1601c && (
+                    <div className="mt-4 flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => navigate(getHistoryPath("1601c"), { replace: true })}
+                            className="text-sm text-teal-600 hover:text-teal-800 font-medium"
+                        >
+                            ← Back to 1601C
+                        </button>
+                    </div>
+                )}
+                {!show1601cTable && (
+                    <div className="mt-8">
+                        <StartIllustration
+                            title="Generate"
+                            label="Select data to generate from the selection."
+                        />
+                    </div>
+                )}
+                {show1601cTable && (
+                    <div className="mt-6">
+                        <FixedHeaderTable
+                            columns={hook1601c.columns}
+                            rows={hook1601c.rows}
+                            onChangeCell={hook1601c.handleChangeCell}
+                            lockedKeys={hook1601c.lockedKeys}
+                        />
+                    </div>
+                )}
             </div>
-            {(formProps.loading) && <LoadingBackground />}
+            {(formProps.loading || hook1601c.downloadLoading) && <LoadingBackground />}
         </>
     );
 };
