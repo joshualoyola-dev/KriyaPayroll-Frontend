@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useToastContext } from "../contexts/ToastProvider";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { addOneRestday, deleteOneRestday, fetchRestdays } from "../services/restday.service";
@@ -50,7 +50,7 @@ const useRestday = () => {
     const { addToast } = useToastContext();
     const location = useLocation();
 
-    const handleFetchRestdays = async () => {
+    const handleFetchRestdays = useCallback(async () => {
         setIsRestdaysLoading(true);
 
         try {
@@ -69,7 +69,7 @@ const useRestday = () => {
         finally {
             setIsRestdaysLoading(false);
         }
-    };
+    }, [company, debouncedQuery_employee_id, debouncedQuery_from, debouncedQuery_to, limit]);
 
     useEffect(() => {
         if (!company) return;
@@ -77,7 +77,7 @@ const useRestday = () => {
         if (location.pathname === '/attendance/restday') {
             handleFetchRestdays();
         }
-    }, [location.pathname, company, debouncedQuery_employee_id, debouncedQuery_to, debouncedQuery_from, limit]); // Added dependency array
+    }, [location.pathname, handleFetchRestdays]); // Added dependency array
 
     const handleAddRow = () => {
         const newRow = { ...formData, id: Date.now() };

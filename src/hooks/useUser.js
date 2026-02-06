@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getPayrollUsers, getUser } from "../services/user.service";
 import { useAuthContext } from "../contexts/AuthProvider";
 
@@ -8,10 +8,19 @@ const useUser = () => {
     const [loading, setLoading] = useState(false);
     const [isUsersLoading, setIsUsersLoading] = useState(false);
 
-
     const { token } = useAuthContext();
 
-    const fetchUserInfo = async () => {
+    const userIdToName = useMemo(() => {
+        const map = new Map();
+
+        for (const u of users) {
+            map.set(u.user_id, `${u.first_name} ${u.last_name}`)
+        };
+
+        return map;
+    }, [users]);
+
+    const fetchUserInfo = useCallback(async () => {
         setLoading(true);
         try {
             const response = await getUser();
@@ -22,9 +31,9 @@ const useUser = () => {
         finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const fetchPayrollUsers = async () => {
+    const fetchPayrollUsers = useCallback(async () => {
         setIsUsersLoading(true);
         try {
             const response = await getPayrollUsers();
@@ -43,28 +52,28 @@ const useUser = () => {
         finally {
             setIsUsersLoading(false);
         }
-    };
+    }, []);
 
 
-    const mapUserIdToName = (user_id) => {
-        const userToMap = users.find(u => u.user_id === user_id);
-        if (!userToMap) return user_id;
+    const mapUserIdToName = useCallback((user_id) => {
+        const user = userIdToName.get(user_id);
+        if (!user) return user_id;
 
-        return `${userToMap?.first_name} ${userToMap?.last_name}`;
-    };
+        return user;
+    }, [users]);
 
     useEffect(() => {
         if (!token) return;
 
         fetchUserInfo();
-    }, [token]);
+    }, [token, fetchUserInfo]);
 
 
     useEffect(() => {
         if (!token) return;
 
         fetchPayrollUsers();
-    }, [token]);
+    }, [token, fetchPayrollUsers]);
 
     return {
         users, setUsers,
