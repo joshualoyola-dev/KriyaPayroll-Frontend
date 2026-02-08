@@ -1,6 +1,6 @@
 import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import { useRef, useEffect, useState } from "react";
-import { ChevronDownIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon, PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import NoAccess from "../../../components/NoAccess";
 import LoadingBackground from "../../../components/LoadingBackground";
 import env from "../../../configs/env.config";
@@ -12,16 +12,21 @@ import {
 } from "../../../configs/data-export.config";
 import useDataExportHistory from "../../../hooks/useDataExportHistory";
 import { formatDateToWords } from "../../../utility/datetime.utility";
+import { getTaxExportDetail, fetch1601cColumns } from "../../../services/data-export.service";
+import FixedHeaderTable from "./FixedHeaderTable";
 
 const STATUS_STYLES = {
     DRAFT: { bg: "bg-orange-100", text: "text-orange-700" },
     SAVED: { bg: "bg-emerald-100", text: "text-emerald-700" },
+    PDF: { bg: "bg-blue-100", text: "text-blue-700" },
     REJECTED: { bg: "bg-rose-100", text: "text-rose-700" },
+    DELETED: { bg: "bg-gray-200", text: "text-gray-700" },
 };
 
 const ACTION_LABELS = {
     DRAFTED: { by: "Drafted by", at: "Drafted at" },
     SAVED: { by: "Saved by", at: "Saved at" },
+    PDF: { by: "PDF by", at: "PDF at" },
     DELETED: { by: "Deleted by", at: "Deleted at" },
 };
 
@@ -44,6 +49,8 @@ const DataExportHistoryPage = () => {
     } = useDataExportHistory(formTypeFromPath);
     const statusDropdownRef = useRef(null);
     const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+    /** 1601c: preview modal — when set, show modal with entry data */
+    const [previewEntryId, setPreviewEntryId] = useState(null);
 
     // Show page when user has feature access, or when permissions not loaded yet (so the History UI is visible like the design)
     let hasAccess = false;
@@ -187,6 +194,8 @@ const DataExportHistoryPage = () => {
                             key={entry.id}
                             entry={entry}
                             formTypeLabel={formTypeConfig.label}
+                            formTypeFromPath={formTypeFromPath}
+                            onView={() => setPreviewEntryId(entry.id)}
                             onEdit={() => navigate(getAddNewPath(formTypeFromPath) + `?edit=${entry.id}`)}
                             onDelete={() => {
                                 if (window.confirm("Delete this entry? This cannot be undone.")) {
@@ -197,12 +206,22 @@ const DataExportHistoryPage = () => {
                     ))}
                 </div>
             </div>
+            {formTypeFromPath === "1601c" && previewEntryId && (
+                <PreviewModal
+                    entryId={previewEntryId}
+                    onClose={() => setPreviewEntryId(null)}
+                    onOpenFull={(id) => {
+                        setPreviewEntryId(null);
+                        navigate(getAddNewPath("1601c") + `?edit=${id}`);
+                    }}
+                />
+            )}
             {loading && <LoadingBackground />}
         </>
     );
 };
 
-function HistoryEntryCard({ entry, formTypeLabel, onEdit, onDelete }) {
+function HistoryEntryCard({ entry, formTypeLabel, formTypeFromPath, onView, onEdit, onDelete }) {
     const statusStyle = STATUS_STYLES[entry.status] ?? {
         bg: "bg-gray-100",
         text: "text-gray-700",
@@ -215,9 +234,17 @@ function HistoryEntryCard({ entry, formTypeLabel, onEdit, onDelete }) {
         entry.payrollPeriodStart && entry.payrollPeriodEnd
             ? `Payroll for ${formatDateToWords(entry.payrollPeriodStart)} to ${formatDateToWords(entry.payrollPeriodEnd)}`
             : "Payroll period";
+    const canPreview = formTypeFromPath === "1601c" && typeof onView === "function";
 
     return (
-        <div className="flex items-center justify-between p-5 rounded-xl border border-gray-800 bg-white hover:bg-gray-50/50 transition-colors">
+        <div
+            role={canPreview ? "button" : undefined}
+            tabIndex={canPreview ? 0 : undefined}
+            title={canPreview ? "Click to preview data" : undefined}
+            onClick={canPreview ? (e) => { if (!e.target.closest("button")) onView(); } : undefined}
+            onKeyDown={canPreview ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onView(); } } : undefined}
+            className={`flex items-center justify-between p-5 rounded-xl border border-gray-800 bg-white transition-colors ${canPreview ? "cursor-pointer hover:bg-gray-50/50 hover:border-teal-300" : "hover:bg-gray-50/50"}`}
+        >
             <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-gray-900">{periodLabel}</p>
                 <p className="text-xs text-gray-500 mt-0.5">Form Type: {formTypeLabel}</p>
@@ -264,6 +291,106 @@ function HistoryEntryCard({ entry, formTypeLabel, onEdit, onDelete }) {
                 >
                     {entry.status}
                 </span>
+            </div>
+        </div>
+    );
+}
+
+/** Modal that fetches and shows 1601c entry data as read-only preview */
+function PreviewModal({ entryId, onClose, onOpenFull }) {
+    const [detail, setDetail] = useState(null);
+    const [columns, setColumns] = useState([]);
+    const [lockedKeys, setLockedKeys] = useState(new Set());
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (!entryId) return;
+        let cancelled = false;
+        setLoading(true);
+        setError(null);
+        (async () => {
+            try {
+                const [detailRes, columnsRes] = await Promise.all([
+                    getTaxExportDetail(entryId),
+                    fetch1601cColumns(),
+                ]);
+                if (cancelled) return;
+                if (!detailRes) {
+                    setError("Entry not found");
+                    return;
+                }
+                setDetail(detailRes);
+                const colList = columnsRes?.data?.columns ?? [];
+                setColumns(colList);
+                setLockedKeys(new Set(colList.map((c) => c.key)));
+            } catch (err) {
+                if (!cancelled) setError(err?.message ?? "Failed to load preview");
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        })();
+        return () => { cancelled = true; };
+    }, [entryId]);
+
+    const snapshot = detail?.form_data_snapshot ?? {};
+    const rowRaw = snapshot.template ?? snapshot;
+    const row = columns.length
+        ? columns.reduce((acc, col) => ({ ...acc, [col.key]: rowRaw[col.key] ?? "" }), {})
+        : { ...rowRaw };
+    const periodFrom = detail?.period_from ? new Date(detail.period_from) : null;
+    const periodTo = detail?.period_to ? new Date(detail.period_to) : null;
+    const periodLabel =
+        periodFrom && periodTo
+            ? `Payroll for ${formatDateToWords(periodFrom.toISOString().slice(0, 10))} to ${formatDateToWords(periodTo.toISOString().slice(0, 10))}`
+            : "Preview";
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
+            <div
+                className="bg-white rounded-xl shadow-xl max-w-[95vw] max-h-[90vh] flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h2 className="text-lg font-bold text-gray-900">{periodLabel}</h2>
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => onOpenFull(entryId)}
+                            className="rounded-lg bg-teal-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-700"
+                        >
+                            Open full view
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                            title="Close"
+                        >
+                            <XMarkIcon className="h-5 w-5" />
+                        </button>
+                    </div>
+                </div>
+                <div className="flex-1 overflow-auto p-4">
+                    {loading && (
+                        <div className="flex items-center justify-center py-12 text-gray-500">
+                            Loading preview…
+                        </div>
+                    )}
+                    {error && (
+                        <div className="py-8 text-center text-red-600 text-sm">{error}</div>
+                    )}
+                    {!loading && !error && columns.length > 0 && (
+                        <div className="overflow-x-auto max-h-[70vh]">
+                            <FixedHeaderTable
+                                columns={columns}
+                                rows={[row]}
+                                onChangeCell={() => {}}
+                                lockedKeys={lockedKeys}
+                            />
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

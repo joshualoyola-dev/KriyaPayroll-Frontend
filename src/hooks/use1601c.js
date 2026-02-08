@@ -114,11 +114,73 @@ const use1601c = () => {
         }, columnsList);
     };
 
+    // Backend sends data with column keys ("Total Comp (14)", "Agent Name", etc.), not field_code
+    const FIELD_CODE_TO_COLUMN_KEY = {
+        month: "Month",
+        year: "Year",
+        sheets_attached: "Sheets Attached",
+        tin: "TIN",
+        company_tin: "TIN",
+        rdo: "RDO Code",
+        company_name: "Agent Name",
+        company_address: "Address",
+        company_phone: "Contact No",
+        company_email: "Email",
+        total_compensation: "Total Comp (14)",
+        minimum_wage: "Min Wage (15)",
+        holiday_overtime_night_diff_hazard: "Holiday Pay (16)",
+        holiday_pay: "Holiday Pay (16)",
+        thirteenth_month: "13th Month (17)",
+        de_minimis: "De Minimis (18)",
+        mandatory_contributions: "SSS/PHIC (19)",
+        other_non_taxable: "Other Non-Tax (20)",
+        total_non_taxable: "Total Non-Tax (21)",
+        total_taxable_compensation: "Total Taxable (22)",
+        less_exempt: "ess: Exempt (23)",
+        net_taxable_compensation: "Net Taxable (24)",
+        tax_withheld: "Tax Withheld (25)",
+        total_taxes_withheld: "Tax Withheld (25)",
+        amended_return: "Amended Return?",
+        taxes_withheld_flag: "Taxes Withheld?",
+        tax_relief: "Tax Relief",
+        specify: "Specify(13A)",
+        prev_month_1: "Prev Month 1",
+        date_paid_1: "Date Paid 1",
+        bank_1: "Bank 1",
+        ref_1: "Ref 1",
+        tax_paid_1: "Tax Paid 1",
+        tax_due_1: "Tax Due 1",
+        adjustment_1: "Adjustment 1",
+        prev_month_2: "Prev Month 2",
+        date_paid_2: "Date Paid 2",
+        bank_2: "Bank 2",
+        ref_2: "Ref 2",
+        tax_paid_2: "Tax Paid 2",
+        tax_due_2: "Tax Due 2",
+        adjustment_2: "Adjustment 2",
+        prev_month_3: "Prev Month 3",
+        date_paid_3: "Date Paid 3",
+        bank_3: "Bank 3",
+        ref_3: "Ref 3",
+        tax_paid_3: "Tax Paid 3",
+        tax_due_3: "Tax Due 3",
+        adjustment_3: "Adjustment 3",
+        total_adjustment: "Total Adj (Sch)",
+        payment_type: "Payment Type",
+        pay_bank: "Pay Bank",
+        pay_number: "Pay Number",
+        pay_date: "Pay Date",
+        pay_amount: "Pay Amount",
+        others: "Others",
+        zipcode: "Zipcode",
+    };
+
     const fillTemplateWithBackend = (tpl, backendRow = {}) => {
         const next = (tpl ?? []).map((f) => {
             if (!f?.field_code) return f;
-            if (backendRow[f.field_code] === undefined) return f;
-            return { ...f, value: backendRow[f.field_code] };
+            const columnKey = FIELD_CODE_TO_COLUMN_KEY[f.field_code];
+            if (!columnKey || backendRow[columnKey] === undefined) return f;
+            return { ...f, value: backendRow[columnKey] };
         });
         return normalizeTemplateValues(next);
     };
@@ -126,70 +188,8 @@ const use1601c = () => {
     const templateToRow = (tpl) => {
         const byCode = indexTemplateByCode(tpl);
 
-        // Map template field_code -> current table column keys
-        const map = {
-            generated: "Generated?",
-            month: "Month",
-            year: "Year",
-            sheets_attached: "Sheets Attached",
-            tin: "TIN",
-            company_tin: "TIN",
-            rdo: "RDO Code",
-            company_name: "Agent Name",
-            company_address: "Address",
-            company_phone: "Contact No",
-            company_email: "Email",
-
-            total_compensation: "Total Comp (14)",
-            minimum_wage: "Min Wage (15)",
-            holiday_overtime_night_diff_hazard: "Holiday Pay (16)",
-            thirteenth_month: "13th Month (17)",
-            de_minimis: "De Minimis (18)",
-            mandatory_contributions: "SSS/PHIC (19)",
-            other_non_taxable: "Other Non-Tax (20)",
-            less_exempt: "ess: Exempt (23)",
-            tax_withheld: "Tax Withheld (25)",
-            total_taxes_withheld: "Tax Withheld (25)",
-
-            amended_return: "Amended Return?",
-            taxes_withheld_flag: "Taxes Withheld?",
-            tax_relief: "Tax Relief",
-            specify: "Specify(13A)",
-
-            prev_month_1: "Prev Month 1",
-            date_paid_1: "Date Paid 1",
-            bank_1: "Bank 1",
-            ref_1: "Ref 1",
-            tax_paid_1: "Tax Paid 1",
-            tax_due_1: "Tax Due 1",
-            adjustment_1: "Adjustment 1",
-
-            prev_month_2: "Prev Month 2",
-            date_paid_2: "Date Paid 2",
-            bank_2: "Bank 2",
-            ref_2: "Ref 2",
-            tax_paid_2: "Tax Paid 2",
-            tax_due_2: "Tax Due 2",
-            adjustment_2: "Adjustment 2",
-
-            prev_month_3: "Prev Month 3",
-            date_paid_3: "Date Paid 3",
-            bank_3: "Bank 3",
-            ref_3: "Ref 3",
-            tax_paid_3: "Tax Paid 3",
-            tax_due_3: "Tax Due 3",
-            adjustment_3: "Adjustment 3",
-
-            total_adjustment: "Total Adj (Sch)",
-            payment_type: "Payment Type",
-            pay_bank: "Pay Bank",
-            pay_number: "Pay Number",
-            pay_date: "Pay Date",
-            pay_amount: "Pay Amount",
-            others: "Others",
-
-            zipcode: "Zipcode",
-        };
+        // Map template field_code -> current table column keys (same as FIELD_CODE_TO_COLUMN_KEY for BIR 1601c)
+        const map = { ...FIELD_CODE_TO_COLUMN_KEY };
 
         const row = {};
         for (const [code, colKey] of Object.entries(map)) {
@@ -280,6 +280,15 @@ const use1601c = () => {
         }
     };
 
+    /** Load a draft from history into the form for editing (periodFrom/periodTo as ISO or YYYY-MM-DD, snapshotRow = form_data_snapshot.template or form_data_snapshot) */
+    const loadDraftForEdit = (periodFrom, periodTo, snapshotRow) => {
+        const fromStr = periodFrom ? (typeof periodFrom === "string" ? periodFrom.slice(0, 10) : periodFrom.toISOString?.()?.slice(0, 10)) : "";
+        const toStr = periodTo ? (typeof periodTo === "string" ? periodTo.slice(0, 10) : periodTo.toISOString?.()?.slice(0, 10)) : "";
+        setFormData((prev) => ({ ...prev, date_start: fromStr, date_end: toStr }));
+        const row = snapshotRow && typeof snapshotRow === "object" ? snapshotRow : {};
+        setRows([recompute1601cRow(row, columns)]);
+    };
+
     return {
         formData, setFormData,
         rows, setRows,
@@ -290,7 +299,8 @@ const use1601c = () => {
         columnsLoading,
         handleGenerate,
         handleDownload,
-        handleChangeCell
+        handleChangeCell,
+        loadDraftForEdit,
     };
 };
 

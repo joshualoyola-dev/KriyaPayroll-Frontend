@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useCompanyContext } from "../contexts/CompanyProvider";
-import { fetchDataExportHistory } from "../services/data-export.service";
+import { fetchDataExportHistory, updateTaxExportHistory } from "../services/data-export.service";
 import { DATA_EXPORT_HISTORY_STATUSES } from "../configs/data-export.config";
 
 const defaultFilters = {
@@ -19,22 +19,24 @@ const useDataExportHistory = (formTypeId) => {
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState(defaultFilters);
 
+    const companyId = company?.company_id ?? null;
+
     const loadHistory = useCallback(async () => {
         if (!formTypeId) return;
         setLoading(true);
         try {
-            const res = await fetchDataExportHistory(formTypeId, {
-                dateFrom: filters.dateFrom,
-                dateTo: filters.dateTo,
-                status: filters.status,
-            });
+            const res = await fetchDataExportHistory(
+                formTypeId,
+                { dateFrom: filters.dateFrom, dateTo: filters.dateTo, status: filters.status },
+                companyId,
+            );
             setEntries(res?.data ?? []);
         } catch {
             setEntries([]);
         } finally {
             setLoading(false);
         }
-    }, [formTypeId, filters.dateFrom, filters.dateTo, filters.status]);
+    }, [formTypeId, companyId, filters.dateFrom, filters.dateTo, filters.status]);
 
     const handleSearch = useCallback(() => {
         loadHistory();
@@ -44,9 +46,20 @@ const useDataExportHistory = (formTypeId) => {
         setFilters((prev) => ({ ...prev, [key]: value }));
     }, []);
 
+    /** Soft delete: mark entry as DELETED so it stays on history and shows under Deleted filter */
     const handleDelete = useCallback(async (entryId) => {
-        // TODO: call API when backend supports delete
-        setEntries((prev) => prev.filter((e) => e.id !== entryId));
+        try {
+            await updateTaxExportHistory(entryId, { status: "DELETED" });
+            setEntries((prev) =>
+                prev.map((e) =>
+                    String(e.id) === String(entryId)
+                        ? { ...e, status: "DELETED", actionType: "DELETED" }
+                        : e
+                )
+            );
+        } catch {
+            // keep entry in list on error; user can retry or refresh
+        }
     }, []);
 
     const handleEdit = useCallback((entryId) => {
