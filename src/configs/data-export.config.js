@@ -14,7 +14,6 @@ export const DATA_EXPORT_HISTORY_STATUSES = [
     { value: "DRAFT", label: "Draft" },
     { value: "PDF", label: "PDF" },
     { value: "REJECTED", label: "Rejected" },
-    { value: "DELETED", label: "Deleted" },
 ];
 
 export const getFormTypeById = (id) =>
