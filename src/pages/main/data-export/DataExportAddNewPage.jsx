@@ -13,6 +13,7 @@ import use1601c from "../../../hooks/use1601c";
 import { useCompanyContext } from "../../../contexts/CompanyProvider";
 import { useToastContext } from "../../../contexts/ToastProvider";
 import { convertToISO8601 } from "../../../utility/datetime.utility";
+import { downloadExcel1601c } from "../../../utility/excel.utility";
 import { fetch2316Data, createTaxExportHistory, getTaxExportDetail, updateTaxExportHistory } from "../../../services/data-export.service";
 
 const toNum = (v) => {
@@ -97,7 +98,7 @@ const DataExportAddNewPage = () => {
         }
     }, [formTypeConfig, navigate]);
 
-    // Load draft for edit when URL has ?edit=<id> (1601c only)
+    // Load draft for edit when URL has ?edit=<id> (1601c)
     useEffect(() => {
         if (formTypeFromPath !== "1601c" || !editId || !hook1601c.columns?.length) return;
         let cancelled = false;
@@ -115,6 +116,32 @@ const DataExportAddNewPage = () => {
         load();
         return () => { cancelled = true; };
     }, [formTypeFromPath, editId, hook1601c.columns?.length]);
+
+    // Load draft for edit when URL has ?edit=<id> (2316)
+    useEffect(() => {
+        if (formTypeFromPath !== "2316" || !editId) return;
+        let cancelled = false;
+        const load = async () => {
+            try {
+                const detail = await getTaxExportDetail(editId);
+                if (cancelled || !detail) return;
+                const snapshot = detail.form_data_snapshot ?? {};
+                const fromDate = detail.period_from ? new Date(detail.period_from).toISOString().slice(0, 10) : "";
+                const toDate = detail.period_to ? new Date(detail.period_to).toISOString().slice(0, 10) : "";
+                setFormData2316((prev) => ({ ...prev, date_start: fromDate, date_end: toDate }));
+                const rows = Array.isArray(snapshot.rows) && snapshot.rows.length > 0
+                    ? snapshot.rows.map((r) => recompute2316Row(r))
+                    : (snapshot && typeof snapshot === "object" && !snapshot.template
+                        ? [recompute2316Row(snapshot)]
+                        : []);
+                setRows2316(rows);
+            } catch {
+                if (!cancelled) addToast("Failed to load draft for editing", "error");
+            }
+        };
+        load();
+        return () => { cancelled = true; };
+    }, [formTypeFromPath, editId]);
 
     const handleSuccess = () => {
         navigate(getHistoryPath(formTypeFromPath), { replace: true });
@@ -295,6 +322,78 @@ const DataExportAddNewPage = () => {
         });
     };
 
+    const handle2316SaveDraft = async () => {
+        if (!company?.company_id && !editId) {
+            addToast("No company selected", "error");
+            return;
+        }
+        const period_from = convertToISO8601(formData2316.date_start);
+        const period_to = convertToISO8601(formData2316.date_end);
+        if (!period_from || !period_to) {
+            addToast("Please select a valid date range (From and To)", "warning");
+            return;
+        }
+        try {
+            if (editId) {
+                await updateTaxExportHistory(editId, {
+                    contents: { rows: rows2316 },
+                });
+                addToast("Draft updated", "success");
+            } else {
+                await createTaxExportHistory(company.company_id, {
+                    form_type: "2316",
+                    period_from,
+                    period_to,
+                    contents: { rows: rows2316 },
+                });
+                addToast("Draft saved to history", "success");
+            }
+            navigate(getHistoryPath("2316"), { replace: true });
+        } catch (err) {
+            addToast(err?.response?.data?.error || err?.message || "Failed to save draft", "error");
+        }
+    };
+
+    const handle2316GeneratePdf = async () => {
+        if (!company?.company_id && !editId) {
+            addToast("No company selected", "error");
+            return;
+        }
+        const period_from = convertToISO8601(formData2316.date_start);
+        const period_to = convertToISO8601(formData2316.date_end);
+        if (!period_from || !period_to) {
+            addToast("Please select a valid date range (From and To)", "warning");
+            return;
+        }
+        try {
+            if (editId) {
+                await updateTaxExportHistory(editId, {
+                    status: "PDF",
+                    contents: { rows: rows2316 },
+                });
+                addToast("Saved with status PDF", "success");
+            } else {
+                await createTaxExportHistory(company.company_id, {
+                    form_type: "2316",
+                    period_from,
+                    period_to,
+                    contents: { rows: rows2316 },
+                    status: "PDF",
+                });
+                addToast("Saved with status PDF", "success");
+            }
+            navigate(getHistoryPath("2316"), { replace: true });
+        } catch (err) {
+            addToast(err?.response?.data?.error || err?.message || "Failed to save as PDF", "error");
+        }
+    };
+
+    const handle2316Download = () => {
+        if (rows2316.length === 0) return;
+        const filename = `2316-export-${formData2316.date_start || "date"}-${formData2316.date_end || "date"}`.replace(/\//g, "-");
+        downloadExcel1601c(SECTION_2316_COLUMNS, rows2316, filename, "2316");
+    };
+
     const handle1601cSaveDraft = async () => {
         if (!company?.company_id && !editId) {
             addToast("No company selected", "error");
@@ -377,6 +476,7 @@ const DataExportAddNewPage = () => {
                             <label className="text-xs font-medium text-gray-700">Download 2316</label>
                             <button
                                 type="button"
+                                onClick={handle2316Download}
                                 className="rounded-xl bg-orange-700 px-4 py-2 text-sm font-medium text-white hover:bg-orange-800"
                             >
                                 Download
@@ -384,13 +484,14 @@ const DataExportAddNewPage = () => {
                             <div className="flex flex-col gap-1.5 mt-1">
                                 <button
                                     type="button"
+                                    onClick={handle2316GeneratePdf}
                                     className="rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
                                 >
                                     Generate a PDF
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => navigate(getHistoryPath("2316"), { replace: true })}
+                                    onClick={handle2316SaveDraft}
                                     className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
                                 >
                                     Save as Draft
