@@ -9,6 +9,7 @@ import {
     getFormTypeById,
     getAddNewPath,
     DATA_EXPORT_HISTORY_STATUSES,
+    SECTION_2316_COLUMNS,
 } from "../../../configs/data-export.config";
 import useDataExportHistory from "../../../hooks/useDataExportHistory";
 import { formatDateToWords } from "../../../utility/datetime.utility";
@@ -206,13 +207,14 @@ const DataExportHistoryPage = () => {
                     ))}
                 </div>
             </div>
-            {formTypeFromPath === "1601c" && previewEntryId && (
+            {(formTypeFromPath === "1601c" || formTypeFromPath === "2316") && previewEntryId && (
                 <PreviewModal
+                    formTypeFromPath={formTypeFromPath}
                     entryId={previewEntryId}
                     onClose={() => setPreviewEntryId(null)}
                     onOpenFull={(id) => {
                         setPreviewEntryId(null);
-                        navigate(getAddNewPath("1601c") + `?edit=${id}`);
+                        navigate(getAddNewPath(formTypeFromPath) + `?edit=${id}`);
                     }}
                 />
             )}
@@ -234,7 +236,7 @@ function HistoryEntryCard({ entry, formTypeLabel, formTypeFromPath, onView, onEd
         entry.payrollPeriodStart && entry.payrollPeriodEnd
             ? `Payroll for ${formatDateToWords(entry.payrollPeriodStart)} to ${formatDateToWords(entry.payrollPeriodEnd)}`
             : "Payroll period";
-    const canPreview = formTypeFromPath === "1601c" && typeof onView === "function";
+    const canPreview = (formTypeFromPath === "1601c" || formTypeFromPath === "2316") && typeof onView === "function";
 
     return (
         <div
@@ -296,13 +298,15 @@ function HistoryEntryCard({ entry, formTypeLabel, formTypeFromPath, onView, onEd
     );
 }
 
-/** Modal that fetches and shows 1601c entry data as read-only preview */
-function PreviewModal({ entryId, onClose, onOpenFull }) {
+/** Modal that fetches and shows 1601c or 2316 entry data as read-only preview */
+function PreviewModal({ formTypeFromPath, entryId, onClose, onOpenFull }) {
     const [detail, setDetail] = useState(null);
     const [columns, setColumns] = useState([]);
     const [lockedKeys, setLockedKeys] = useState(new Set());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const is2316 = formTypeFromPath === "2316";
 
     useEffect(() => {
         if (!entryId) return;
@@ -311,19 +315,31 @@ function PreviewModal({ entryId, onClose, onOpenFull }) {
         setError(null);
         (async () => {
             try {
-                const [detailRes, columnsRes] = await Promise.all([
-                    getTaxExportDetail(entryId),
-                    fetch1601cColumns(),
-                ]);
-                if (cancelled) return;
-                if (!detailRes) {
-                    setError("Entry not found");
-                    return;
+                if (is2316) {
+                    const detailRes = await getTaxExportDetail(entryId);
+                    if (cancelled) return;
+                    if (!detailRes) {
+                        setError("Entry not found");
+                        return;
+                    }
+                    setDetail(detailRes);
+                    setColumns(SECTION_2316_COLUMNS);
+                    setLockedKeys(new Set(SECTION_2316_COLUMNS.map((c) => c.key)));
+                } else {
+                    const [detailRes, columnsRes] = await Promise.all([
+                        getTaxExportDetail(entryId),
+                        fetch1601cColumns(),
+                    ]);
+                    if (cancelled) return;
+                    if (!detailRes) {
+                        setError("Entry not found");
+                        return;
+                    }
+                    setDetail(detailRes);
+                    const colList = columnsRes?.data?.columns ?? [];
+                    setColumns(colList);
+                    setLockedKeys(new Set(colList.map((c) => c.key)));
                 }
-                setDetail(detailRes);
-                const colList = columnsRes?.data?.columns ?? [];
-                setColumns(colList);
-                setLockedKeys(new Set(colList.map((c) => c.key)));
             } catch (err) {
                 if (!cancelled) setError(err?.message ?? "Failed to load preview");
             } finally {
@@ -331,19 +347,39 @@ function PreviewModal({ entryId, onClose, onOpenFull }) {
             }
         })();
         return () => { cancelled = true; };
-    }, [entryId]);
+    }, [entryId, is2316]);
 
     const snapshot = detail?.form_data_snapshot ?? {};
-    const rowRaw = snapshot.template ?? snapshot;
-    const row = columns.length
-        ? columns.reduce((acc, col) => ({ ...acc, [col.key]: rowRaw[col.key] ?? "" }), {})
-        : { ...rowRaw };
+    let rows = [];
+    if (is2316) {
+        if (Array.isArray(snapshot.rows) && snapshot.rows.length > 0) {
+            rows = SECTION_2316_COLUMNS.length
+                ? snapshot.rows.map((rowRaw) =>
+                    SECTION_2316_COLUMNS.reduce((acc, col) => ({ ...acc, [col.key]: rowRaw[col.key] ?? "" }), {})
+                )
+                : snapshot.rows;
+        } else if (snapshot && typeof snapshot === "object" && !snapshot.template) {
+            const singleRow = SECTION_2316_COLUMNS.length
+                ? SECTION_2316_COLUMNS.reduce((acc, col) => ({ ...acc, [col.key]: snapshot[col.key] ?? "" }), {})
+                : { ...snapshot };
+            rows = [singleRow];
+        }
+    } else {
+        const rowRaw = snapshot.template ?? snapshot;
+        const row = columns.length
+            ? columns.reduce((acc, col) => ({ ...acc, [col.key]: rowRaw[col.key] ?? "" }), {})
+            : { ...rowRaw };
+        rows = [row];
+    }
+
     const periodFrom = detail?.period_from ? new Date(detail.period_from) : null;
     const periodTo = detail?.period_to ? new Date(detail.period_to) : null;
     const periodLabel =
         periodFrom && periodTo
             ? `Payroll for ${formatDateToWords(periodFrom.toISOString().slice(0, 10))} to ${formatDateToWords(periodTo.toISOString().slice(0, 10))}`
             : "Preview";
+
+    const showTable = !loading && !error && columns.length > 0 && rows.length > 0;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
@@ -380,11 +416,14 @@ function PreviewModal({ entryId, onClose, onOpenFull }) {
                     {error && (
                         <div className="py-8 text-center text-red-600 text-sm">{error}</div>
                     )}
-                    {!loading && !error && columns.length > 0 && (
+                    {!loading && !error && columns.length > 0 && rows.length === 0 && (
+                        <div className="py-8 text-center text-gray-500 text-sm">No data in this entry.</div>
+                    )}
+                    {showTable && (
                         <div className="overflow-x-auto max-h-[70vh]">
                             <FixedHeaderTable
                                 columns={columns}
-                                rows={[row]}
+                                rows={rows}
                                 onChangeCell={() => {}}
                                 lockedKeys={lockedKeys}
                             />
