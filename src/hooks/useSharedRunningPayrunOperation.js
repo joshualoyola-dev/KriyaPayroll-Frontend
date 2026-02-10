@@ -38,7 +38,6 @@ const useSharedRunningPayrunOperation = () => {
     const [logs, setLogs] = useState([]);
     const [logsLoading, setLogsLoading] = useState(false);
     const [toggleLogs, setToggleLogs] = useState(false);
-    const [calculateTaxWithheld, setCalculateTaxWithheld] = useState(false);
     const [payrunType, setPayrunType] = useState('REGULAR');
     const [toggleEmployeeSelections, setToggleEmployeeSelections] = useState(false);
     const [employeeForLastPay, setEmployeeForLastPay] = useState();
@@ -71,9 +70,6 @@ const useSharedRunningPayrunOperation = () => {
             // get payslips totals
             const resultPayablesTotals = await getPayslipsTotals(company.company_id, resultPayrun.data.payrun.payrun_id, resultPayrun.data.payrun.status);
             setPayslipTotal(resultPayablesTotals.data.totals);
-
-            //reset the tax withheld option
-            setCalculateTaxWithheld(false);
         } catch (error) {
             console.log(error);
             addToast("Failed to initialize the payrun", "error");
@@ -279,7 +275,7 @@ const useSharedRunningPayrunOperation = () => {
                 edited_payslips: cleanedEditedPayslips,
                 old_payslips: cleanedOldPayslips
             };
-            const result = await saveEdit(company.company_id, payrun.payrun_id, payload, calculateTaxWithheld, payrunType.toLowerCase());
+            const result = await saveEdit(company.company_id, payrun.payrun_id, payload, payrunType.toLowerCase());
             console.log('result saving edits', result);
             addToast("Successfully saved payrun edits", "success");
             await initializePayrun(payrun.payrun_id);
@@ -293,7 +289,6 @@ const useSharedRunningPayrunOperation = () => {
     };
 
     const handleClosePayrun = () => {
-        setCalculateTaxWithheld(false);
         setToggleEmployeeSelections(false);
         setPayslipTotal([]);
         setPayslips([]);
@@ -340,10 +335,6 @@ const useSharedRunningPayrunOperation = () => {
 
     const handleToggleLogs = () => {
         setToggleLogs(!toggleLogs);
-    }
-
-    const handleToggleCalculateTaxWithhelds = () => {
-        setCalculateTaxWithheld(!calculateTaxWithheld);
     }
 
     const handleEmployeeIdsChange = (employee_id) => {
@@ -398,9 +389,6 @@ const useSharedRunningPayrunOperation = () => {
         logs, setLogs,
         logsLoading, setLogsLoading,
         toggleLogs, handleToggleLogs,
-
-        handleToggleCalculateTaxWithhelds,
-        calculateTaxWithheld,
 
         payrunType, setPayrunType,
         handleEmployeeIdsChange,

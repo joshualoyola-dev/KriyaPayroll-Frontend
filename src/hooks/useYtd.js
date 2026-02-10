@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchYearToDate } from "../services/data-export.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { convertToISO8601, formatDateToWords } from "../utility/datetime.utility";
@@ -10,7 +10,7 @@ import { downloadExcelMatrix } from "../utility/excel.utility";
 const formData = {
     date_start: '',
     date_end: '',
-    active_employees: true,
+    active_employees: false,
     payrun_payment_or_period: 'PAYMENT',
     payrun_status: ['APPROVED'],
     employee_ids: [],
@@ -51,6 +51,11 @@ const useYtd = () => {
             setYtdsLoading(false);
         }
     };
+
+    useEffect(() => {
+        console.log('form data: ', dateRangeFormData);
+
+    }, [dateRangeFormData])
 
     const handleDownload = () => {
         setDownloadLoading(true);
