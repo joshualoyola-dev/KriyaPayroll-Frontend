@@ -4,6 +4,7 @@ import { useSharedRunningPayrunOperationContext } from "../../../../contexts/Sha
 import { useToastContext } from "../../../../contexts/ToastProvider";
 import EmployeeSelection from "./EmployeeSelection";
 import { formatDateToWords } from "../../../../utility/datetime.utility";
+import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
 
 const OptionGenerate = () => {
     const { payitems } = usePayitemContext();
@@ -18,6 +19,7 @@ const OptionGenerate = () => {
         employeeForLastPay
     } = useSharedRunningPayrunOperationContext();
     const { addToast } = useToastContext();
+    const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
 
 
     const handleSubmit = async (e) => {
@@ -253,6 +255,25 @@ const OptionGenerate = () => {
                     </div>
                 </div>
             )}
+
+            {(options.employee_ids.length > 0 && String(payrunType).toUpperCase() === 'SPECIAL') &&
+                <div className="pt-4 mt-2 border-t border-gray-200">
+                    <p className="text-xs font-medium text-gray-700 mb-3">Selected Employee:</p>
+                    <div className="flex flex-wrap gap-2">
+                        {options.employee_ids.map((employee_id, idx) => {
+
+                            return (
+                                <div
+                                    key={idx}
+                                    className="inline-flex items-center px-3 py-1.5 rounded-full text-xs text-teal-700 bg-teal-50 border border-teal-200"
+                                >
+                                    <span className="font-medium">{mapEmployeeIdToEmployeeName(employee_id)}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            }
 
             {/* Render employee details for last payrun */}
             {employeeForLastPay && (

@@ -8,6 +8,8 @@ import { useEmployeeContext } from "../../../contexts/EmployeeProvider";
 import { convertToISO8601 } from "../../../utility/datetime.utility";
 import { fetch2316Data } from "../../../services/data-export.service";
 
+import { download2316Pdf } from "../../../api/export.api";
+
 const statuses = ["APPROVED", "DRAFT", "FOR_APPROVAL", "REJECTED"];
 
 const defaultFormData = {
@@ -97,12 +99,45 @@ const Section2316 = () => {
             setGenerateLoading(false);
         }
     };
-
-    const handleDownload = async () => {
+const handleDownload = async () => {
         setDownloadLoading(true);
         try {
             // Placeholder: wire download logic when backend/export format is ready.
             return;
+        } finally {
+            setDownloadLoading(false);
+        }
+    };
+
+    const handleGeneratePDF = async () => {
+        // 1. Basic Validation
+        if (!company?.company_id) {
+            addToast("No company selected", "error");
+            return;
+        }
+
+        // Extracts the year from the "To" date picker
+        const year = formData.date_end ? new Date(formData.date_end).getFullYear() : null;
+
+        if (!year) {
+            addToast("Please select a date range to determine the tax year.", "warning");
+            return;
+        }
+
+        setDownloadLoading(true);
+
+        try {
+            addToast(`Preparing BIR 2316 for year ${year}...`, "info");
+
+            // 2. Call the function from your export.api file
+            const result = await download2316Pdf(company.company_id, year);
+
+            if (result) {
+                addToast("PDF generated and downloaded successfully.", "success");
+            }
+        } catch (error) {
+            console.error("PDF Export Error:", error);
+            addToast("Failed to connect to the PDF service.", "error");
         } finally {
             setDownloadLoading(false);
         }
@@ -246,9 +281,11 @@ const Section2316 = () => {
                         <div className="mt-2 flex gap-2">
                             <button
                                 type="button"
+                                onClick={handleGeneratePDF} // <--- This connects the click to your function
+                                disabled={downloadLoading}  // <--- This prevents double-clicks while loading
                                 className="rounded-xl bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700"
                             >
-                                Generate a PDF
+                               {downloadLoading ? "Generating..." : "Generate a PDF"}
                             </button>
                             <button
                                 type="button"

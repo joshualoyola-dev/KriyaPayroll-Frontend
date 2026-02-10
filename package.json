@@ -14,7 +14,7 @@
     "@tailwindcss/vite": "^4.1.12",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/react-table": "^8.21.3",
-    "axios": "^1.11.0",
+    "axios": "^1.13.5",
     "date-fns": "^4.1.0",
     "file-saver": "^2.0.5",
     "jwt-decode": "^4.0.0",

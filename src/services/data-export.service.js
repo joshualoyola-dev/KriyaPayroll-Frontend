@@ -86,7 +86,7 @@ const mapHistoryEntry = (h) => {
         payrollPeriodEnd: dTo ? dTo.toISOString().slice(0, 10) : "",
         formType: h.form_type || "",
         status: h.status || "",
-        actionBy: h.created_by_user_id != null ? `User #${h.created_by_user_id}` : "",
+        actionBy: h.created_by_user_name != null ? `${h.created_by_user_name}` : "",
         actionAt: h.created_at ? new Date(h.created_at).toISOString().slice(0, 10) : "",
         actionType,
     };
