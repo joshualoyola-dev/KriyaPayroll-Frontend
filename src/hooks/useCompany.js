@@ -193,10 +193,9 @@ const useCompany = () => {
             e.preventDefault();
 
             if (
-                companyFormData.approvers.length === 0 ||
                 companyFormData.editors.length === 0
             ) {
-                addToast("Select approvers/editors from the selection", "warning");
+                addToast("Select users to manage the companys payroll from the selection", "warning");
                 return;
             }
 
