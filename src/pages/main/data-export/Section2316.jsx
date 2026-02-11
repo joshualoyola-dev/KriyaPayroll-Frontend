@@ -8,7 +8,7 @@ import { useEmployeeContext } from "../../../contexts/EmployeeProvider";
 import { convertToISO8601 } from "../../../utility/datetime.utility";
 import { fetch2316Data } from "../../../services/data-export.service";
 
-import { download2316Pdf } from "../../../api/export.api";
+import { generate2316Pdf } from "../../../api/export.api";
 
 const statuses = ["APPROVED", "DRAFT", "FOR_APPROVAL", "REJECTED"];
 
@@ -110,16 +110,23 @@ const handleDownload = async () => {
     };
 
     const handleGeneratePDF = async () => {
+        console.log("🔵 [Section2316] handleGeneratePDF CLICKED!");
+        console.log("🔵 Company:", company);
+        console.log("🔵 Form Data:", formData);
+        
         // 1. Basic Validation
         if (!company?.company_id) {
+            console.log("❌ No company selected");
             addToast("No company selected", "error");
             return;
         }
 
         // Extracts the year from the "To" date picker
         const year = formData.date_end ? new Date(formData.date_end).getFullYear() : null;
+        console.log("🔵 Extracted year:", year);
 
         if (!year) {
+            console.log("❌ No year found");
             addToast("Please select a date range to determine the tax year.", "warning");
             return;
         }
@@ -129,11 +136,11 @@ const handleDownload = async () => {
         try {
             addToast(`Preparing BIR 2316 for year ${year}...`, "info");
 
-            // 2. Call the function from your export.api file
-            const result = await download2316Pdf(company.company_id, year);
+            // 2. Generate PDF - it will be saved to Google Drive automatically
+            const success = await generate2316Pdf(company.company_id, year);
 
-            if (result) {
-                addToast("PDF generated and downloaded successfully.", "success");
+            if (success) {
+                addToast("PDF generated successfully and saved to Google Drive!", "success");
             }
         } catch (error) {
             console.error("PDF Export Error:", error);

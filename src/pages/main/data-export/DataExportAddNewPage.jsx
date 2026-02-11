@@ -15,6 +15,7 @@ import { useToastContext } from "../../../contexts/ToastProvider";
 import { convertToISO8601 } from "../../../utility/datetime.utility";
 import { downloadExcel1601c } from "../../../utility/excel.utility";
 import { fetch2316Data, createTaxExportHistory, getTaxExportDetail, updateTaxExportHistory } from "../../../services/data-export.service";
+import { generate2316Pdf, generate1601cPdf } from "../../../api/export.api";
 
 const toNum = (v) => {
     const n = Number(v);
@@ -382,13 +383,21 @@ const DataExportAddNewPage = () => {
             addToast("Please select a valid date range (From and To)", "warning");
             return;
         }
+        
+        // Extract year from period_to for PDF generation
+        const year = period_to ? new Date(period_to).getFullYear() : null;
+        if (!year) {
+            addToast("Could not determine year from date range", "error");
+            return;
+        }
+        
         try {
+            // Save to database first
             if (editId) {
                 await updateTaxExportHistory(editId, {
                     status: "PDF",
                     contents: { rows: rows2316 },
                 });
-                addToast("Saved with status PDF", "success");
             } else {
                 await createTaxExportHistory(company.company_id, {
                     form_type: "2316",
@@ -397,11 +406,22 @@ const DataExportAddNewPage = () => {
                     contents: { rows: rows2316 },
                     status: "PDF",
                 });
-                addToast("Saved with status PDF", "success");
             }
+            
+            // Then generate PDF via API
+            addToast(`Generating PDF for year ${year}...`, "info");
+            const success = await generate2316Pdf(company.company_id, year);
+            
+            if (success) {
+                addToast("PDF generated successfully and saved to Google Drive!", "success");
+            } else {
+                addToast("PDF generation failed", "error");
+            }
+            
             navigate(getHistoryPath("2316"), { replace: true });
         } catch (err) {
-            addToast(err?.response?.data?.error || err?.message || "Failed to save as PDF", "error");
+            console.error("PDF Generation Error:", err);
+            addToast(err?.response?.data?.error || err?.message || "Failed to generate PDF", "error");
         }
     };
 
@@ -444,7 +464,7 @@ const DataExportAddNewPage = () => {
         }
     };
 
-    /** Save to DB with status "PDF" (create or update) when user clicks Generate a PDF */
+    /** Generate PDF and save to DB when user clicks Generate a PDF */
     const handle1601cGeneratePdf = async () => {
         if (!company?.company_id && !editId) {
             addToast("No company selected", "error");
@@ -456,14 +476,25 @@ const DataExportAddNewPage = () => {
             addToast("Please select a valid date range (From and To)", "warning");
             return;
         }
+        
+        // Extract year and month from period_to for PDF generation
+        const dateObj = period_to ? new Date(period_to) : null;
+        const year = dateObj ? dateObj.getFullYear() : null;
+        const month = dateObj ? dateObj.getMonth() + 1 : null;
+        
+        if (!year || !month) {
+            addToast("Could not determine year/month from date range", "error");
+            return;
+        }
+        
         const row = hook1601c.rows?.[0];
         try {
+            // Save to database first
             if (editId) {
                 await updateTaxExportHistory(editId, {
                     status: "PDF",
                     contents: row ? { template: row } : {},
                 });
-                addToast("Saved with status PDF", "success");
             } else {
                 await createTaxExportHistory(company.company_id, {
                     form_type: "1601C",
@@ -472,11 +503,22 @@ const DataExportAddNewPage = () => {
                     contents: row ? { template: row } : {},
                     status: "PDF",
                 });
-                addToast("Saved with status PDF", "success");
             }
+            
+            // Then generate PDF via API
+            addToast(`Generating PDF for ${month}/${year}...`, "info");
+            const success = await generate1601cPdf(company.company_id, year, month);
+            
+            if (success) {
+                addToast("PDF generated successfully and saved to Google Drive!", "success");
+            } else {
+                addToast("PDF generation failed", "error");
+            }
+            
             navigate(getHistoryPath("1601c"), { replace: true });
         } catch (err) {
-            addToast(err?.response?.data?.error || err?.message || "Failed to save as PDF", "error");
+            console.error("PDF Generation Error:", err);
+            addToast(err?.response?.data?.error || err?.message || "Failed to generate PDF", "error");
         }
     };
 

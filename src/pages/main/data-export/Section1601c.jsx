@@ -5,7 +5,7 @@ import FixedHeaderTable from "./FixedHeaderTable";
 import use1601c from "../../../hooks/use1601c"; // Adjust path as needed
 import { useEmployeeContext } from "../../../contexts/EmployeeProvider";
 
-import { download1601cPdf } from "../../../api/export.api";
+import { generate1601cPdf } from "../../../api/export.api";
 import { useCompanyContext } from "../../../contexts/CompanyProvider";
 import { useToastContext } from "../../../contexts/ToastProvider";
 
@@ -66,14 +66,20 @@ const Section1601c = () => {
     const { addToast } = useToastContext();
 
     const handleGenerate1601CPDF = async () => {
+        console.log("🔵 [Section1601c] handleGenerate1601CPDF CLICKED!");
+        console.log("🔵 Company:", company);
+        console.log("🔵 Form Data:", formData);
+        
         if (!company?.company_id) {
+            console.log("❌ No company selected");
             addToast("No company selected", "error");
             return;
         }
 
         const dateObj = formData.date_end ? new Date(formData.date_end) : null;
         const year = dateObj ? dateObj.getFullYear() : null;
-        const month = dateObj ? dateObj.getMonth() + 1 : null; 
+        const month = dateObj ? dateObj.getMonth() + 1 : null;
+        console.log("🔵 Extracted year:", year, "month:", month); 
 
         if (!year || !month) {
             addToast("Please select a date range first.", "warning");
@@ -82,9 +88,9 @@ const Section1601c = () => {
 
         try {
             addToast(`Generating 1601C for ${month}/${year}...`, "info");
-            const success = await download1601cPdf(company.company_id, year, month);
+            const success = await generate1601cPdf(company.company_id, year, month);
             if (success) {
-                addToast("1601C PDF downloaded successfully!", "success");
+                addToast("PDF generated successfully and saved to Google Drive!", "success");
             }
         } catch (err) {
             addToast("Error generating PDF.", "error");
