@@ -16,10 +16,12 @@ const OptionGenerate = () => {
         isSaving,
         payrunType,
         handleClosePayrun,
-        employeeForLastPay
+        employeeForLastPay,
+        payitemDropdownOpen, setPayitemDropdownOpen
     } = useSharedRunningPayrunOperationContext();
     const { addToast } = useToastContext();
     const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
+
 
 
     const handleSubmit = async (e) => {
@@ -127,31 +129,35 @@ const OptionGenerate = () => {
                         Pay Items
                     </label>
                     <div className="relative">
-                        <select
-                            onChange={(e) => {
-                                if (e.target.value) {
-                                    handlePayitemChange(e.target.value);
-                                    e.target.value = ''; // Reset select after selection
-                                }
-                            }}
-                            className="w-full px-3 py-2.5 pr-10 border border-gray-500 rounded-3xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white appearance-none cursor-pointer text-gray-500"
-                            defaultValue=""
+                        <button
+                            type="button"
+                            onClick={() => setPayitemDropdownOpen(o => !o)}
+                            className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm flex justify-between items-center"
                         >
-                            <option value="" disabled>Select Payitems</option>
-                            {payitems
-                                .filter(item =>
-                                    !options.pay_items.some(selectedItem =>
-                                        Object.keys(selectedItem)[0] === item.payitem_id
+                            Select Pay Items
+                            <ChevronDownIcon className="h-5 w-5 text-gray-400" />
+                        </button>
+
+                        {payitemDropdownOpen && (
+                            <div className="absolute z-10 mt-2 w-full  bg-white border border-gray-500  rounded-xl max-h-80 overflow-auto">
+                                {payitems
+                                    .filter(item =>
+                                        !options.pay_items.some(
+                                            p => Object.keys(p)[0] === item.payitem_id
+                                        )
                                     )
-                                )
-                                .map((item) => (
-                                    <option key={item.payitem_id} value={item.payitem_id} className="text-gray-900">
-                                        {item.payitem_name}
-                                    </option>
-                                ))
-                            }
-                        </select>
-                        <ChevronDownIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+                                    .map(item => (
+                                        <button
+                                            key={item.payitem_id}
+                                            type="button"
+                                            onClick={() => handlePayitemChange(item.payitem_id)}
+                                            className="w-full text-left px-4 py-2 hover:bg-teal-50 text-sm text-gray-700"
+                                        >
+                                            {item.payitem_name}
+                                        </button>
+                                    ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 

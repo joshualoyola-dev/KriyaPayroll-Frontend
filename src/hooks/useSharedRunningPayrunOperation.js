@@ -41,12 +41,14 @@ const useSharedRunningPayrunOperation = () => {
     const [payrunType, setPayrunType] = useState('REGULAR');
     const [toggleEmployeeSelections, setToggleEmployeeSelections] = useState(false);
     const [employeeForLastPay, setEmployeeForLastPay] = useState();
+    const [payitemDropdownOpen, setPayitemDropdownOpen] = useState(false);
 
     const { payitems } = usePayitemContext();
     const { activeEmployees, employees } = useEmployeeContext();
     const { addToast } = useToastContext();
     const { company } = useCompanyContext();
     const { handleFetchPayruns } = usePayrunContext();
+
 
 
 
@@ -396,7 +398,8 @@ const useSharedRunningPayrunOperation = () => {
         handleToggleEmployeeSelections,
 
         payslipsTotal, setPayslipTotal,
-        employeeForLastPay, setEmployeeForLastPay
+        employeeForLastPay, setEmployeeForLastPay,
+        payitemDropdownOpen, setPayitemDropdownOpen
     };
 };
 
