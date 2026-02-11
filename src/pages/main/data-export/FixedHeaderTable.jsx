@@ -18,7 +18,8 @@ const FixedHeaderTable = ({ columns, rows, onChangeCell, lockedKeys = new Set() 
                     {rows.map((row, rowIdx) => (
                         <tr key={rowIdx} className="odd:bg-white even:bg-gray-50">
                             {columns.map((col) => {
-                                const value = row[col.key] ?? "";
+                                const raw = row[col.key];
+                                const value = raw != null && typeof raw === "object" ? "" : String(raw ?? "");
                                 const locked = lockedKeys.has(col.key);
 
                                 return (

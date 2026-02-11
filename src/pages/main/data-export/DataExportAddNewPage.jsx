@@ -98,24 +98,40 @@ const DataExportAddNewPage = () => {
         }
     }, [formTypeConfig, navigate]);
 
-    // Load draft for edit when URL has ?edit=<id> (1601c)
+    // Load draft for edit when URL has ?edit=<id> (1601c) — same behavior as 2316 edit
     useEffect(() => {
-        if (formTypeFromPath !== "1601c" || !editId || !hook1601c.columns?.length) return;
+        if (formTypeFromPath !== "1601c" || !editId) return;
+        if (hook1601c.columnsLoading || !hook1601c.columns?.length) return;
         let cancelled = false;
         const load = async () => {
             try {
                 const detail = await getTaxExportDetail(editId);
                 if (cancelled || !detail) return;
-                const snapshot = detail.form_data_snapshot ?? {};
-                const rowData = snapshot.template ?? snapshot;
+                const raw = detail.form_data_snapshot;
+                const snapshot =
+                    typeof raw === "string"
+                        ? (() => {
+                              try {
+                                  return JSON.parse(raw);
+                              } catch {
+                                  return {};
+                              }
+                          })()
+                        : raw ?? {};
+                const rowData =
+                    snapshot && typeof snapshot === "object" && !Array.isArray(snapshot)
+                        ? snapshot.template ?? snapshot
+                        : {};
                 hook1601c.loadDraftForEdit(detail.period_from, detail.period_to, rowData);
             } catch {
                 if (!cancelled) addToast("Failed to load draft for editing", "error");
             }
         };
         load();
-        return () => { cancelled = true; };
-    }, [formTypeFromPath, editId, hook1601c.columns?.length]);
+        return () => {
+            cancelled = true;
+        };
+    }, [formTypeFromPath, editId, hook1601c.columnsLoading, hook1601c.columns?.length]);
 
     // Load draft for edit when URL has ?edit=<id> (2316)
     useEffect(() => {
@@ -311,7 +327,8 @@ const DataExportAddNewPage = () => {
 
     const is1601c = formTypeFromPath === "1601c";
     const is2316 = formTypeFromPath === "2316";
-    const show1601cTable = is1601c && hook1601c.rows?.length > 0;
+    const viewOnlyMode = false; // allow edit on 1601c same as 2316
+    const show1601cTable = is1601c && (hook1601c.columns?.length ?? 0) > 0 && (hook1601c.rows?.length ?? 0) > 0;
     const show2316Table = is2316 && rows2316.length > 0;
 
     const handle2316CellChange = (rowIdx, key, value) => {
@@ -555,10 +572,14 @@ const DataExportAddNewPage = () => {
                 )}
                 {!show1601cTable && !show2316Table && (
                     <div className="mt-8">
-                        <StartIllustration
-                            title="Generate"
-                            label="Select date range and click Generate to fetch data from the payrun."
-                        />
+                        {is1601c && editId && hook1601c.columnsLoading ? (
+                            <p className="text-center text-gray-500">Loading draft…</p>
+                        ) : (
+                            <StartIllustration
+                                title="Generate"
+                                label="Select date range and click Generate to fetch data from the payrun."
+                            />
+                        )}
                     </div>
                 )}
                 {show1601cTable && (

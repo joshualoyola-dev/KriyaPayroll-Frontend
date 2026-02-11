@@ -27,8 +27,9 @@ const formatMoney = (value) => {
 
 const ensureRowShape = (row, columns) => {
     const shaped = { ...row };
-    for (const col of columns) {
-        if (!(col.key in shaped)) {
+    const cols = Array.isArray(columns) ? columns : [];
+    for (const col of cols) {
+        if (col && col.key != null && !(col.key in shaped)) {
             shaped[col.key] = "";
         }
     }
@@ -282,11 +283,17 @@ const use1601c = () => {
 
     /** Load a draft from history into the form for editing (periodFrom/periodTo as ISO or YYYY-MM-DD, snapshotRow = form_data_snapshot.template or form_data_snapshot) */
     const loadDraftForEdit = (periodFrom, periodTo, snapshotRow) => {
-        const fromStr = periodFrom ? (typeof periodFrom === "string" ? periodFrom.slice(0, 10) : periodFrom.toISOString?.()?.slice(0, 10)) : "";
-        const toStr = periodTo ? (typeof periodTo === "string" ? periodTo.slice(0, 10) : periodTo.toISOString?.()?.slice(0, 10)) : "";
-        setFormData((prev) => ({ ...prev, date_start: fromStr, date_end: toStr }));
-        const row = snapshotRow && typeof snapshotRow === "object" ? snapshotRow : {};
-        setRows([recompute1601cRow(row, columns)]);
+        try {
+            const fromStr = periodFrom ? (typeof periodFrom === "string" ? periodFrom.slice(0, 10) : periodFrom.toISOString?.()?.slice(0, 10)) : "";
+            const toStr = periodTo ? (typeof periodTo === "string" ? periodTo.slice(0, 10) : periodTo.toISOString?.()?.slice(0, 10)) : "";
+            setFormData((prev) => ({ ...prev, date_start: fromStr, date_end: toStr }));
+            const row = snapshotRow && typeof snapshotRow === "object" && !Array.isArray(snapshotRow) ? snapshotRow : {};
+            const cols = Array.isArray(columns) ? columns : [];
+            setRows([recompute1601cRow(row, cols)]);
+        } catch (err) {
+            addToast("Failed to load draft data", "error");
+            setRows([]);
+        }
     };
 
     return {
