@@ -30,7 +30,10 @@ const useDataExportHistory = (formTypeId) => {
             overrideFilters ?? filters,
             companyId
         );
-        setEntries(res?.data ?? []);
+        // Filter out entries with "GENERATED" status to avoid duplicates of "PDF" entries
+        const allEntries = res?.data ?? [];
+        const filteredEntries = allEntries.filter((entry) => entry.status !== "GENERATED");
+        setEntries(filteredEntries);
     } catch {
         setEntries([]);
     } finally {

@@ -391,6 +391,52 @@ const DataExportAddNewPage = () => {
             return;
         }
         
+        // Check if rows exist
+        if (!rows2316 || rows2316.length === 0) {
+            addToast("Please generate data first before creating a PDF", "error");
+            return;
+        }
+        
+        // Validate that all columns are filled (excluding computed columns)
+        const columns = SECTION_2316_COLUMNS || [];
+        // Computed fields that are auto-calculated and shouldn't be validated
+        const computedFields = new Set([
+            "taxable_compensation",           // 21 = computed
+            "gross_taxable_compensation",     // 23 = computed
+            "total_tax_withheld",             // 26 = computed
+            "total_tax_withheld_after_credit", // 28 = computed
+            "total_non_taxable_compensation",  // 38 = computed
+            "total_taxable_compensation",      // 52 = computed
+        ]);
+        
+        const emptyColumns = [];
+        
+        // Check all rows for empty columns
+        for (const row of rows2316) {
+            for (const column of columns) {
+                const key = column.key;
+                // Skip computed columns
+                if (computedFields.has(key)) {
+                    continue;
+                }
+                
+                const value = row[key];
+                // Check if value is empty, null, undefined, or just whitespace
+                if (value === null || value === undefined || value === "" || (typeof value === "string" && value.trim() === "")) {
+                    const columnLabel = column.label || key;
+                    // Only add if not already in the list
+                    if (!emptyColumns.includes(columnLabel)) {
+                        emptyColumns.push(columnLabel);
+                    }
+                }
+            }
+        }
+        
+        if (emptyColumns.length > 0) {
+            addToast(`Please fill up all columns. You cannot generate a PDF if not filling all columns. Missing: ${emptyColumns.slice(0, 3).join(", ")}${emptyColumns.length > 3 ? ` and ${emptyColumns.length - 3} more` : ""}`, "error");
+            return;
+        }
+        
         try {
             // Save to database first
             if (editId) {
@@ -408,20 +454,28 @@ const DataExportAddNewPage = () => {
                 });
             }
             
-            // Then generate PDF via API
-            addToast(`Generating PDF for year ${year}...`, "info");
-            const success = await generate2316Pdf(company.company_id, year);
-            
-            if (success) {
-                addToast("PDF generated successfully and saved to Google Drive!", "success");
-            } else {
-                addToast("PDF generation failed", "error");
-            }
-            
+            // Navigate back immediately after saving to database
             navigate(getHistoryPath("2316"), { replace: true });
+            
+            // Generate PDF in the background (don't await, let it run async)
+            addToast(`Generating PDF for year ${year}...`, "info");
+            generate2316Pdf(company.company_id, year)
+                .then((success) => {
+                    if (success) {
+                        addToast("PDF generated successfully and saved to Google Drive!", "success");
+                    } else {
+                        addToast("PDF generation failed", "error");
+                    }
+                })
+                .catch((err) => {
+                    console.error("PDF Generation Error:", err);
+                    addToast(err?.response?.data?.error || err?.message || "Failed to generate PDF", "error");
+                });
         } catch (err) {
-            console.error("PDF Generation Error:", err);
-            addToast(err?.response?.data?.error || err?.message || "Failed to generate PDF", "error");
+            console.error("Save Error:", err);
+            addToast(err?.response?.data?.error || err?.message || "Failed to save data", "error");
+            // Navigate back even if save fails
+            navigate(getHistoryPath("2316"), { replace: true });
         }
     };
 
@@ -488,6 +542,35 @@ const DataExportAddNewPage = () => {
         }
         
         const row = hook1601c.rows?.[0];
+        if (!row) {
+            addToast("Please generate data first before creating a PDF", "error");
+            return;
+        }
+        
+        // Validate that all columns are filled (excluding locked/computed columns)
+        const columns = hook1601c.columns || [];
+        const lockedKeys = hook1601c.lockedKeys || new Set();
+        const emptyColumns = [];
+        
+        for (const column of columns) {
+            const key = column.key;
+            // Skip locked/computed columns as they are auto-calculated
+            if (lockedKeys.has(key)) {
+                continue;
+            }
+            
+            const value = row[key];
+            // Check if value is empty, null, undefined, or just whitespace
+            if (value === null || value === undefined || value === "" || (typeof value === "string" && value.trim() === "")) {
+                emptyColumns.push(column.label || key);
+            }
+        }
+        
+        if (emptyColumns.length > 0) {
+            addToast(`Please fill up all columns. You cannot generate a PDF if not filling all columns. Missing: ${emptyColumns.slice(0, 3).join(", ")}${emptyColumns.length > 3 ? ` and ${emptyColumns.length - 3} more` : ""}`, "error");
+            return;
+        }
+        
         try {
             // Save to database first
             if (editId) {
@@ -505,20 +588,28 @@ const DataExportAddNewPage = () => {
                 });
             }
             
-            // Then generate PDF via API
-            addToast(`Generating PDF for ${month}/${year}...`, "info");
-            const success = await generate1601cPdf(company.company_id, year, month);
-            
-            if (success) {
-                addToast("PDF generated successfully and saved to Google Drive!", "success");
-            } else {
-                addToast("PDF generation failed", "error");
-            }
-            
+            // Navigate back immediately after saving to database
             navigate(getHistoryPath("1601c"), { replace: true });
+            
+            // Generate PDF in the background (don't await, let it run async)
+            addToast(`Generating PDF for ${month}/${year}...`, "info");
+            generate1601cPdf(company.company_id, year, month)
+                .then((success) => {
+                    if (success) {
+                        addToast("PDF generated successfully and saved to Google Drive!", "success");
+                    } else {
+                        addToast("PDF generation failed", "error");
+                    }
+                })
+                .catch((err) => {
+                    console.error("PDF Generation Error:", err);
+                    addToast(err?.response?.data?.error || err?.message || "Failed to generate PDF", "error");
+                });
         } catch (err) {
-            console.error("PDF Generation Error:", err);
-            addToast(err?.response?.data?.error || err?.message || "Failed to generate PDF", "error");
+            console.error("Save Error:", err);
+            addToast(err?.response?.data?.error || err?.message || "Failed to save data", "error");
+            // Navigate back even if save fails
+            navigate(getHistoryPath("1601c"), { replace: true });
         }
     };
 
