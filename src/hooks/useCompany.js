@@ -7,6 +7,7 @@ import {
     createCompanyRestdayRate,
     createCompanyWorkingDays,
     createUserToManageCompany,
+    deleteUserCompanyAccess,
     fetchCompanyNDRate,
     fetchCompanyPayrollFrequency,
     fetchCompanyRegularOTRate,
@@ -14,6 +15,7 @@ import {
     fetchCompanyWorkingDays,
     getCompaniesService,
     getCompanyFullDetail,
+    getUsersWithCompanyAccess,
     updateCompany,
     updateCompanyInfo,
 } from "../services/company.service";
@@ -67,6 +69,11 @@ const useCompany = () => {
     const [ndRate, setNdRate] = useState();
     const [regularOTRate, setRegularOTRate] = useState();
     const [restdayRate, setRestdayRate] = useState();
+
+    // users to manage payroll
+    const [companyUsers, setCompanyUsers] = useState([]);
+    const [companyUsersLoading, setCompanyUsersLoading] = useState(false);
+    const [deleteCompanyUsersLoading, setDeleteCompanyUsersLoading] = useState(false);
 
     const { addToast } = useToastContext();
     const { token } = useAuthContext();
@@ -126,6 +133,44 @@ const useCompany = () => {
             });
         }
     }, [company]);
+
+
+    const fetchUserHasAccessOnCompany = useCallback(async () => {
+        setCompanyUsersLoading(true);
+        try {
+            const response = await getUsersWithCompanyAccess(company.company_id);
+            const { data: usersOfCompany } = response.data;
+            setCompanyUsers(usersOfCompany);
+        } catch (error) {
+            console.log('response on fetch of company users: ', error);
+            addToast("Failed to fetch users that manage payroll", "error");
+        }
+        finally {
+            setCompanyUsersLoading(false);
+        }
+    }, [company]);
+
+    useEffect(() => {
+        if (!company) return;
+
+        fetchUserHasAccessOnCompany();
+    }, [company, fetchUserHasAccessOnCompany]);
+
+
+    const deleteUserAccessOnCompany = async (user_id, management_id) => {
+        setDeleteCompanyUsersLoading(true);
+        try {
+            await deleteUserCompanyAccess(management_id);
+            setCompanyUsers((prevUsers) => prevUsers.filter((u) => u.user_id !== user_id));
+            addToast("User removed successfully", "success");
+        } catch (error) {
+            console.error(error);
+            addToast(`Failed to delete user ${user_id}`, "error");
+        } finally {
+            setDeleteCompanyUsersLoading(false);
+        }
+    };
+
 
     const handleFetchCompanyPayrunConfigurations = useCallback(async () => {
         //fetch company configurations
@@ -359,6 +404,11 @@ const useCompany = () => {
         ndRate, setNdRate,
         regularOTRate, setRegularOTRate,
         restdayRate, setRestdayRate,
+
+        companyUsers,
+        companyUsersLoading,
+        deleteCompanyUsersLoading,
+        deleteUserAccessOnCompany
     };
 };
 

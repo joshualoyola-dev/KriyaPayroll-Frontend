@@ -2,6 +2,7 @@ import EditCompanyForm from "./EditCompanyForm";
 import EditCompanyInfoForm from "./EditCompanyInfoForm";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { PencilIcon, XCircleIcon } from "@heroicons/react/16/solid";
+import { useUserContext } from "../contexts/UserProvider";
 
 const EditCompanyModal = () => {
     const {
@@ -11,7 +12,13 @@ const EditCompanyModal = () => {
         isEditCompanyInfo,
         company,
         setIsEditCompanyModalOpen,
+        companyUsers,
+        companyUsersLoading,
+        deleteUserAccessOnCompany,
+        deleteCompanyUsersLoading,
     } = useCompanyContext();
+
+    const { mapUserIdToName } = useUserContext();
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800/30 px-4">
@@ -134,6 +141,55 @@ const EditCompanyModal = () => {
                                 <PencilIcon className="w-5 h-5" />
                             </button>
                         )}
+                    </div>
+
+                    <div className="border-t border-gray-200"></div>
+                    <div>
+                        {/* Header */}
+                        <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-sm font-semibold text-gray-800">
+                                Company Users
+                            </h3>
+                            <span className="text-xs text-gray-500">
+                                {companyUsers?.length || 0} {companyUsers?.length === 1 ? 'user' : 'users'}
+                            </span>
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-xs text-gray-500 mb-3">
+                            Users listed below have permission to manage payroll and related records for <span className="font-medium text-gray-700">{company.company_name}</span>.
+                        </p>
+
+                        {/* Users List */}
+                        {companyUsersLoading ? (
+                            <div className="text-sm text-gray-500">Loading users...</div>
+                        ) : companyUsers?.length === 0 ? (
+                            <div className="text-sm text-gray-500 italic">
+                                No users are currently assigned to this company.
+                            </div>
+                        ) : (
+                            <div className="grid gap-2 sm:grid-cols-2">
+                                {companyUsers.map((u) => (
+                                    <div
+                                        key={u.user_id}
+                                        className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm hover:bg-gray-100 transition"
+                                    >
+                                        <span className="text-gray-700 font-medium">
+                                            {mapUserIdToName(u.user_id)}
+                                        </span>
+                                        <button
+                                            onClick={() => deleteUserAccessOnCompany(u.user_id, u.management_id)}
+                                        >
+                                            <XCircleIcon className="w-4 h-4 text-gray-400 hover:text-red-600" />
+                                        </button>
+
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+
+
                     </div>
                 </div>
             </div>
