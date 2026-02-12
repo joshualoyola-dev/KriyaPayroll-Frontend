@@ -21,30 +21,37 @@ const useDataExportHistory = (formTypeId) => {
 
     const companyId = company?.company_id ?? null;
 
-    const loadHistory = useCallback(async () => {
-        if (!formTypeId) return;
-        setLoading(true);
-        try {
-            const res = await fetchDataExportHistory(
-                formTypeId,
-                { dateFrom: filters.dateFrom, dateTo: filters.dateTo, status: filters.status },
-                companyId,
-            );
-            setEntries(res?.data ?? []);
-        } catch {
-            setEntries([]);
-        } finally {
-            setLoading(false);
-        }
-    }, [formTypeId, companyId, filters.dateFrom, filters.dateTo, filters.status]);
+    const loadHistory = useCallback(async (overrideFilters) => {
+    if (!formTypeId || !companyId) return;
+    setLoading(true);
+    try {
+        const res = await fetchDataExportHistory(
+            formTypeId,
+            overrideFilters ?? filters,
+            companyId
+        );
+        setEntries(res?.data ?? []);
+    } catch {
+        setEntries([]);
+    } finally {
+        setLoading(false);
+    }
+}, [formTypeId, companyId]);
 
     const handleSearch = useCallback(() => {
         loadHistory();
     }, [loadHistory]);
 
-    const handleFilterChange = useCallback((key, value) => {
-        setFilters((prev) => ({ ...prev, [key]: value }));
-    }, []);
+    const handleFilterChange = useCallback(
+        (key, value) => {
+            setFilters((prev) => {
+                const newFilters = { ...prev, [key]: value};
+                loadHistory(newFilters);
+                return newFilters;
+            });
+        },
+        [loadHistory]
+    );
 
     /** Soft delete: mark entry as DELETED so it stays on history and shows under Deleted filter */
     const handleDelete = useCallback(async (entryId) => {

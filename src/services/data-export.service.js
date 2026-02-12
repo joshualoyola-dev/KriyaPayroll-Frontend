@@ -103,7 +103,11 @@ export const fetchDataExportHistory = async (formTypeId, params = {}, companyId 
         try {
             const form_type = formTypeToApi(formTypeId);
             const query = new URLSearchParams({ form_type });
-            if (status && String(status).trim()) query.set("status", status);
+
+            if (status && String(status).trim().toUpperCase() !== "ALL") {
+    query.set("status", status.trim().toUpperCase());
+}
+
             const res = await payroll_api.get(
                 `/api/v1/data-exports/company/${companyId}/tax-history?${query.toString()}`,
             );
