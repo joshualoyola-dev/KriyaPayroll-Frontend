@@ -20,6 +20,7 @@ import {
 import { useToastContext } from "../contexts/ToastProvider";
 import { useAuthContext } from "../contexts/AuthProvider";
 import { useLocation } from "react-router-dom";
+import { getCompanyAccessToken } from "../services/user.service";
 
 const initialFormData = {
     company_id: "",
@@ -31,7 +32,7 @@ const initialFormData = {
     company_address: "",
     company_phone: "",
     company_tin: "",
-    business_type: "",
+    business_type: "SOLE_PROPRIETORSHIP",
 
     editors: [],
     approvers: [],
@@ -229,10 +230,20 @@ const useCompany = () => {
                     company_trade_name: companyFormData.company_trade_name,
                     company_email: companyFormData.company_email,
                     company_logo: companyFormData.company_logo,
+
+                    company_address: companyFormData.company_address,
+                    company_phone: companyFormData.company_phone,
+                    company_tin: companyFormData.company_tin,
+                    business_type: companyFormData.business_type,
                 };
+
+                //request a new company token
+                const { data: companyToken } = await getCompanyAccessToken();
+                localStorage.setItem('companyAccessToken', companyToken);
 
                 setCompanies((prev) => [...prev, newCompany]);
                 setCompany(newCompany);
+                localStorage.setItem("selected_company_id", newCompany.company_id);
                 setIsAddCompanyModalOpen(false);
 
                 addToast("New Company Created", "success");
