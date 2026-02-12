@@ -20,6 +20,15 @@ const useUser = () => {
         return map;
     }, [users]);
 
+
+    const mapUserIdToName = useCallback((user_id) => {
+        const user = userIdToName.get(user_id);
+        if (!user) return user_id;
+
+        return user;
+    }, [users]);
+
+
     const fetchUserInfo = useCallback(async () => {
         setLoading(true);
         try {
@@ -37,14 +46,8 @@ const useUser = () => {
         setIsUsersLoading(true);
         try {
             const response = await getPayrollUsers();
-            const parsedUser = response.data.users.map(u => ({
-                user_id: u.user_id,
-                first_name: u.HrisUserInfo.first_name,
-                last_name: u.HrisUserInfo.last_name,
-            }));
-            console.log('parsed', parsedUser);
-
-            setUsers(parsedUser);
+            const { data: payrollUsers } = response.data;
+            setUsers(payrollUsers);
         } catch (error) {
             console.log('error', error);
             setUsers(null);
@@ -54,13 +57,6 @@ const useUser = () => {
         }
     }, []);
 
-
-    const mapUserIdToName = useCallback((user_id) => {
-        const user = userIdToName.get(user_id);
-        if (!user) return user_id;
-
-        return user;
-    }, [users]);
 
     useEffect(() => {
         if (!token) return;
