@@ -19,8 +19,6 @@ const OptionEdit = () => {
         handleAddPayitemToPayslips,
         toggleLogs, handleToggleLogs,
         logs,
-        calculateTaxWithheld,
-        handleToggleCalculateTaxWithhelds,
         employeeForLastPay,
     } = useSharedRunningPayrunOperationContext();
 
@@ -79,34 +77,12 @@ const OptionEdit = () => {
                                     Save
                                 </button>
                             </Tooltip>
-                            <Tooltip text={"Calculate the tax withheld for edited records. Otherwise, save all and calculate tax withheld for all records."}>
-                                <input
-                                    type="checkbox"
-                                    value={calculateTaxWithheld}
-                                    onChange={handleToggleCalculateTaxWithhelds}
-                                    disabled={isForApproval || isApproved}
-                                />
-                            </Tooltip>
                         </div>
                     )}
 
                     {statusLoading ? (
                         <span className="text-sm text-gray-500">Loading...</span>
                     ) : (
-                        // <Tooltip text={(!hasChangedStatusAccess || isApproved) ? "Approved or No Access" : ""}>
-                        //     <select
-                        //         value={payrun.status}
-                        //         onChange={(e) => handleChangeStatus(e.target.value)}
-                        //         disabled={isApproved || !hasChangedStatusAccess}
-                        //         className={`px-3 py-2 text-sm rounded-xl border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 ${isApproved ? "cursor-not-allowed bg-gray-100 text-gray-400" : ""
-                        //             }`}
-                        //     >
-                        //         <option value="DRAFT">Draft</option>
-                        //         <option value="FOR_APPROVAL">For Approval</option>
-                        //         <option value="APPROVED">Approved</option>
-                        //         <option value="REJECTED">Rejected</option>
-                        //     </select>
-                        // </Tooltip>
                         <Tooltip
                             text={
                                 !hasChangedStatusAccess

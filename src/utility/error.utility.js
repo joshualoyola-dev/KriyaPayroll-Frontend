@@ -35,10 +35,25 @@ const getErrorMessage = (error, fallback = "Something went wrong") => {
     }
 }
 
-export const getResponseErrorMessage = (error, falback = "Something went wrong") => {
-    if (!error) return falback;
+export const getResponseErrorMessage = (error, fallback = "Something went wrong") => {
+    if (!error) return fallback;
 
-    return error.response.data.error;
+    // Check if error has response structure
+    if (error.response?.data) {
+        // Check for different error message formats
+        if (error.response.data.error) {
+            return error.response.data.error;
+        }
+        if (error.response.data.message) {
+            return error.response.data.message;
+        }
+        if (typeof error.response.data === "string") {
+            return error.response.data;
+        }
+    }
+
+    // Fallback to getErrorMessage for other error types
+    return getErrorMessage(error, fallback);
 }
 
 

@@ -45,7 +45,7 @@ const useHoliday = () => {
         }
     }, [company, addToast]);
 
-    const handleFetchEmployeesAttendanceOnHoliday = async () => {
+    const handleFetchEmployeesAttendanceOnHoliday = useCallback(async () => {
         setAttendancesLoading(true);
         try {
             const result = await fetchEmployeesAttendanceOnHoliday(company.company_id, selectedHoliday.holiday_date);
@@ -59,19 +59,20 @@ const useHoliday = () => {
         finally {
             setAttendancesLoading(false);
         }
-    };
+    }, [selectedHoliday]);
 
     useEffect(() => {
         if (!selectedHoliday) return;
+        if (!company) return;
 
         handleFetchEmployeesAttendanceOnHoliday();
-    }, [selectedHoliday])
+    }, [handleFetchEmployeesAttendanceOnHoliday])
 
     useEffect(() => {
         if (location.pathname === '/attendance/holiday') {
             handleFetchHolidays();
         }
-    }, [handleFetchHolidays, location.pathname]);
+    }, [company, handleFetchHolidays, location.pathname]);
 
     //populate the update form if there is a selected
     useEffect(() => {

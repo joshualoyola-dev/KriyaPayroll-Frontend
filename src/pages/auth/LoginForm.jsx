@@ -2,6 +2,7 @@ import Input from "../../components/Input.component";
 import { useAuthContext } from "../../contexts/AuthProvider";
 import { Link } from "react-router-dom";
 import DualBallLoading from "../../assets/dual-ball-loading.svg";
+import env from "../../configs/env.config";
 
 const LoginForm = () => {
     const { formData, setFormData, isLoading, handleLogin } = useAuthContext();
@@ -38,7 +39,7 @@ const LoginForm = () => {
             {/* Forgot Password */}
             <div className="flex justify-end">
                 <Link
-                    to="/auth/forgot-password"
+                    to={env.VITE_HRIS_FRONTEND_URL}
                     className="text-sm text-teal-600 hover:underline"
                 >
                     Forgot password?

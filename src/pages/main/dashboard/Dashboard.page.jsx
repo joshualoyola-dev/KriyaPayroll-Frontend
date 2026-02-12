@@ -1,5 +1,4 @@
 import Question from "../../../components/Question";
-import UnderDevelopment from "../../../components/UnderDevelopment";
 import { useCompanyContext } from "../../../contexts/CompanyProvider";
 import { DailyRecordsCounts } from "./daily-records/DailyRecordsCounts";
 import EmployeeWithNoLastPayRecord from "./last-pay/EmployeeWithNoLastPayRecord";

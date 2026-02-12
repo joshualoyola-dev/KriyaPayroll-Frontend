@@ -88,3 +88,21 @@ export const formatDateToWords = (date) => {
 
     return `${month} ${day}, ${year}`;
 };
+
+// Helper function to format date to ISO format (YYYY-MM-DD)
+export const formatToISODate = (dateValue) => {
+    if (!dateValue) return null;
+
+    // If it's already a string in YYYY-MM-DD format, return as-is
+    if (typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+        return dateValue;
+    }
+
+    // If it's a Date object or parseable string, convert to YYYY-MM-DD
+    const date = new Date(dateValue);
+    if (!isNaN(date.getTime())) {
+        return date.toISOString().slice(0, 10);
+    }
+
+    return null;
+};

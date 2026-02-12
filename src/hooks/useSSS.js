@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useToastContext } from "../contexts/ToastProvider";
 import { fetchSSS, updateSSS } from "../services/contribution.service";
 import { useUserContext } from "../contexts/UserProvider";
 import { convertToISO8601 } from "../utility/datetime.utility";
 import { useLocation } from "react-router-dom";
+import { useContributionContext } from "../contexts/ContributionProvider";
 
 const useSSS = () => {
     const [ssss, setSSSS] = useState([]);
@@ -13,7 +14,9 @@ const useSSS = () => {
     const { user } = useUserContext();
     const location = useLocation();
 
-    const handleFetchSss = async () => {
+    const { selectedTab } = useContributionContext();
+
+    const handleFetchSss = useCallback(async () => {
         setSsssLoading(true);
 
         try {
@@ -31,16 +34,18 @@ const useSSS = () => {
         } finally {
             setSsssLoading(false);
         }
-    }
+    }, []);
 
     useEffect(() => {
         if (!user) return;
 
         //fetch if the user is on /configuration/contribution 
-        if (location.pathname === '/configuration/contribution') {
-            handleFetchSss();
-        }
-    }, [user, location.pathname]);
+        if (location.pathname !== '/configuration/contribution') return;
+        if (selectedTab.id != 'sss') return;
+        if (ssss.length > 0) return;
+
+        handleFetchSss();
+    }, [user, location.pathname, handleFetchSss]);
 
     const handleUpdateSss = async (id, updatedData) => {
         try {

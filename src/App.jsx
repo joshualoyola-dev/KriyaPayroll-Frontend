@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom"
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom"
 import LoginPage from "./pages/auth/LoginPage"
 import DashboardPage from "./pages/main/dashboard/Dashboard.page"
 import HomePage from "./pages/home/HomePage"
@@ -41,16 +41,14 @@ import { SssProvider } from "./contexts/SssProvider"
 import { PayrunProvider } from "./contexts/PayrunProvider"
 import SendPayslipPage from "./pages/main/payrun/payrun/SendPayslipPage"
 import { PayslipProvider } from "./contexts/PayslipProvider"
-import DataExportPage from "./pages/main/data-export/DataExportPage"
-import DataExportDraftPage from "./pages/main/data-export/DataExportDraftPage"
 import DataExportHistoryPage from "./pages/main/data-export/DataExportHistoryPage"
+import DataExportAddNewPage from "./pages/main/data-export/DataExportAddNewPage"
 import { ExportProvider } from "./contexts/ExportProvider"
 import { YtdProvider } from "./contexts/YtdProvider"
 import { SharedRunningPayrunOperationProvider } from "./contexts/SharedRunningPayrunOperationProvider"
 import { DailyRecordsAnalyticsProvider } from "./contexts/DailyRecordsAnalyticsProvider"
 import { UploadPayrunProvider } from "./contexts/UploadPayrunProvider"
 import UploadPayrunPage from "./pages/main/payrun/upload/UploadPayrunPage"
-import { CompareNetPayProvider } from "./contexts/CompareNetPayProvider"
 
 function App() {
   return (
@@ -80,49 +78,51 @@ function App() {
                                                   <PayslipProvider >
                                                     <ExportProvider >
                                                       <YtdProvider>
-                                                        <CompareNetPayProvider >
-                                                          <Routes>
-                                                            {/* Public routes */}
-                                                            <Route path="/" element={<HomePage />} />
-                                                            {/* Navitate to Dasboard if there'? token */}
-                                                            <Route element={<PublicRoute />}>
-                                                              <Route path="/auth/login" element={<LoginPage />} />
+                                                        <Routes>
+                                                          {/* Public routes */}
+                                                          <Route path="/" element={<HomePage />} />
+                                                          {/* Navitate to Dasboard if there'? token */}
+                                                          <Route element={<PublicRoute />}>
+                                                            <Route path="/auth/login" element={<LoginPage />} />
+                                                          </Route>
+
+                                                          {/* Protected routes with MainLayout */}
+                                                          <Route element={<MainLayout />}>
+                                                            <Route element={<ProtectedRoute />} >
+                                                              <Route path="/dashboard" element={<DashboardPage />} />
+
+                                                              <Route path="/payrun" element={<PayrunPage />} />
+                                                              <Route path="/payrun/regular" element={< RegularPayrunPage />} />
+                                                              <Route path="/payrun/special" element={<SpecialPayrunPage />} />
+                                                              <Route path="/payrun/last" element={<LastPayrunPage />} />
+                                                              <Route path="/payrun/send-payslips" element={< SendPayslipPage />} />
+                                                              <Route path="/payrun/upload" element={<UploadPayrunPage />} />
+
+                                                              <Route path="/employee" element={<EmployeePage />} />
+
+                                                              <Route path="/attendance" element={<AttendancePage />} />
+                                                              <Route path="/attendance/absence" element={<AbsencePage />} />
+                                                              <Route path="/attendance/leave" element={<LeavePage />} />
+                                                              <Route path="/attendance/overtime" element={<OvertimePage />} />
+                                                              <Route path="/attendance/restday" element={<RestdayPage />} />
+                                                              <Route path="/attendance/holiday" element={<HolidayPage />} />
+
+
+                                                              <Route path="/configuration/payitem" element={<PayitemPage />} />
+                                                              <Route path="/configuration/company-configuration" element={<CompanyConfigsPage />} />
+                                                              <Route path="/configuration/recurring-pay" element={<RecurringPayPage />} />
+                                                              <Route path="/configuration/contribution" element={<ContributionPage />} />
+
+                                                              <Route path="/data-export" element={<Navigate to="/data-export/ytd" replace />} />
+                                                              <Route path="/data-export/ytd" element={<DataExportHistoryPage />} />
+                                                              <Route path="/data-export/2316" element={<DataExportHistoryPage />} />
+                                                              <Route path="/data-export/1601c" element={<DataExportHistoryPage />} />
+                                                              <Route path="/data-export/ytd/new" element={<DataExportAddNewPage />} />
+                                                              <Route path="/data-export/2316/new" element={<DataExportAddNewPage />} />
+                                                              <Route path="/data-export/1601c/new" element={<DataExportAddNewPage />} />
                                                             </Route>
-
-                                                            {/* Protected routes with MainLayout */}
-                                                            <Route element={<MainLayout />}>
-                                                              <Route element={<ProtectedRoute />} >
-                                                                <Route path="/dashboard" element={<DashboardPage />} />
-
-                                                                <Route path="/payrun" element={<PayrunPage />} />
-                                                                <Route path="/payrun/regular" element={< RegularPayrunPage />} />
-                                                                <Route path="/payrun/special" element={<SpecialPayrunPage />} />
-                                                                <Route path="/payrun/last" element={<LastPayrunPage />} />
-                                                                <Route path="/payrun/send-payslips" element={< SendPayslipPage />} />
-                                                                <Route path="/payrun/upload" element={<UploadPayrunPage />} />
-
-                                                                <Route path="/employee" element={<EmployeePage />} />
-
-                                                                <Route path="/attendance" element={<AttendancePage />} />
-                                                                <Route path="/attendance/absence" element={<AbsencePage />} />
-                                                                <Route path="/attendance/leave" element={<LeavePage />} />
-                                                                <Route path="/attendance/overtime" element={<OvertimePage />} />
-                                                                <Route path="/attendance/restday" element={<RestdayPage />} />
-                                                                <Route path="/attendance/holiday" element={<HolidayPage />} />
-
-
-                                                                <Route path="/configuration/payitem" element={<PayitemPage />} />
-                                                                <Route path="/configuration/company-configuration" element={<CompanyConfigsPage />} />
-                                                                <Route path="/configuration/recurring-pay" element={<RecurringPayPage />} />
-                                                                <Route path="/configuration/contribution" element={<ContributionPage />} />
-
-                                                                <Route path="/data-export" element={<DataExportPage />} />
-                                                                <Route path="/data-export/draft" element={<DataExportDraftPage />} />
-                                                                <Route path="/data-export/history" element={<DataExportHistoryPage />} />
-                                                              </Route>
-                                                            </Route>
-                                                          </Routes>
-                                                        </CompareNetPayProvider>
+                                                          </Route>
+                                                        </Routes>
                                                       </YtdProvider>
                                                     </ExportProvider>
                                                   </PayslipProvider>

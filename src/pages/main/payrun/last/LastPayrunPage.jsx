@@ -5,7 +5,7 @@ import OptionGenerate from "../shared-component/OptionGenerate";
 import PayslipTable from "../shared-component/PayslipTable";
 
 const LastPayrunPage = () => {
-    const { payslips, setPayslips, payrun, payslipsLoading, isSaving, statusLoading, isInitializing } = useSharedRunningPayrunOperationContext();
+    const { payslips, setPayslips, payrun, payslipsLoading, isSaving, statusLoading, isInitializing, payslipsTotal } = useSharedRunningPayrunOperationContext();
 
     return (
         <>
@@ -15,7 +15,7 @@ const LastPayrunPage = () => {
             <div className="overflow-x-auto">
                 {payslips.length === 0
                     ? <div></div>
-                    : <PayslipTable data={payslips} setData={setPayslips} />
+                    : <PayslipTable data={payslips} setData={setPayslips} totals={payslipsTotal} />
                 }
             </div>
             {(payslipsLoading || isSaving || statusLoading || isInitializing) && <LoadingBackground />}
