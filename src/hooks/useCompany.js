@@ -74,10 +74,32 @@ const useCompany = () => {
     const [companyUsers, setCompanyUsers] = useState([]);
     const [companyUsersLoading, setCompanyUsersLoading] = useState(false);
     const [deleteCompanyUsersLoading, setDeleteCompanyUsersLoading] = useState(false);
+    const [companyUsersForm, setCompanyUsersForm] = useState([]);
+    const [isAddCompanyUser, setIsAddCompanyUser] = useState(false);
+    const [addCompanyUserLoading, setAdddCompanyUserLoading] = useState(false);
 
     const { addToast } = useToastContext();
     const { token } = useAuthContext();
     const location = useLocation();
+
+    const addCompanyUserToManageCompany = async () => {
+        setAdddCompanyUserLoading(true);
+
+        try {
+            const userIds = companyUsersForm.join(',');
+            await createUserToManageCompany(userIds, company.company_id);
+            await fetchUserHasAccessOnCompany();
+
+            setCompanyUsersForm([]);
+            setIsAddCompanyUser(false);
+        } catch (error) {
+            addToast("Failed to add user to company", "error");
+        }
+        finally {
+            setAdddCompanyUserLoading(false);
+        }
+    };
+
 
     const fetchCompanies = useCallback(async () => {
         setLoading(true);
@@ -408,7 +430,12 @@ const useCompany = () => {
         companyUsers,
         companyUsersLoading,
         deleteCompanyUsersLoading,
-        deleteUserAccessOnCompany
+        deleteUserAccessOnCompany,
+        addCompanyUserToManageCompany,
+
+        companyUsersForm, setCompanyUsersForm,
+        isAddCompanyUser, setIsAddCompanyUser,
+        addCompanyUserLoading
     };
 };
 
