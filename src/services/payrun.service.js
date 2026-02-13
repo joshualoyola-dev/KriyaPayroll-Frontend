@@ -67,3 +67,9 @@ export const getAllLastPayrunSummaries = async (company_id) => {
 export const getEmployeeWithNoLastPay = async (company_id) => {
     return await payroll_api.get(`/api/v1/payruns/${company_id}/last/missing-payruns`);
 }
+
+export const deletePayslipsDraftsAndRelatedRecord = async (company_id, payrun_id, employee_ids) => {
+    const joinedeEmployeeIds = employee_ids.join('&employee_ids=');
+
+    return await payroll_api.delete(`/api/v1/payruns/${company_id}/${payrun_id}/payslips?employee_ids=${joinedeEmployeeIds}`);
+};
