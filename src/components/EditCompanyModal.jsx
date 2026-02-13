@@ -5,6 +5,10 @@ import { PencilIcon, XCircleIcon } from "@heroicons/react/16/solid";
 import { useUserContext } from "../contexts/UserProvider";
 import CompanyUserForm from "./CompanyUserForm";
 import { useToastContext } from "../contexts/ToastProvider";
+import { userHasFeatureAccess } from "../utility/access-controll.utility";
+import env from "../configs/env.config";
+import { PlusIcon } from "@heroicons/react/24/solid";
+import { PlusCircleIcon } from "@heroicons/react/20/solid";
 
 const EditCompanyModal = () => {
     const {
@@ -23,6 +27,9 @@ const EditCompanyModal = () => {
 
     const { mapUserIdToName } = useUserContext();
     const { addToast } = useToastContext();
+
+    const hasCompanyInfoManagementAccess = userHasFeatureAccess(env.VITE_PAYROLL_COMPANY_INFO_MANAGEMENT);
+    const hasUserManagementOnCompanyUserAccess = userHasFeatureAccess(env.VITE_PAYROLL_USER_MANAGEMENT_ON_COMPANY_PAYROLL);
 
 
     const handleDeleteUser = (userId, managementId, userName) => {
@@ -105,10 +112,10 @@ const EditCompanyModal = () => {
                             <EditCompanyForm />
                         )}
 
-                        {!isEditCompany && (
+                        {(!isEditCompany && hasCompanyInfoManagementAccess) && (
                             <button
                                 onClick={() => setIsEditCompany(true)}
-                                className="absolute top-2 right-2 text-gray-500 hover:text-teal-600 transition"
+                                className="absolute top-2 right-2 text-gray-400 hover:text-teal-600 transition"
                             >
                                 <PencilIcon className="w-5 h-5" />
                             </button>
@@ -155,10 +162,10 @@ const EditCompanyModal = () => {
                             <EditCompanyInfoForm />
                         )}
 
-                        {!isEditCompanyInfo && (
+                        {(!isEditCompanyInfo && hasCompanyInfoManagementAccess) && (
                             <button
                                 onClick={() => setIsEditCompanyInfo(true)}
-                                className="absolute top-2 right-2 text-gray-500 hover:text-teal-600 transition"
+                                className="absolute top-2 right-2 text-gray-400 hover:text-teal-600 transition"
                             >
                                 <PencilIcon className="w-5 h-5" />
                             </button>
@@ -203,18 +210,18 @@ const EditCompanyModal = () => {
                                                     <span className="text-gray-700 font-medium">
                                                         {mapUserIdToName(u.user_id)}
                                                     </span>
-                                                    <button
-                                                        deleteCompanyUsersLoading disabled={deleteCompanyUsersLoading}
-                                                        onClick={() =>
-                                                            handleDeleteUser(
-                                                                u.user_id,
-                                                                u.management_id,
-                                                                mapUserIdToName(u.user_id)
-                                                            )
-                                                        }                                                >
-                                                        <XCircleIcon className="w-4 h-4 text-gray-400 hover:text-red-600" />
-                                                    </button>
-
+                                                    {hasUserManagementOnCompanyUserAccess &&
+                                                        <button
+                                                            deleteCompanyUsersLoading disabled={deleteCompanyUsersLoading}
+                                                            onClick={() =>
+                                                                handleDeleteUser(
+                                                                    u.user_id,
+                                                                    u.management_id,
+                                                                    mapUserIdToName(u.user_id)
+                                                                )
+                                                            }                                                >
+                                                            <XCircleIcon className="w-4 h-4 text-gray-400 hover:text-red-600" />
+                                                        </button>}
                                                 </div>
                                             ))
                                             : (
@@ -229,12 +236,12 @@ const EditCompanyModal = () => {
                             : <CompanyUserForm />
                         }
 
-                        {!isAddCompanyUser && (
+                        {(!isAddCompanyUser && hasUserManagementOnCompanyUserAccess) && (
                             <button
                                 onClick={() => setIsAddCompanyUser(true)}
-                                className="absolute top-2 right-2 text-gray-500 hover:text-teal-600 transition"
+                                className="absolute top-2 right-2 text-gray-400 hover:text-teal-600 transition"
                             >
-                                <PencilIcon className="w-5 h-5" />
+                                <PlusCircleIcon className="w-5 h-5" />
                             </button>
                         )}
                     </div>
