@@ -17,6 +17,14 @@ export const createUserToManageCompany = async (user_ids, company_id) => {
     return await payroll_api.post(`/api/v1/companies/${company_id}/access`, { user_ids });
 }
 
+export const getUsersWithCompanyAccess = async (company_id) => {
+    return await payroll_api.get(`/api/v1/companies/${company_id}/access`);
+}
+
+export const deleteUserCompanyAccess = async (management_id) => {
+    return await payroll_api.delete(`/api/v1/companies/access/${management_id}`);
+}
+
 export const createCompanyPayrollFrequency = async (company_id, frequency) => {
     return await payroll_api.post(`/api/v1/companies/${company_id}/configuration/payroll-frequency`, { frequency })
 };
