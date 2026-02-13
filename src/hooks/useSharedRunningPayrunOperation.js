@@ -3,7 +3,7 @@ import { usePayitemContext } from "../contexts/PayitemProvider";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { convertToISO8601, formatDateToWords } from "../utility/datetime.utility";
-import { generatePayrun, getPayrun, getPayrunPayslipPayables, getPayslipsTotals, saveEdit, savePayrunDraft, updateStatus } from "../services/payrun.service";
+import { deletePayslipsDraftsAndRelatedRecord, generatePayrun, getPayrun, getPayrunPayslipPayables, getPayslipsTotals, saveEdit, savePayrunDraft, updateStatus } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sanitizedPayslips } from "../utility/payrun.utility";
@@ -42,14 +42,15 @@ const useSharedRunningPayrunOperation = () => {
     const [toggleEmployeeSelections, setToggleEmployeeSelections] = useState(false);
     const [employeeForLastPay, setEmployeeForLastPay] = useState();
     const [payitemDropdownOpen, setPayitemDropdownOpen] = useState(false);
+    const [employeeIdsForm, setEmployeeIdsForm] = useState([]);
+    const [isEditEmployeeOnDraft, setIsEditEmployeeOnDraft] = useState(false);
+    const [isEditEmployeesOnDraftLoading, setIsEditEmployeesOnDraftLoading] = useState(false);
 
     const { payitems } = usePayitemContext();
     const { activeEmployees, employees } = useEmployeeContext();
     const { addToast } = useToastContext();
     const { company } = useCompanyContext();
     const { handleFetchPayruns } = usePayrunContext();
-
-
 
 
     const location = useLocation();
@@ -364,6 +365,21 @@ const useSharedRunningPayrunOperation = () => {
         setToggleEmployeeSelections(!toggleEmployeeSelections);
     }
 
+    const deleteSelectedPayslipsFromDraft = async () => {
+        setIsEditEmployeesOnDraftLoading(true);
+
+        try {
+            await deletePayslipsDraftsAndRelatedRecord(company.company_id, payrun.payrun_id, employeeIdsForm);
+            addToast("Successfully deleted payslips and related records", "success");
+            window.location.reload();
+        } catch (error) {
+            addToast("Failed to delete payslips", "error");
+        }
+        finally {
+            setIsEditEmployeesOnDraftLoading(false);
+        }
+    };
+
     return {
         options, setOptions,
         //options controll
@@ -399,7 +415,13 @@ const useSharedRunningPayrunOperation = () => {
 
         payslipsTotal, setPayslipTotal,
         employeeForLastPay, setEmployeeForLastPay,
-        payitemDropdownOpen, setPayitemDropdownOpen
+        payitemDropdownOpen, setPayitemDropdownOpen,
+
+
+        employeeIdsForm, setEmployeeIdsForm,
+        isEditEmployeeOnDraft, setIsEditEmployeeOnDraft,
+        isEditEmployeesOnDraftLoading, setIsEditEmployeesOnDraftLoading,
+        deleteSelectedPayslipsFromDraft
     };
 };
 
