@@ -93,7 +93,7 @@ const Section1601c = () => {
                 addToast("PDF generated successfully and saved to Google Drive!", "success");
             }
         } catch (err) {
-            addToast("Error generating PDF.", "error");
+            addToast(err?.message || "Error generating PDF.", "error");
         }
     }; 
     return (

@@ -438,7 +438,7 @@ const DataExportAddNewPage = () => {
         }
         
         try {
-            // Save to database first
+            // 1. Update draft / create entry first (so backend can fetch from DB)
             if (editId) {
                 await updateTaxExportHistory(editId, {
                     status: "PDF",
@@ -454,27 +454,21 @@ const DataExportAddNewPage = () => {
                 });
             }
             
-            // Navigate back immediately after saving to database
-            navigate(getHistoryPath("2316"), { replace: true });
-            
-            // Generate PDF in the background (don't await, let it run async)
+            // 2. Generate PDF (await so it runs for both new and edit)
             addToast(`Generating PDF for year ${year}...`, "info");
-            generate2316Pdf(company.company_id, year)
-                .then((success) => {
-                    if (success) {
-                        addToast("PDF generated successfully and saved to Google Drive!", "success");
-                    } else {
-                        addToast("PDF generation failed", "error");
-                    }
-                })
-                .catch((err) => {
-                    console.error("PDF Generation Error:", err);
-                    addToast(err?.response?.data?.error || err?.message || "Failed to generate PDF", "error");
-                });
+            const success = await generate2316Pdf(company.company_id, year);
+            
+            if (success) {
+                addToast("PDF generated successfully and saved to Google Drive!", "success");
+            } else {
+                addToast("PDF generation failed", "error");
+            }
+            
+            // 3. Navigate back after PDF generation
+            navigate(getHistoryPath("2316"), { replace: true });
         } catch (err) {
-            console.error("Save Error:", err);
-            addToast(err?.response?.data?.error || err?.message || "Failed to save data", "error");
-            // Navigate back even if save fails
+            console.error("Save or PDF Error:", err);
+            addToast(err?.response?.data?.error || err?.message || "Failed to save or generate PDF", "error");
             navigate(getHistoryPath("2316"), { replace: true });
         }
     };
@@ -572,7 +566,7 @@ const DataExportAddNewPage = () => {
         }
         
         try {
-            // Save to database first
+            // 1. Update draft / create entry first (so backend can fetch from DB)
             if (editId) {
                 await updateTaxExportHistory(editId, {
                     status: "PDF",
@@ -588,27 +582,22 @@ const DataExportAddNewPage = () => {
                 });
             }
             
-            // Navigate back immediately after saving to database
-            navigate(getHistoryPath("1601c"), { replace: true });
-            
-            // Generate PDF in the background (don't await, let it run async)
+            // 2. Generate PDF (await so it runs for both new and edit)
             addToast(`Generating PDF for ${month}/${year}...`, "info");
-            generate1601cPdf(company.company_id, year, month)
-                .then((success) => {
-                    if (success) {
-                        addToast("PDF generated successfully and saved to Google Drive!", "success");
-                    } else {
-                        addToast("PDF generation failed", "error");
-                    }
-                })
-                .catch((err) => {
-                    console.error("PDF Generation Error:", err);
-                    addToast(err?.response?.data?.error || err?.message || "Failed to generate PDF", "error");
-                });
+            const success = await generate1601cPdf(company.company_id, year, month);
+            
+            if (success) {
+                addToast("PDF generated successfully and saved to Google Drive!", "success");
+            } else {
+                addToast("PDF generation failed", "error");
+            }
+            
+            // 3. Navigate back after PDF generation
+            navigate(getHistoryPath("1601c"), { replace: true });
         } catch (err) {
-            console.error("Save Error:", err);
-            addToast(err?.response?.data?.error || err?.message || "Failed to save data", "error");
-            // Navigate back even if save fails
+            console.error("Save or PDF Error:", err);
+            const msg = err?.response?.data?.message || err?.response?.data?.detail || err?.response?.data?.error || err?.message || "Failed to save or generate PDF";
+            addToast(msg, "error");
             navigate(getHistoryPath("1601c"), { replace: true });
         }
     };

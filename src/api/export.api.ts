@@ -58,22 +58,6 @@ export const generate2316Pdf = async (
     return true;
   } catch (error: any) {
     console.error("[Frontend] ❌ 2316 PDF Generation Failed:", error);
-    
-    // Provide more specific error messages
-    let errorMessage = "Failed to generate 2316 PDF.";
-    if (error.response?.status === 404) {
-      errorMessage = "No data found for the selected year.";
-    } else if (error.response?.status === 400) {
-      errorMessage = error.response.data?.message || "Invalid request parameters.";
-    } else if (error.response?.status === 500) {
-      errorMessage = error.response.data?.error || "Server error occurred while generating PDF.";
-    } else if (error.code === 'ECONNABORTED') {
-      errorMessage = "Request timed out. The PDF generation is taking too long.";
-    } else if (error.message) {
-      errorMessage = error.message;
-    }
-    
-    alert(errorMessage);
     return false;
   }
 };
@@ -117,22 +101,12 @@ export const generate1601cPdf = async (
     return true;
   } catch (error: any) {
     console.error("[Frontend] ❌ 1601C PDF Generation Failed:", error);
-    
-    // Provide more specific error messages
-    let errorMessage = "Failed to generate 1601C PDF.";
-    if (error.response?.status === 404) {
-      errorMessage = "No data found for the selected period.";
-    } else if (error.response?.status === 400) {
-      errorMessage = error.response.data?.message || "Invalid request parameters.";
-    } else if (error.response?.status === 500) {
-      errorMessage = error.response.data?.error || "Server error occurred while generating PDF.";
-    } else if (error.code === 'ECONNABORTED') {
-      errorMessage = "Request timed out. The PDF generation is taking too long.";
-    } else if (error.message) {
-      errorMessage = error.message;
-    }
-    
-    alert(errorMessage);
-    return false;
+    const msg =
+      error?.response?.data?.message ||
+      error?.response?.data?.detail ||
+      error?.response?.data?.error ||
+      error?.message ||
+      "PDF generation failed";
+    throw new Error(msg);
   }
 };
