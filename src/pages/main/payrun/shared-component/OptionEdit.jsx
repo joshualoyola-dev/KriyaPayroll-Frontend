@@ -1,4 +1,4 @@
-import { ChevronDownIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
+import { ChevronDownIcon, InformationCircleIcon, UserMinusIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { convertToISO8601, formatDateToWords } from "../../../../utility/datetime.utility";
 import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
@@ -6,6 +6,7 @@ import env from "../../../../configs/env.config";
 import Tooltip from "../../../../components/Tooltip";
 import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
 import PayrunLogs from "./PayrunLogs";
+import DeleteEmployeesOnPayrunDraft from "./DeleteEmployeesOnPayrunDraft";
 
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();
@@ -20,6 +21,7 @@ const OptionEdit = () => {
         toggleLogs, handleToggleLogs,
         logs,
         employeeForLastPay,
+        isEditEmployeeOnDraft, setIsEditEmployeeOnDraft
     } = useSharedRunningPayrunOperationContext();
 
     const isForApproval = payrun.status === "FOR_APPROVAL";
@@ -158,8 +160,20 @@ const OptionEdit = () => {
                 </div>
             )}
 
-            {/* Add Payitem control - at the bottom with proper spacing */}
-            <div className="flex items-center justify-end pt-4 border-t mt-4 border-gray-200">
+            {/* Editing Controls- at the bottom with proper spacing */}
+            <div className="flex items-center justify-end pt-4 border-t mt-4 border-gray-200 space-x-5">
+                {/* Remove employee */}
+                <label className="text-sm font-medium text-gray-700">Remove employee:</label>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setIsEditEmployeeOnDraft(!isEditEmployeeOnDraft)}
+                        className="text-gray-500 hover:cursor-pointer hover:text-teal-600"
+                    >
+                        <UserMinusIcon className="h-5 w-5" />
+                    </button>
+                </div>
+
+                {/* Add payitems */}
                 <div className="flex items-center gap-2">
                     <label className="text-sm font-medium text-gray-700">Add Pay Item:</label>
                     <select
@@ -190,6 +204,9 @@ const OptionEdit = () => {
                     </select>
                 </div>
             </div>
+
+            {isEditEmployeeOnDraft && <DeleteEmployeesOnPayrunDraft />}
+
         </div>
     );
 };
