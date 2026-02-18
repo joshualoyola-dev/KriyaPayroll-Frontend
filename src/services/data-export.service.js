@@ -105,15 +105,23 @@ export const fetchDataExportHistory = async (formTypeId, params = {}, companyId 
             const query = new URLSearchParams({ form_type });
 
             if (status && String(status).trim().toUpperCase() !== "ALL") {
-    query.set("status", status.trim().toUpperCase());
-}
+                query.set("status", status.trim().toUpperCase());
+            }
 
-            const res = await payroll_api.get(
-                `/api/v1/data-exports/company/${companyId}/tax-history?${query.toString()}`,
-            );
+            const url = `/api/v1/data-exports/company/${companyId}/tax-history?${query.toString()}`;
+            console.log(`[fetchDataExportHistory] Calling API: ${url}`);
+            
+            const res = await payroll_api.get(url);
+            console.log(`[fetchDataExportHistory] API response:`, res?.data);
+            
             const list = res?.data?.histories ?? [];
+            console.log(`[fetchDataExportHistory] Found ${list.length} histories, mapping...`);
+            
             return { data: list.map(mapHistoryEntry) };
-        } catch {
+        } catch (error) {
+            console.error('[fetchDataExportHistory] API error:', error);
+            console.error('[fetchDataExportHistory] Error details:', error?.response?.data || error?.message);
+            console.error('[fetchDataExportHistory] Status:', error?.response?.status);
             return { data: [] };
         }
     }

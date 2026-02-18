@@ -9,12 +9,9 @@ import {
     getFormTypeById,
     getAddNewPath,
     DATA_EXPORT_HISTORY_STATUSES,
-    SECTION_2316_COLUMNS,
 } from "../../../configs/data-export.config";
 import useDataExportHistory from "../../../hooks/useDataExportHistory";
 import { formatDateToWords } from "../../../utility/datetime.utility";
-import { getTaxExportDetail, fetch1601cColumns } from "../../../services/data-export.service";
-import FixedHeaderTable from "./FixedHeaderTable";
 
 const STATUS_STYLES = {
     DRAFT: { bg: "bg-orange-100", text: "text-orange-700" },
@@ -47,11 +44,11 @@ const DataExportHistoryPage = () => {
         loadHistory,
         handleDelete,
         statusOptions,
+        company,
     } = useDataExportHistory(formTypeFromPath);
     const statusDropdownRef = useRef(null);
     const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
-    /** 1601c: preview modal — when set, show modal with entry data */
-    const [previewEntryId, setPreviewEntryId] = useState(null);
+    // Preview modal removed - now navigates directly to view page
 
     // Show page when user has feature access, or when permissions not loaded yet (so the History UI is visible like the design)
     let hasAccess = false;
@@ -81,7 +78,12 @@ const DataExportHistoryPage = () => {
             navigate("/data-export/ytd", { replace: true });
             return;
         }
-        loadHistory();
+        // Wait a bit for company context to load, then fetch history
+        const timer = setTimeout(() => {
+            console.log('[DataExportHistoryPage] Calling loadHistory for formType:', formTypeFromPath);
+            loadHistory();
+        }, 100);
+        return () => clearTimeout(timer);
         // Only run when form type changes; Search button triggers loadHistory manually
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [formTypeFromPath]);
@@ -97,6 +99,25 @@ const DataExportHistoryPage = () => {
 
     if (!formTypeConfig) {
         return null;
+    }
+
+    // Debug: Check if company is loaded
+    const hasCompany = company?.company_id;
+    
+    if (!hasCompany) {
+        return (
+            <div className="w-full max-w-full p-8">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                    <h2 className="text-lg font-semibold text-yellow-800 mb-2">⚠️ No Company Selected</h2>
+                    <p className="text-yellow-700">
+                        Please select a company from the company dropdown to view data export history.
+                    </p>
+                    <p className="text-sm text-yellow-600 mt-2">
+                        Current company context: {company ? JSON.stringify(company) : 'null'}
+                    </p>
+                </div>
+            </div>
+        );
     }
 
     const currentStatusLabel = statusOptions.find((s) => s.value === filters.status)?.label ?? (filters.status || "All");
@@ -196,7 +217,7 @@ const DataExportHistoryPage = () => {
                             entry={entry}
                             formTypeLabel={formTypeConfig.label}
                             formTypeFromPath={formTypeFromPath}
-                            onView={() => setPreviewEntryId(entry.id)}
+                            onView={() => navigate(getAddNewPath(formTypeFromPath) + `?view=${entry.id}`)}
                             onEdit={() => navigate(getAddNewPath(formTypeFromPath) + `?edit=${entry.id}`)}
                             onDelete={() => {
                                 if (window.confirm("Delete this entry? This cannot be undone.")) {
@@ -207,17 +228,7 @@ const DataExportHistoryPage = () => {
                     ))}
                 </div>
             </div>
-            {(formTypeFromPath === "1601c" || formTypeFromPath === "2316") && previewEntryId && (
-                <PreviewModal
-                    formTypeFromPath={formTypeFromPath}
-                    entryId={previewEntryId}
-                    onClose={() => setPreviewEntryId(null)}
-                    onOpenFull={(id) => {
-                        setPreviewEntryId(null);
-                        navigate(getAddNewPath(formTypeFromPath) + `?edit=${id}`);
-                    }}
-                />
-            )}
+            {/* Preview modal removed - now navigates directly to view page */}
             {loading && <LoadingBackground />}
         </>
     );
@@ -298,135 +309,6 @@ function HistoryEntryCard({ entry, formTypeLabel, formTypeFromPath, onView, onEd
     );
 }
 
-/** Modal that fetches and shows 1601c or 2316 entry data as read-only preview */
-function PreviewModal({ formTypeFromPath, entryId, onClose, onOpenFull }) {
-    const [detail, setDetail] = useState(null);
-    const [columns, setColumns] = useState([]);
-    const [lockedKeys, setLockedKeys] = useState(new Set());
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    const is2316 = formTypeFromPath === "2316";
-
-    useEffect(() => {
-        if (!entryId) return;
-        let cancelled = false;
-        setLoading(true);
-        setError(null);
-        (async () => {
-            try {
-                if (is2316) {
-                    const detailRes = await getTaxExportDetail(entryId);
-                    if (cancelled) return;
-                    if (!detailRes) {
-                        setError("Entry not found");
-                        return;
-                    }
-                    setDetail(detailRes);
-                    setColumns(SECTION_2316_COLUMNS);
-                    setLockedKeys(new Set(SECTION_2316_COLUMNS.map((c) => c.key)));
-                } else {
-                    const [detailRes, columnsRes] = await Promise.all([
-                        getTaxExportDetail(entryId),
-                        fetch1601cColumns(),
-                    ]);
-                    if (cancelled) return;
-                    if (!detailRes) {
-                        setError("Entry not found");
-                        return;
-                    }
-                    setDetail(detailRes);
-                    const colList = columnsRes?.data?.columns ?? [];
-                    setColumns(colList);
-                    setLockedKeys(new Set(colList.map((c) => c.key)));
-                }
-            } catch (err) {
-                if (!cancelled) setError(err?.message ?? "Failed to load preview");
-            } finally {
-                if (!cancelled) setLoading(false);
-            }
-        })();
-        return () => { cancelled = true; };
-    }, [entryId, is2316]);
-
-    const snapshot = detail?.form_data_snapshot ?? {};
-    let rows = [];
-    if (is2316) {
-        if (Array.isArray(snapshot.rows) && snapshot.rows.length > 0) {
-            rows = SECTION_2316_COLUMNS.length
-                ? snapshot.rows.map((rowRaw) =>
-                    SECTION_2316_COLUMNS.reduce((acc, col) => ({ ...acc, [col.key]: rowRaw[col.key] ?? "" }), {})
-                )
-                : snapshot.rows;
-        } else if (snapshot && typeof snapshot === "object" && !snapshot.template) {
-            const singleRow = SECTION_2316_COLUMNS.length
-                ? SECTION_2316_COLUMNS.reduce((acc, col) => ({ ...acc, [col.key]: snapshot[col.key] ?? "" }), {})
-                : { ...snapshot };
-            rows = [singleRow];
-        }
-    } else {
-        const rowRaw = snapshot.template ?? snapshot;
-        const row = columns.length
-            ? columns.reduce((acc, col) => ({ ...acc, [col.key]: rowRaw[col.key] ?? "" }), {})
-            : { ...rowRaw };
-        rows = [row];
-    }
-
-    const periodFrom = detail?.period_from ? new Date(detail.period_from) : null;
-    const periodTo = detail?.period_to ? new Date(detail.period_to) : null;
-    const periodLabel =
-        periodFrom && periodTo
-            ? `Payroll for ${formatDateToWords(periodFrom.toISOString().slice(0, 10))} to ${formatDateToWords(periodTo.toISOString().slice(0, 10))}`
-            : "Preview";
-
-    const showTable = !loading && !error && columns.length > 0 && rows.length > 0;
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
-            <div
-                className="bg-white rounded-xl shadow-xl max-w-[95vw] max-h-[90vh] flex flex-col"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                    <h2 className="text-lg font-bold text-gray-900">{periodLabel}</h2>
-                    <div className="flex items-center gap-2">
-                       
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
-                            title="Close"
-                        >
-                            <XMarkIcon className="h-5 w-5" />
-                        </button>
-                    </div>
-                </div>
-                <div className="flex-1 overflow-auto p-4">
-                    {loading && (
-                        <div className="flex items-center justify-center py-12 text-gray-500">
-                            Loading preview…
-                        </div>
-                    )}
-                    {error && (
-                        <div className="py-8 text-center text-red-600 text-sm">{error}</div>
-                    )}
-                    {!loading && !error && columns.length > 0 && rows.length === 0 && (
-                        <div className="py-8 text-center text-gray-500 text-sm">No data in this entry.</div>
-                    )}
-                    {showTable && (
-                        <div className="overflow-x-auto max-h-[70vh]">
-                            <FixedHeaderTable
-                                columns={columns}
-                                rows={rows}
-                                onChangeCell={() => {}}
-                                lockedKeys={lockedKeys}
-                            />
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
+// PreviewModal removed - now navigates directly to view page
 
 export default DataExportHistoryPage;

@@ -20,9 +20,28 @@ const useDataExportHistory = (formTypeId) => {
     const [filters, setFilters] = useState(defaultFilters);
 
     const companyId = company?.company_id ?? null;
+    
+    // Debug: log company state
+    console.log('[useDataExportHistory] Company context:', { 
+        company, 
+        companyId, 
+        hasCompany: !!company,
+        formTypeId 
+    });
 
     const loadHistory = useCallback(async (overrideFilters) => {
-    if (!formTypeId || !companyId) return;
+    if (!formTypeId) {
+        console.warn('[useDataExportHistory] Missing formTypeId:', formTypeId);
+        return;
+    }
+    if (!companyId) {
+        console.warn('[useDataExportHistory] Missing companyId. Company context:', company);
+        console.warn('[useDataExportHistory] Cannot fetch history without a selected company.');
+        setEntries([]);
+        return;
+    }
+    
+    console.log(`[useDataExportHistory] Loading history for formType=${formTypeId}, companyId=${companyId}`);
     setLoading(true);
     try {
         const res = await fetchDataExportHistory(
@@ -30,16 +49,19 @@ const useDataExportHistory = (formTypeId) => {
             overrideFilters ?? filters,
             companyId
         );
+        console.log(`[useDataExportHistory] API response:`, res?.data?.length || 0, 'entries');
         // Filter out entries with "GENERATED" status to avoid duplicates of "PDF" entries
         const allEntries = res?.data ?? [];
         const filteredEntries = allEntries.filter((entry) => entry.status !== "GENERATED");
+        console.log(`[useDataExportHistory] After filtering GENERATED:`, filteredEntries.length, 'entries');
         setEntries(filteredEntries);
-    } catch {
+    } catch (error) {
+        console.error('[useDataExportHistory] Error fetching history:', error);
         setEntries([]);
     } finally {
         setLoading(false);
     }
-}, [formTypeId, companyId]);
+}, [formTypeId, companyId, filters]);
 
     const handleSearch = useCallback(() => {
         loadHistory();
@@ -88,7 +110,7 @@ const useDataExportHistory = (formTypeId) => {
         handleDelete,
         handleEdit,
         statusOptions: DATA_EXPORT_HISTORY_STATUSES,
-        company,
+        company, // Export company so page can check if it's loaded
     };
 };
 

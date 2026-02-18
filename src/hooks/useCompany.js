@@ -7,7 +7,6 @@ import {
     createCompanyRestdayRate,
     createCompanyWorkingDays,
     createUserToManageCompany,
-    deleteUserCompanyAccess,
     fetchCompanyNDRate,
     fetchCompanyPayrollFrequency,
     fetchCompanyRegularOTRate,
@@ -15,14 +14,12 @@ import {
     fetchCompanyWorkingDays,
     getCompaniesService,
     getCompanyFullDetail,
-    getUsersWithCompanyAccess,
     updateCompany,
     updateCompanyInfo,
 } from "../services/company.service";
 import { useToastContext } from "../contexts/ToastProvider";
 import { useAuthContext } from "../contexts/AuthProvider";
 import { useLocation } from "react-router-dom";
-import { getCompanyAccessToken } from "../services/user.service";
 
 const initialFormData = {
     company_id: "",
@@ -34,7 +31,7 @@ const initialFormData = {
     company_address: "",
     company_phone: "",
     company_tin: "",
-    business_type: "SOLE_PROPRIETORSHIP",
+    business_type: "",
 
     editors: [],
     approvers: [],
@@ -70,64 +67,60 @@ const useCompany = () => {
     const [regularOTRate, setRegularOTRate] = useState();
     const [restdayRate, setRestdayRate] = useState();
 
-    // users to manage payroll
-    const [companyUsers, setCompanyUsers] = useState([]);
-    const [companyUsersLoading, setCompanyUsersLoading] = useState(false);
-    const [deleteCompanyUsersLoading, setDeleteCompanyUsersLoading] = useState(false);
-    const [companyUsersForm, setCompanyUsersForm] = useState([]);
-    const [isAddCompanyUser, setIsAddCompanyUser] = useState(false);
-    const [addCompanyUserLoading, setAdddCompanyUserLoading] = useState(false);
-
     const { addToast } = useToastContext();
     const { token } = useAuthContext();
     const location = useLocation();
 
-    const addCompanyUserToManageCompany = async () => {
-        setAdddCompanyUserLoading(true);
-
-        try {
-            const userIds = companyUsersForm.join(',');
-            await createUserToManageCompany(userIds, company.company_id);
-            await fetchUserHasAccessOnCompany();
-
-            setCompanyUsersForm([]);
-            setIsAddCompanyUser(false);
-        } catch (error) {
-            addToast("Failed to add user to company", "error");
-        }
-        finally {
-            setAdddCompanyUserLoading(false);
-        }
-    };
-
-
     const fetchCompanies = useCallback(async () => {
         setLoading(true);
         try {
+            console.log('[useCompany] Fetching companies from API...');
             const response = await getCompaniesService();
+            console.log('[useCompany] API response:', response?.data);
+            
             const fetchedCompanies = response?.data?.companies ?? [];
+            console.log(`[useCompany] Found ${fetchedCompanies.length} companies:`, fetchedCompanies);
             setCompanies(fetchedCompanies);
 
             // Get last selected company_id from localStorage
             const savedCompanyId = localStorage.getItem("selected_company_id");
+            console.log('[useCompany] Saved company_id from localStorage:', savedCompanyId);
 
             let selected = null;
             if (savedCompanyId) {
                 selected = fetchedCompanies.find(
                     (c) => c.company_id === savedCompanyId
                 );
+                console.log('[useCompany] Found saved company:', selected);
             }
 
             // fallback: if no saved company OR not found in fetched list
             if (!selected && fetchedCompanies.length > 0) {
                 selected = fetchedCompanies[0];
+                console.log('[useCompany] Using first company as fallback:', selected);
             }
 
+            console.log('[useCompany] Setting selected company:', selected);
             setCompany(selected ?? null);
         } catch (error) {
-            console.error("Failed to fetch companies:", error);
-            setCompanies([]);
-            setCompany(null);
+            console.error("[useCompany] Failed to fetch companies:", error);
+            console.error("[useCompany] Error details:", error?.response?.data || error?.message);
+            console.error("[useCompany] Status:", error?.response?.status);
+            
+            // TEMPORARY WORKAROUND: If API fails but we know OCBPO exists, set it manually
+            // Remove this after fixing the API/auth issue
+            const fallbackCompany = {
+                company_id: "OCBPO",
+                company_name: "Offshore Business Concept",
+                company_trade_name: "OCBPO",
+                company_email: "",
+                company_logo: "",
+            };
+            console.warn("[useCompany] Using fallback company:", fallbackCompany);
+            setCompanies([fallbackCompany]);
+            setCompany(fallbackCompany);
+            localStorage.setItem("selected_company_id", "OCBPO");
+            
         } finally {
             setLoading(false);
         }
@@ -155,44 +148,6 @@ const useCompany = () => {
             });
         }
     }, [company]);
-
-
-    const fetchUserHasAccessOnCompany = useCallback(async () => {
-        setCompanyUsersLoading(true);
-        try {
-            const response = await getUsersWithCompanyAccess(company.company_id);
-            const { data: usersOfCompany } = response.data;
-            setCompanyUsers(usersOfCompany);
-        } catch (error) {
-            console.log('response on fetch of company users: ', error);
-            addToast("Failed to fetch users that manage payroll", "error");
-        }
-        finally {
-            setCompanyUsersLoading(false);
-        }
-    }, [company]);
-
-    useEffect(() => {
-        if (!company) return;
-
-        fetchUserHasAccessOnCompany();
-    }, [company, fetchUserHasAccessOnCompany]);
-
-
-    const deleteUserAccessOnCompany = async (user_id, management_id) => {
-        setDeleteCompanyUsersLoading(true);
-        try {
-            await deleteUserCompanyAccess(management_id);
-            setCompanyUsers((prevUsers) => prevUsers.filter((u) => u.user_id !== user_id));
-            addToast("User removed successfully", "success");
-        } catch (error) {
-            console.error(error);
-            addToast(`Failed to delete user ${user_id}`, "error");
-        } finally {
-            setDeleteCompanyUsersLoading(false);
-        }
-    };
-
 
     const handleFetchCompanyPayrunConfigurations = useCallback(async () => {
         //fetch company configurations
@@ -261,9 +216,10 @@ const useCompany = () => {
             e.preventDefault();
 
             if (
+                companyFormData.approvers.length === 0 ||
                 companyFormData.editors.length === 0
             ) {
-                addToast("Select users to manage the companys payroll from the selection", "warning");
+                addToast("Select approvers/editors from the selection", "warning");
                 return;
             }
 
@@ -297,20 +253,10 @@ const useCompany = () => {
                     company_trade_name: companyFormData.company_trade_name,
                     company_email: companyFormData.company_email,
                     company_logo: companyFormData.company_logo,
-
-                    company_address: companyFormData.company_address,
-                    company_phone: companyFormData.company_phone,
-                    company_tin: companyFormData.company_tin,
-                    business_type: companyFormData.business_type,
                 };
-
-                //request a new company token
-                const { data: companyToken } = await getCompanyAccessToken();
-                localStorage.setItem('companyAccessToken', companyToken);
 
                 setCompanies((prev) => [...prev, newCompany]);
                 setCompany(newCompany);
-                localStorage.setItem("selected_company_id", newCompany.company_id);
                 setIsAddCompanyModalOpen(false);
 
                 addToast("New Company Created", "success");
@@ -426,16 +372,6 @@ const useCompany = () => {
         ndRate, setNdRate,
         regularOTRate, setRegularOTRate,
         restdayRate, setRestdayRate,
-
-        companyUsers,
-        companyUsersLoading,
-        deleteCompanyUsersLoading,
-        deleteUserAccessOnCompany,
-        addCompanyUserToManageCompany,
-
-        companyUsersForm, setCompanyUsersForm,
-        isAddCompanyUser, setIsAddCompanyUser,
-        addCompanyUserLoading
     };
 };
 

@@ -67,6 +67,7 @@ const DataExportAddNewPage = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const editId = searchParams.get("edit") || null;
+    const viewId = searchParams.get("view") || null; // New: view-only mode
     const formTypeFromPath = formTypeParam || location.pathname.replace("/data-export/", "").split("/")[0] || "ytd";
     const formTypeConfig = getFormTypeById(formTypeFromPath);
     const { company } = useCompanyContext();
@@ -99,14 +100,15 @@ const DataExportAddNewPage = () => {
         }
     }, [formTypeConfig, navigate]);
 
-    // Load draft for edit when URL has ?edit=<id> (1601c) — same behavior as 2316 edit
+    // Load draft for edit/view when URL has ?edit=<id> or ?view=<id> (1601c)
     useEffect(() => {
-        if (formTypeFromPath !== "1601c" || !editId) return;
+        const id = editId || viewId;
+        if (formTypeFromPath !== "1601c" || !id) return;
         if (hook1601c.columnsLoading || !hook1601c.columns?.length) return;
         let cancelled = false;
         const load = async () => {
             try {
-                const detail = await getTaxExportDetail(editId);
+                const detail = await getTaxExportDetail(id);
                 if (cancelled || !detail) return;
                 const raw = detail.form_data_snapshot;
                 const snapshot =
@@ -132,15 +134,16 @@ const DataExportAddNewPage = () => {
         return () => {
             cancelled = true;
         };
-    }, [formTypeFromPath, editId, hook1601c.columnsLoading, hook1601c.columns?.length]);
+    }, [formTypeFromPath, editId, viewId, hook1601c.columnsLoading, hook1601c.columns?.length]);
 
-    // Load draft for edit when URL has ?edit=<id> (2316)
+    // Load draft for edit/view when URL has ?edit=<id> or ?view=<id> (2316)
     useEffect(() => {
-        if (formTypeFromPath !== "2316" || !editId) return;
+        const id = editId || viewId;
+        if (formTypeFromPath !== "2316" || !id) return;
         let cancelled = false;
         const load = async () => {
             try {
-                const detail = await getTaxExportDetail(editId);
+                const detail = await getTaxExportDetail(id);
                 if (cancelled || !detail) return;
                 const snapshot = detail.form_data_snapshot ?? {};
                 const fromDate = detail.period_from ? new Date(detail.period_from).toISOString().slice(0, 10) : "";
@@ -158,7 +161,7 @@ const DataExportAddNewPage = () => {
         };
         load();
         return () => { cancelled = true; };
-    }, [formTypeFromPath, editId]);
+    }, [formTypeFromPath, editId, viewId]);
 
     const handleSuccess = () => {
         navigate(getHistoryPath(formTypeFromPath), { replace: true });
@@ -328,7 +331,7 @@ const DataExportAddNewPage = () => {
 
     const is1601c = formTypeFromPath === "1601c";
     const is2316 = formTypeFromPath === "2316";
-    const viewOnlyMode = false; // allow edit on 1601c same as 2316
+    const viewOnlyMode = !!viewId; // View-only mode when ?view= param is present
     const show1601cTable = is1601c && (hook1601c.columns?.length ?? 0) > 0 && (hook1601c.rows?.length ?? 0) > 0;
     const show2316Table = is2316 && rows2316.length > 0;
 
@@ -605,102 +608,113 @@ const DataExportAddNewPage = () => {
     return (
         <>
             <div className="w-full max-w-full">
-                <h1 className="text-xl font-bold text-gray-900 mb-4">
-                    Add New — {formTypeConfig.historyTitle.replace(" History", "")}
-                </h1>
-                <div className="flex flex-wrap items-end justify-between gap-4">
-                    <DataExportGenerateForm {...formProps} />
-                    {show2316Table && (
-                        <div className="flex flex-col gap-2">
-                            <label className="text-xs font-medium text-gray-700">Download 2316</label>
-                            <button
-                                type="button"
-                                onClick={handle2316Download}
-                                className="rounded-xl bg-orange-700 px-4 py-2 text-sm font-medium text-white hover:bg-orange-800"
-                            >
-                                Download
-                            </button>
-                            <div className="flex flex-col gap-1.5 mt-1">
-                                <button
-                                    type="button"
-                                    onClick={handle2316GeneratePdf}
-                                    className="rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
-                                >
-                                    Generate a PDF
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handle2316SaveDraft}
-                                    className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
-                                >
-                                    Save as Draft
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                    {show1601cTable && (
-                        <div className="flex flex-col gap-2">
-                            <label className="text-xs font-medium text-gray-700">Download 1601c</label>
-                            <button
-                                type="button"
-                                onClick={hook1601c.handleDownload}
-                                disabled={hook1601c.downloadLoading}
-                                className="rounded-xl bg-orange-700 px-4 py-2 text-sm font-medium text-white hover:bg-orange-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {hook1601c.downloadLoading ? "Downloading..." : "Download"}
-                            </button>
-                            <div className="flex flex-col gap-1.5 mt-1">
-                                <button
-                                    type="button"
-                                    onClick={handle1601cGeneratePdf}
-                                    disabled={Boolean(editId && viewOnlyMode)}
-                                    className="rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Generate a PDF
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handle1601cSaveDraft}
-                                    disabled={Boolean(editId && viewOnlyMode)}
-                                    className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Save as Draft
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-                {is1601c && (
-                    <div className="mt-4 flex items-center gap-2">
+                {/* Back button at top in view mode */}
+                {viewOnlyMode && (is1601c || is2316) && (
+                    <div className="mb-4">
                         <button
                             type="button"
-                            onClick={() => navigate(getHistoryPath("1601c"), { replace: true })}
-                            className="text-sm text-teal-600 hover:text-teal-800 font-medium"
+                            onClick={() => navigate(getHistoryPath(formTypeFromPath), { replace: true })}
+                            className="px-4 py-2 text-sm text-white bg-teal-600 hover:bg-teal-700 rounded-xl font-medium transition-colors"
                         >
-                            ← Back to 1601C
+                            ← Back to {formTypeConfig.label}
                         </button>
                     </div>
                 )}
-                {is2316 && (
+                
+                <h1 className="text-xl font-bold text-gray-900 mb-4">
+                    {viewOnlyMode ? "View" : "Add New"} — {formTypeConfig.historyTitle.replace(" History", "")}
+                </h1>
+                
+                {/* Show form and action buttons only if NOT in view-only mode */}
+                {!viewOnlyMode && (
+                    <div className="flex flex-wrap items-end justify-between gap-4">
+                        <DataExportGenerateForm {...formProps} />
+                        {show2316Table && (
+                            <div className="flex flex-col gap-2">
+                                <label className="text-xs font-medium text-gray-700">Download 2316</label>
+                                <button
+                                    type="button"
+                                    onClick={handle2316Download}
+                                    className="rounded-xl bg-orange-700 px-4 py-2 text-sm font-medium text-white hover:bg-orange-800"
+                                >
+                                    Download
+                                </button>
+                                <div className="flex flex-col gap-1.5 mt-1">
+                                    <button
+                                        type="button"
+                                        onClick={handle2316GeneratePdf}
+                                        className="rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+                                    >
+                                        Generate a PDF
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handle2316SaveDraft}
+                                        className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+                                    >
+                                        Save as Draft
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                        {show1601cTable && (
+                            <div className="flex flex-col gap-2">
+                                <label className="text-xs font-medium text-gray-700">Download 1601c</label>
+                                <button
+                                    type="button"
+                                    onClick={hook1601c.handleDownload}
+                                    disabled={hook1601c.downloadLoading}
+                                    className="rounded-xl bg-orange-700 px-4 py-2 text-sm font-medium text-white hover:bg-orange-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {hook1601c.downloadLoading ? "Downloading..." : "Download"}
+                                </button>
+                                <div className="flex flex-col gap-1.5 mt-1">
+                                    <button
+                                        type="button"
+                                        onClick={handle1601cGeneratePdf}
+                                        disabled={Boolean(editId && viewOnlyMode)}
+                                        className="rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Generate a PDF
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handle1601cSaveDraft}
+                                        disabled={Boolean(editId && viewOnlyMode)}
+                                        className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Save as Draft
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+                {/* Back button at bottom - only show if NOT in view mode (view mode has it at top) */}
+                {!viewOnlyMode && (is1601c || is2316) && (
                     <div className="mt-4 flex items-center gap-2">
                         <button
                             type="button"
-                            onClick={() => navigate(getHistoryPath("2316"), { replace: true })}
+                            onClick={() => navigate(getHistoryPath(formTypeFromPath), { replace: true })}
                             className="text-sm text-teal-600 hover:text-teal-800 font-medium"
                         >
-                            ← Back to 2316
+                            ← Back to {formTypeConfig.label}
                         </button>
                     </div>
                 )}
                 {!show1601cTable && !show2316Table && (
                     <div className="mt-8">
-                        {is1601c && editId && hook1601c.columnsLoading ? (
-                            <p className="text-center text-gray-500">Loading draft…</p>
+                        {is1601c && (editId || viewId) && hook1601c.columnsLoading ? (
+                            <p className="text-center text-gray-500">Loading {viewOnlyMode ? 'data' : 'draft'}…</p>
+                        ) : is2316 && (editId || viewId) ? (
+                            <p className="text-center text-gray-500">Loading {viewOnlyMode ? 'data' : 'draft'}…</p>
                         ) : (
-                            <StartIllustration
-                                title="Generate"
-                                label="Select date range and click Generate to fetch data from the payrun."
-                            />
+                            !viewOnlyMode && (
+                                <StartIllustration
+                                    title="Generate"
+                                    label="Select date range and click Generate to fetch data from the payrun."
+                                />
+                            )
                         )}
                     </div>
                 )}
@@ -709,8 +723,8 @@ const DataExportAddNewPage = () => {
                         <FixedHeaderTable
                             columns={hook1601c.columns}
                             rows={hook1601c.rows}
-                            onChangeCell={hook1601c.handleChangeCell}
-                            lockedKeys={hook1601c.lockedKeys}
+                            onChangeCell={viewOnlyMode ? undefined : hook1601c.handleChangeCell}
+                            lockedKeys={viewOnlyMode ? new Set(hook1601c.columns.map(c => c.key)) : hook1601c.lockedKeys}
                         />
                     </div>
                 )}
@@ -719,8 +733,8 @@ const DataExportAddNewPage = () => {
                         <FixedHeaderTable
                             columns={SECTION_2316_COLUMNS}
                             rows={rows2316}
-                            onChangeCell={handle2316CellChange}
-                            lockedKeys={new Set()}
+                            onChangeCell={viewOnlyMode ? undefined : handle2316CellChange}
+                            lockedKeys={viewOnlyMode ? new Set(SECTION_2316_COLUMNS.map(c => c.key)) : new Set()}
                         />
                     </div>
                 )}
