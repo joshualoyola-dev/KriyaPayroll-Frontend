@@ -390,13 +390,7 @@ function PreviewModal({ formTypeFromPath, entryId, onClose, onOpenFull }) {
                 <div className="flex items-center justify-between p-4 border-b border-gray-200">
                     <h2 className="text-lg font-bold text-gray-900">{periodLabel}</h2>
                     <div className="flex items-center gap-2">
-                        <button
-                            type="button"
-                            onClick={() => onOpenFull(entryId)}
-                            className="rounded-lg bg-teal-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-700"
-                        >
-                            Open full view
-                        </button>
+                       
                         <button
                             type="button"
                             onClick={onClose}
