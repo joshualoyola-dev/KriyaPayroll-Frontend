@@ -6,6 +6,7 @@ import { useCompanyContext } from "../contexts/CompanyProvider";
 import { downloadExcelPayrunSummary } from "../utility/excel.utility";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { usePayitemContext } from "../contexts/PayitemProvider";
+import { checkPDFGenerationService } from "../services/integration.service";
 
 const usePayslip = () => {
     const [payrun, setPayrun] = useState();
@@ -15,6 +16,9 @@ const usePayslip = () => {
     const [isPayrunLoading, setIsPayrunLoading] = useState(false);
     const [failedIds, setFailedIds] = useState([]);
     const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([]); // New state for selection
+
+    const [isPDFServiceReady, setIsPDFServiceReady] = useState(false);
+    const [isCheckingPDFService, setIsCheckingPDFService] = useState(true);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -115,7 +119,6 @@ const usePayslip = () => {
 
     const handleDownloadPayslips = async () => {
         try {
-            console.log('payslips before download: ', payslips);
             const cleanedPayslips = payslips.map(payslip => ({
                 employee_id: payslip.employee_id,
                 total_deductions: payslip.total_deductions,
@@ -123,14 +126,30 @@ const usePayslip = () => {
                 total_taxes: payslip.total_taxes,
                 net_salary: payslip.net_salary,
             }));
-
-            console.log('cleaned payslips: ', cleanedPayslips);
             downloadExcelPayrunSummary(cleanedPayslips, mapEmployeeIdToEmployeeName, 'Payrun Summary', 'Payrun-summary');
         } catch (error) {
             console.log(error);
             addToast("Failed to download payslips", "error");
         }
     };
+
+    const checkPDFGenerationServerStatus = useCallback(async () => {
+        setIsCheckingPDFService(true);
+
+        try {
+            await checkPDFGenerationService();
+            setIsPDFServiceReady(true);
+        } catch (error) {
+            setIsPDFServiceReady(false);
+        } finally {
+            setIsCheckingPDFService(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        checkPDFGenerationServerStatus();
+    }, []);
+
 
     return {
         isSending, setIsSending,
@@ -143,7 +162,10 @@ const usePayslip = () => {
         selectedEmployeeIds,
         handleToggleEmployee,
         handleSelectAll,
-        handleDeselectAll
+        handleDeselectAll,
+        checkPDFGenerationServerStatus,
+
+        isPDFServiceReady, isCheckingPDFService
     }
 };
 
