@@ -89,7 +89,20 @@ const usePayrun = () => {
             }
 
             const fileName = resultPayrun.data.payrun.payrun_title ?? 'Payslips';
-            downloadPayablesAndTotals(result.data.payslips, mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName, fileName, 'Payslips', resultPayslips.data.payslips);
+            downloadPayablesAndTotals(
+                result.data.payslips,
+                mapEmployeeIdToEmployeeName,
+                mapPayitemIdToPayitemName,
+                fileName,
+                'Payslips',
+                resultPayslips.data.payslips,
+                {
+                    payrun_type: `${resultPayrun.data.payrun.payrun_type} PAYROLL`,
+                    payrun_start_date: formatDateToWords(resultPayrun.data.payrun.payrun_start_date),
+                    payrun_end_date: formatDateToWords(resultPayrun.data.payrun.payrun_end_date),
+                    payment_date: formatDateToWords(resultPayrun.data.payrun.payment_date),
+                }
+            );
         } catch (error) {
             console.log('downloading payslips error ', error);
             addToast("Failed to download payslips", "error");
