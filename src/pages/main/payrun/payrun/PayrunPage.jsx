@@ -25,7 +25,9 @@ const PayrunPageInner = ({ payruns, isPayrunLoading, handleClickPayrun, handleDe
         toDate,
         setToDate,
         payrunTabs,
-        payrunTypeMap
+        payrunTypeMap,
+        dateFilterType,
+        setDateFilterType
     } = usePayrunFiltersContext();
 
     return (

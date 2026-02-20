@@ -7,6 +7,7 @@ const usePayrunFilters = (payruns = []) => {
     const [fromDate, setFromDateState] = useState("");
     const [toDate, setToDateState] = useState("");
     const [dateFilterActive, setDateFilterActive] = useState(false);
+    const [dateFilterType, setDateFilterType] = useState("titlePeriod");
 
     const setFromDate = (val) => {
         setFromDateState(val);
@@ -31,7 +32,12 @@ const usePayrunFilters = (payruns = []) => {
     const filterByDate = (payrunsArr) => {
         if (!dateFilterActive || (!fromDate && !toDate)) return payrunsArr;
         return payrunsArr.filter(payrun => {
-            const payrunDate = payrun.payrun_start_date ? payrun.payrun_start_date.slice(0, 10) : "";
+            let payrunDate = "";
+            if (dateFilterType === "paymentDate") {
+                payrunDate = payrun.payment_date ? payrun.payment_date.slice(0, 10) : "";
+            } else {
+                payrunDate = payrun.payrun_start_date ? payrun.payrun_start_date.slice(0, 10) : "";
+            }
             if (fromDate && toDate) {
                 return payrunDate >= fromDate && payrunDate <= toDate;
             } else if (fromDate) {
@@ -54,7 +60,7 @@ const usePayrunFilters = (payruns = []) => {
         regular: applyAllFilters(payruns, 'REGULAR'),
         special: applyAllFilters(payruns, 'SPECIAL'),
         last: applyAllFilters(payruns, 'LAST'),
-    }), [payruns, selectedStatus, fromDate, toDate, dateFilterActive]);
+    }), [payruns, selectedStatus, fromDate, toDate, dateFilterActive, dateFilterType]);
 
     return {
         selectedTab,
@@ -66,7 +72,9 @@ const usePayrunFilters = (payruns = []) => {
         toDate,
         setToDate,
         payrunTabs,
-        payrunTypeMap
+        payrunTypeMap,
+        dateFilterType,
+        setDateFilterType
     };
 };
 

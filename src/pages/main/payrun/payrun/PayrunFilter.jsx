@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from "react";
+import { usePayrunFiltersContext } from "../../../../contexts/PayrunFiltersProvider";
 import { useNavigate } from "react-router-dom";
 
 const PayrunFilter = ({ status, onStatusChange, fromDate, toDate, onFromDateChange, onToDateChange, onSearch }) => {
+    const { dateFilterType, setDateFilterType } = usePayrunFiltersContext();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
@@ -26,6 +28,8 @@ const PayrunFilter = ({ status, onStatusChange, fromDate, toDate, onFromDateChan
 
     const filtersApplied = (status && status !== 'All') || fromDate || toDate;
 
+    // Use dateFilterType to determine which date field to filter by in the parent or in the filtering logic
+    // For now, just display which filter is active for clarity
     return (
         <div className="flex items-center justify-between gap-1 w-full text-xs">
             <div className="flex flex-row gap-1 items-center flex-wrap">
@@ -43,6 +47,18 @@ const PayrunFilter = ({ status, onStatusChange, fromDate, toDate, onFromDateChan
                     value={toDate}
                     onChange={e => onToDateChange(e.target.value)}
                 />
+                <label htmlFor="date-filter-type" className="text-xs font-medium text-gray-700 ml-2">Filter Date By:</label>
+                <select
+                    id="date-filter-type"
+                    value={dateFilterType}
+                    onChange={e => setDateFilterType(e.target.value)}
+                    className="px-2 py-1 border border-gray-300 rounded-full text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white cursor-pointer transition"
+                    style={{ minWidth: 110 }}
+                >
+                    <option value="titlePeriod">Pay Period</option>
+                    <option value="paymentDate">Payment Date</option>
+                </select>
+                <span className="ml-2 text-[11px] text-gray-500 italic">({dateFilterType === 'titlePeriod' ? 'Title/Period' : 'Payment Date'})</span>
                 <label className="text-xs font-medium text-gray-700 ml-2">Status</label>
                 <select
                     className="px-2 py-1 border border-gray-300 rounded-full text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 w-24 bg-white cursor-pointer transition"
