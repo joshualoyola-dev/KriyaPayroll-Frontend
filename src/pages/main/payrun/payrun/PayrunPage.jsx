@@ -97,8 +97,8 @@ const PayrunPage = () => {
                     <thead>
                         <tr className="bg-gray-50 text-xs text-gray-500 uppercase">
                             <th className="px-4 py-2 text-left font-semibold">Status</th>
-                            <th className="px-4 py-2 text-left font-semibold">Title / Period</th>
                             <th className="px-4 py-2 text-left font-semibold">Type</th>
+                            <th className="px-4 py-2 text-left font-semibold">Title / Period</th>
                             <th className="px-4 py-2 text-left font-semibold">Payment Date</th>
                             <th className="px-4 py-2 text-left font-semibold">Updated</th>
                             <th className="px-4 py-2 text-center font-semibold">Actions</th>
@@ -116,22 +116,22 @@ const PayrunPage = () => {
                             return (
                                 <tr
                                     key={payrun.payrun_id}
-                                    className="border-b last:border-b-0 hover:bg-gray-50 transition cursor-pointer text-xs text-gray-800"
+                                    className="hover:bg-gray-50 transition cursor-pointer text-xs text-gray-800"
                                     onClick={() => handleClickPayrun(payrun.payrun_id, payrun.payrun_type)}
                                 >
                                     <td className="px-3 py-2 align-middle">
                                         <span className={`px-3 py-1 rounded-full text-xs font-medium tracking-wide ${status.bg} ${status.text} shadow-sm`} style={{ minWidth: 90, textAlign: 'center', display: 'inline-block' }}>{status.label}</span>
                                     </td>
                                     <td className="px-3 py-2 align-middle">
-                                        <span className="text-gray-900 font-normal truncate block">
-                                            {payrun.payrun_type === 'LAST' ? payrun.payrun_title : `${formatDateToWords(payrun.payrun_start_date)} to ${formatDateToWords(payrun.payrun_end_date)}`}
-                                        </span>
-                                    </td>
-                                    <td className="px-3 py-2 align-middle">
                                         <span className="text-gray-500 font-normal">
                                             {payrun.payrun_type === 'REGULAR' && 'Regular'}
                                             {payrun.payrun_type === 'SPECIAL' && 'Special'}
                                             {payrun.payrun_type === 'LAST' && 'Last'}
+                                        </span>
+                                    </td>
+                                    <td className="px-3 py-2 align-middle">
+                                        <span className="text-gray-900 font-normal truncate block">
+                                            {payrun.payrun_type === 'LAST' ? payrun.payrun_title : `${formatDateToWords(payrun.payrun_start_date)} to ${formatDateToWords(payrun.payrun_end_date)}`}
                                         </span>
                                     </td>
                                     <td className="px-3 py-2 align-middle">
