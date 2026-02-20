@@ -7,7 +7,8 @@ const usePayrunFilters = (payruns = []) => {
     const [fromDate, setFromDateState] = useState("");
     const [toDate, setToDateState] = useState("");
     const [dateFilterActive, setDateFilterActive] = useState(false);
-    const [dateFilterType, setDateFilterType] = useState("titlePeriod");
+    const [dateFilterType, setDateFilterType] = useState("paymentDate");
+    
 
     const setFromDate = (val) => {
         setFromDateState(val);

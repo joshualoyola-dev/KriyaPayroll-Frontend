@@ -45,7 +45,7 @@ const PayrunFilter = ({ status, onStatusChange, fromDate, toDate, onFromDateChan
                     value={toDate}
                     onChange={e => onToDateChange(e.target.value)}
                 />
-                <label htmlFor="date-filter-type" className="text-xs font-medium text-gray-700 ml-2">Filter Date By:</label>
+                <label htmlFor="date-filter-type" className="text-xs font-medium text-gray-700 ml-2">Filter Payrun By:</label>
                 <select
                     id="date-filter-type"
                     value={dateFilterType}
