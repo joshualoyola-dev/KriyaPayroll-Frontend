@@ -28,8 +28,6 @@ const PayrunFilter = ({ status, onStatusChange, fromDate, toDate, onFromDateChan
 
     const filtersApplied = (status && status !== 'All') || fromDate || toDate;
 
-    // Use dateFilterType to determine which date field to filter by in the parent or in the filtering logic
-    // For now, just display which filter is active for clarity
     return (
         <div className="flex items-center justify-between gap-1 w-full text-xs">
             <div className="flex flex-row gap-1 items-center flex-wrap">
