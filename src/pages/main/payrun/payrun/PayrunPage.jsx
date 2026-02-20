@@ -1,6 +1,7 @@
 import { BanknotesIcon, ChevronDownIcon } from "@heroicons/react/24/solid";
 import { formatDateToWords } from "../../../../utility/datetime.utility";
 import { useState } from "react";
+import { PayrunFiltersProvider, usePayrunFiltersContext } from "../../../../contexts/PayrunFiltersProvider";
 import { usePayrunContext } from "../../../../contexts/PayrunProvider";
 import PayrunFilter from "./PayrunFilter";
 import PayrunTabContent from "./PayrunTabContent";
@@ -10,134 +11,82 @@ import { userHasFeatureAccess } from "../../../../utility/access-controll.utilit
 import env from "../../../../configs/env.config";
 import NoAccess from "../../../../components/NoAccess";
 
-const PayrunPage = () => {
 
-    const { payruns, isPayrunLoading, handleClickPayrun, handleDeleteOnePayrun, deleteLoading, handleNavigateSendPayslip, handleDownloadPayslipsExcel, isDownloading, handleDownloadAllLastPayrunsSummary } = usePayrunContext();
+const PayrunPageInner = ({ payruns, isPayrunLoading, handleClickPayrun, handleDeleteOnePayrun, deleteLoading, handleNavigateSendPayslip, handleDownloadPayslipsExcel, isDownloading, handleDownloadAllLastPayrunsSummary, hasDeleteAccess }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [payrunToDelete, setPayrunToDelete] = useState(null);
-    const [selectedTab, setSelectedTab] = useState('regular');
-    const [selectedStatus, setSelectedStatus] = useState('All');
-    const [fromDate, setFromDateState] = useState("");
-    const [toDate, setToDateState] = useState("");
-    const [dateFilterActive, setDateFilterActive] = useState(false);
-
-
-    const setFromDate = (val) => {
-        setFromDateState(val);
-        setDateFilterActive(!!val || !!toDate);
-    };
-    const setToDate = (val) => {
-        setToDateState(val);
-        setDateFilterActive(!!fromDate || !!val);
-    };
-
-    const payrunTabs = [
-        { key: 'regular', label: 'Regular Payrun', icon: BanknotesIcon },
-        { key: 'special', label: 'Special Payrun', icon: BanknotesIcon },
-        { key: 'last', label: 'Last Payrun', icon: BanknotesIcon },
-    ];
-
-    const filterByStatus = (payrunsArr) => {
-        if (selectedStatus === 'All') return payrunsArr;
-        return payrunsArr.filter(payrun => payrun.status === selectedStatus);
-    };
-
-    const filterByDate = (payrunsArr) => {
-        if (!dateFilterActive || (!fromDate && !toDate)) return payrunsArr;
-        return payrunsArr.filter(payrun => {
-            const payrunDate = payrun.payrun_start_date ? payrun.payrun_start_date.slice(0, 10) : "";
-            if (fromDate && toDate) {
-                return payrunDate >= fromDate && payrunDate <= toDate;
-            } else if (fromDate) {
-                return payrunDate >= fromDate;
-            } else if (toDate) {
-                return payrunDate <= toDate;
-            }
-            return true;
-        });
-    };
-
-    const applyAllFilters = (arr, type) => {
-        let filtered = arr.filter(payrun => payrun.payrun_type === type);
-        filtered = filterByStatus(filtered);
-        filtered = filterByDate(filtered);
-        return filtered;
-    };
-
-    const payrunTypeMap = {
-        regular: applyAllFilters(payruns, 'REGULAR'),
-        special: applyAllFilters(payruns, 'SPECIAL'),
-        last: applyAllFilters(payruns, 'LAST'),
-    };
-
-    const hasAccess = userHasFeatureAccess(env.VITE_PAYROLL_PAYRUNS_VIEW);
-    const hasDeleteAccess = userHasFeatureAccess(env.VITE_PAYROLL_DELETE_PAYRUN);
-
-
-    if (!hasAccess) {
-        return <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
-    }
+    const {
+        selectedTab,
+        setSelectedTab,
+        selectedStatus,
+        setSelectedStatus,
+        fromDate,
+        setFromDate,
+        toDate,
+        setToDate,
+        payrunTabs,
+        payrunTypeMap
+    } = usePayrunFiltersContext();
 
     return (
-        <>
-            <div className="w-full max-w-full">
-                <div className="flex gap-x-2 border-b border-gray-200 bg-white rounded-t-lg overflow-x-auto">
-                    {payrunTabs.map(tab => {
-                        const Icon = tab.icon;
-                        const isActive = selectedTab === tab.key;
-                        return (
-                            <button
-                                key={tab.key}
-                                onClick={() => setSelectedTab(tab.key)}
-                                className={`flex items-center cursor-pointer gap-x-2 px-4 py-2 text-sm font-semibold border-b-2 transition-colors duration-200 focus:outline-none ${isActive ? 'border-teal-600 text-teal-600 bg-gray-50' : 'border-transparent text-gray-500 hover:text-teal-600 hover:bg-gray-50'}`}
-                            >
-                                <Icon className="w-5 h-5" />
-                                {tab.label}
-                            </button>
-                        );
-                    })}
-                </div>
-
-                <div className="pt-4 mb-4 w-full">
-                    <PayrunFilter
-                        status={selectedStatus}
-                        onStatusChange={setSelectedStatus}
-                        fromDate={fromDate}
-                        toDate={toDate}
-                        onFromDateChange={setFromDate}
-                        onToDateChange={setToDate}
-                    />
-                </div>
-
-                {selectedTab === 'last' && (
-                    <div className="flex justify-end mb-2">
+        <div className="w-full max-w-full">
+            <div className="flex gap-x-2 border-b border-gray-200 bg-white rounded-t-lg overflow-x-auto">
+                {payrunTabs.map(tab => {
+                    const Icon = tab.icon;
+                    const isActive = selectedTab === tab.key;
+                    return (
                         <button
-                            onClick={handleDownloadAllLastPayrunsSummary}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded-full text-xs font-semibold shadow transition"
-                            style={{ minHeight: 0 }}
+                            key={tab.key}
+                            onClick={() => setSelectedTab(tab.key)}
+                            className={`flex items-center cursor-pointer gap-x-2 px-4 py-2 text-sm font-semibold border-b-2 transition-colors duration-200 focus:outline-none ${isActive ? 'border-teal-600 text-teal-600 bg-gray-50' : 'border-transparent text-gray-500 hover:text-teal-600 hover:bg-gray-50'}`}
                         >
-                            Download All Last Payrun
+                            <Icon className="w-5 h-5" />
+                            {tab.label}
                         </button>
-                    </div>
-                )}
-
-                <div className="pt-5">
-                    {isPayrunLoading ? (
-                        <DualBallLoading />
-                    ) : (
-                        <PayrunTabContent
-                            payruns={payrunTypeMap[selectedTab]}
-                            handleClickPayrun={handleClickPayrun}
-                            handleDownloadPayslipsExcel={handleDownloadPayslipsExcel}
-                            handleNavigateSendPayslip={handleNavigateSendPayslip}
-                            hasDeleteAccess={hasDeleteAccess}
-                            setPayrunToDelete={setPayrunToDelete}
-                            setShowDeleteModal={setShowDeleteModal}
-                        />
-                    )}
-                </div>
-                {(deleteLoading || isDownloading) && <LoadingBackground />}
+                    );
+                })}
             </div>
+
+            <div className="pt-4 mb-4 w-full">
+                <PayrunFilter
+                    status={selectedStatus}
+                    onStatusChange={setSelectedStatus}
+                    fromDate={fromDate}
+                    toDate={toDate}
+                    onFromDateChange={setFromDate}
+                    onToDateChange={setToDate}
+                />
+            </div>
+
+            {selectedTab === 'last' && (
+                <div className="flex justify-end mb-2">
+                    <button
+                        onClick={handleDownloadAllLastPayrunsSummary}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded-full text-xs font-semibold shadow transition"
+                        style={{ minHeight: 0 }}
+                    >
+                        Download All Last Payrun
+                    </button>
+                </div>
+            )}
+
+            <div className="pt-5">
+                {isPayrunLoading ? (
+                    <DualBallLoading />
+                ) : (
+                    <PayrunTabContent
+                        payruns={payrunTypeMap[selectedTab]}
+                        handleClickPayrun={handleClickPayrun}
+                        handleDownloadPayslipsExcel={handleDownloadPayslipsExcel}
+                        handleNavigateSendPayslip={handleNavigateSendPayslip}
+                        hasDeleteAccess={hasDeleteAccess}
+                        setPayrunToDelete={setPayrunToDelete}
+                        setShowDeleteModal={setShowDeleteModal}
+                    />
+                )}
+            </div>
+            
+            {(deleteLoading || isDownloading) && <LoadingBackground />}
 
             {showDeleteModal && payrunToDelete && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -167,7 +116,45 @@ const PayrunPage = () => {
                     </div>
                 </div>
             )}
-        </>
+        </div>
+    );
+};
+
+const PayrunPage = () => {
+    const { 
+        payruns, 
+        isPayrunLoading, 
+        handleClickPayrun, 
+        handleDeleteOnePayrun, 
+        deleteLoading, 
+        handleNavigateSendPayslip, 
+        handleDownloadPayslipsExcel, 
+        isDownloading, 
+        handleDownloadAllLastPayrunsSummary 
+    } = usePayrunContext();
+
+    const hasAccess = userHasFeatureAccess(env.VITE_PAYROLL_PAYRUNS_VIEW);
+    const hasDeleteAccess = userHasFeatureAccess(env.VITE_PAYROLL_DELETE_PAYRUN);
+
+    if (!hasAccess) {
+        return <NoAccess title={'Unauthorized'} label={'You are not allowed to access this resource'} />
+    }
+
+    return (
+        <PayrunFiltersProvider payruns={payruns}>
+            <PayrunPageInner
+                payruns={payruns}
+                isPayrunLoading={isPayrunLoading}
+                handleClickPayrun={handleClickPayrun}
+                handleDeleteOnePayrun={handleDeleteOnePayrun}
+                deleteLoading={deleteLoading}
+                handleNavigateSendPayslip={handleNavigateSendPayslip}
+                handleDownloadPayslipsExcel={handleDownloadPayslipsExcel}
+                isDownloading={isDownloading}
+                handleDownloadAllLastPayrunsSummary={handleDownloadAllLastPayrunsSummary}
+                hasDeleteAccess={hasDeleteAccess}
+            />
+        </PayrunFiltersProvider>
     );
 };
 
