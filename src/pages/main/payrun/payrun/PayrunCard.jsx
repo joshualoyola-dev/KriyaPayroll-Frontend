@@ -53,7 +53,6 @@ const PayrunCard = ({ payrun, idx, oncClickCard, onDelete, onNavigateSendPayslip
             key={idx}
             className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-3 rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-all cursor-pointer group text-xs"
         >
-            {/* Left: Status and Main Info */}
             <div className="flex items-center gap-3 flex-1 min-w-0">
                 <span
                     className={`px-2.5 py-0.5 rounded-full text-xs font-medium tracking-wide ${status.bg} ${status.text} shadow-sm`}
@@ -83,7 +82,6 @@ const PayrunCard = ({ payrun, idx, oncClickCard, onDelete, onNavigateSendPayslip
                 </div>
             </div>
 
-            {/* Right: Payment Date and Actions */}
             <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 flex-shrink-0">
                 <div className="text-left md:text-right text-xs md:w-28">
                     <div className="text-gray-500">Payment Date</div>

@@ -11,7 +11,7 @@ const PayrunFilter = ({ status, onStatusChange, fromDate, toDate, onFromDateChan
         navigate(`/payrun/${option}?payrun_type=${option}`);
     };
 
-    // Close dropdown when clicking outside
+  
     useEffect(() => {
         if (!isDropdownOpen) return;
         function handleClickOutside(event) {
@@ -28,9 +28,7 @@ const PayrunFilter = ({ status, onStatusChange, fromDate, toDate, onFromDateChan
 
     return (
         <div className="flex items-center justify-between gap-1 w-full text-xs">
-            {/* Left: Compact Filters */}
             <div className="flex flex-row gap-1 items-center flex-wrap">
-                {/* Date */}
                 <label className="text-xs font-medium text-gray-700">From</label>
                 <input
                     type="date"
