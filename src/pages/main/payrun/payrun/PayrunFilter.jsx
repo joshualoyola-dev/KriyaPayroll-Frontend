@@ -56,7 +56,7 @@ const PayrunFilter = ({ status, onStatusChange, fromDate, toDate, onFromDateChan
                     <option value="titlePeriod">Pay Period</option>
                     <option value="paymentDate">Payment Date</option>
                 </select>
-                <span className="ml-2 text-[11px] text-gray-500 italic">({dateFilterType === 'titlePeriod' ? 'Title/Period' : 'Payment Date'})</span>
+
                 <label className="text-xs font-medium text-gray-700 ml-2">Status</label>
                 <select
                     className="px-2 py-1 border border-gray-300 rounded-full text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 w-24 bg-white cursor-pointer transition"
