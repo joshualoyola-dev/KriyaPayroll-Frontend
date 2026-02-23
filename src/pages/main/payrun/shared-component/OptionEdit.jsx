@@ -7,6 +7,8 @@ import Tooltip from "../../../../components/Tooltip";
 import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
 import PayrunLogs from "./PayrunLogs";
 import DeleteEmployeesOnPayrunDraft from "./DeleteEmployeesOnPayrunDraft";
+import { useState } from "react";
+import { editPayrunPeriod } from "../../../../services/payrun.service";
 
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();
@@ -24,8 +26,40 @@ const OptionEdit = () => {
         isEditEmployeeOnDraft, setIsEditEmployeeOnDraft
     } = useSharedRunningPayrunOperationContext();
 
+
     const isForApproval = payrun.status === "FOR_APPROVAL";
     const isApproved = payrun.status === "APPROVED";
+
+    // Local state for editable dates
+    const [editDates, setEditDates] = useState({
+        payrun_start_date: payrun.payrun_start_date,
+        payrun_end_date: payrun.payrun_end_date,
+        payment_date: payrun.payment_date,
+    });
+    const [isEditingDates, setIsEditingDates] = useState(false);
+    const [isSavingDates, setIsSavingDates] = useState(false);
+    const [dateError, setDateError] = useState("");
+
+    // Handler for input changes
+    const handleDateChange = (e) => {
+        const { name, value } = e.target;
+        setEditDates((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // Handler for saving dates
+    const handleSaveDates = async () => {
+        setIsSavingDates(true);
+        setDateError("");
+        try {
+            await editPayrunPeriod(payrun.company_id, payrun.payrun_id, editDates);
+            setIsEditingDates(false);
+            // Optionally, refresh payrun data here if needed
+        } catch (err) {
+            setDateError("Failed to update dates. Please try again.");
+        } finally {
+            setIsSavingDates(false);
+        }
+    };
 
     // TODO: approved payrun feature
     /**
@@ -122,30 +156,86 @@ const OptionEdit = () => {
                 </div>
             </div>
 
-            {/* Date selection grid - now with clear spacing */}
+            {/* Date selection grid - now with edit capability */}
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6">
                 {/* Date From */}
                 <div className="space-y-2">
                     <label className="block text-xs font-medium text-gray-700">Date From</label>
-                    <div className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm">
-                        {convertToISO8601(payrun.payrun_start_date)}
-                    </div>
+                    {isEditingDates && !isApproved ? (
+                        <input
+                            type="date"
+                            name="payrun_start_date"
+                            value={editDates.payrun_start_date?.slice(0, 10) || ""}
+                            onChange={handleDateChange}
+                            className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm"
+                        />
+                    ) : (
+                        <div className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm">
+                            {convertToISO8601(payrun.payrun_start_date)}
+                        </div>
+                    )}
                 </div>
 
                 {/* Date To */}
                 <div className="space-y-2">
                     <label className="block text-xs font-medium text-gray-700">Date To</label>
-                    <div className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm">
-                        {convertToISO8601(payrun.payrun_end_date)}
+                    {isEditingDates && !isApproved ? (
+                        <input
+                            type="date"
+                            name="payrun_end_date"
+                            value={editDates.payrun_end_date?.slice(0, 10) || ""}
+                            onChange={handleDateChange}
+                            className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm"
+                        />
+                    ) : (
+                        <div className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm">
+                            {convertToISO8601(payrun.payrun_end_date)}
+                        </div>
+                    )}
+                </div>
+
+                {/* Payment Date (read-only) */}
+                <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Payment Date</label>
+                    <div className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm bg-gray-100">
+                        {convertToISO8601(payrun.payment_date)}
                     </div>
                 </div>
 
-                {/* Payment Date */}
-                <div className="space-y-2">
-                    <label className="block text-xs font-medium text-gray-700">Payment Date</label>
-                    <div className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm">
-                        {convertToISO8601(payrun.payment_date)}
-                    </div>
+                {/* Edit/Save/Cancel buttons */}
+                <div className="flex flex-col justify-end gap-2 col-span-1 lg:col-span-2">
+                    {!isApproved && (
+                        isEditingDates ? (
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={handleSaveDates}
+                                    disabled={isSavingDates}
+                                    className="px-4 py-2 text-sm font-medium rounded-xl bg-teal-600 text-white hover:bg-teal-700 disabled:bg-gray-300 disabled:text-gray-500"
+                                >
+                                    {isSavingDates ? "Saving..." : "Save Dates"}
+                                </button>
+                                <button
+                                    onClick={() => { setIsEditingDates(false); setEditDates({
+                                        payrun_start_date: payrun.payrun_start_date,
+                                        payrun_end_date: payrun.payrun_end_date,
+                                        payment_date: payrun.payment_date,
+                                    }); setDateError(""); }}
+                                    disabled={isSavingDates}
+                                    className="px-4 py-2 text-sm font-medium rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-50"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setIsEditingDates(true)}
+                                className="px-4 py-2 text-sm font-medium rounded-xl bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100"
+                            >
+                                Edit Dates
+                            </button>
+                        )
+                    )}
+                    {dateError && <span className="text-xs text-red-500">{dateError}</span>}
                 </div>
             </div>
             {employeeForLastPay && (
