@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
-import { deleteOnePayrun, getAllLastPayrunSummaries, getCompanyPayruns, getEmployeeWithNoLastPay, getPayrun, getPayrunPayslipPayables, getPayslips, getPayslipsDraft } from "../services/payrun.service";
+import { deleteOnePayrun, getAllLastPayrunSummaries, getCompanyPayruns, getEmployeeWithNoLastPay, getPayrun, getPayrunPayslipPayables, getPayslips, getPayslipsDraft, editPayrunPeriod } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { downloadExcelLastPayrunSummary, downloadPayablesAndTotals } from "../utility/excel.utility";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
@@ -22,6 +22,55 @@ const usePayrun = () => {
     const [selectedPayruns, setSelectedPayruns] = useState([]); // payrun_id's
     const [netSalariesPerPayrun, setNetSalariesPerPayrun] = useState([]);
     const [salariesLoading, setSalariesLoading] = useState(false);
+
+    // --- Payrun date editing state ---
+    const [editDates, setEditDates] = useState(null); // { payrun_start_date, payrun_end_date, payment_date }
+    const [isEditingDates, setIsEditingDates] = useState(false);
+    const [isSavingDates, setIsSavingDates] = useState(false);
+    const [dateError, setDateError] = useState("");
+
+    // Call this to start editing dates for a payrun
+    const startEditDates = (payrun) => {
+        setEditDates({
+            payrun_start_date: payrun.payrun_start_date,
+            payrun_end_date: payrun.payrun_end_date,
+            payment_date: payrun.payment_date,
+        });
+        setIsEditingDates(true);
+        setDateError("");
+    };
+
+    // Call this to cancel editing
+    const cancelEditDates = (payrun) => {
+        setEditDates({
+            payrun_start_date: payrun.payrun_start_date,
+            payrun_end_date: payrun.payrun_end_date,
+            payment_date: payrun.payment_date,
+        });
+        setIsEditingDates(false);
+        setDateError("");
+    };
+
+    // Handler for input changes
+    const handleDateChange = (e) => {
+        const { name, value } = e.target;
+        setEditDates((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // Handler for saving dates
+    const handleSaveDates = async (company_id, payrun_id) => {
+        setIsSavingDates(true);
+        setDateError("");
+        try {
+            await editPayrunPeriod(company_id, payrun_id, editDates);
+            setIsEditingDates(false);
+            // Optionally, refresh payrun data here if needed
+        } catch (err) {
+            setDateError("Failed to update dates. Please try again.");
+        } finally {
+            setIsSavingDates(false);
+        }
+    };
 
 
     const navigate = useNavigate();
@@ -222,14 +271,23 @@ const usePayrun = () => {
         employeesWithNoLastPay,
         employeeLoading,
 
-
         handleSelectPayruns,
         handleRemoveSelectedPayruns,
         selectedPayruns, setSelectedPayruns,
         netSalariesPerPayrun, setNetSalariesPerPayrun,
         handlefetchPayrunNetSalaries,
         salariesLoading, setSalariesLoading,
-        mapPayrunIdToReadableName
+        mapPayrunIdToReadableName,
+
+        // Payrun date editing state and handlers
+        editDates, setEditDates,
+        isEditingDates, setIsEditingDates,
+        isSavingDates, setIsSavingDates,
+        dateError, setDateError,
+        startEditDates,
+        cancelEditDates,
+        handleDateChange,
+        handleSaveDates,
     };
 };
 
