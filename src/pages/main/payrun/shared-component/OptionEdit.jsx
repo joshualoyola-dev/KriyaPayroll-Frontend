@@ -33,7 +33,7 @@ const OptionEdit = () => {
     const isForApproval = payrun.status === "FOR_APPROVAL";
     const isApproved = payrun.status === "APPROVED";
 
-    // Use payrun date editing state and handlers from usePayrun
+    // Use payrun date editing state and handlers from useSharedRunningPayrunOperationContext
     const {
         editDates,
         setEditDates,
@@ -47,7 +47,7 @@ const OptionEdit = () => {
         cancelEditDates,
         handleDateChange,
         handleSaveDates,
-    } = usePayrun();
+    } = useSharedRunningPayrunOperationContext();
 
     // TODO: approved payrun feature
     /**
