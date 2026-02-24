@@ -1,4 +1,4 @@
-import { ChevronDownIcon, InformationCircleIcon, UserMinusIcon } from "@heroicons/react/24/solid";
+import { ChevronDownIcon, InformationCircleIcon, UserMinusIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { convertToISO8601, formatDateToWords } from "../../../../utility/datetime.utility";
 import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
@@ -8,7 +8,8 @@ import { useSharedRunningPayrunOperationContext } from "../../../../contexts/Sha
 import PayrunLogs from "./PayrunLogs";
 import DeleteEmployeesOnPayrunDraft from "./DeleteEmployeesOnPayrunDraft";
 import { useState } from "react";
-import { editPayrunPeriod } from "../../../../services/payrun.service";
+import { editPayrunPeriod, getPayrun } from "../../../../services/payrun.service";
+import { usePayrunContext } from "../../../../contexts/PayrunProvider";
 
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();
@@ -47,13 +48,29 @@ const OptionEdit = () => {
     };
 
     // Handler for saving dates
+    const { handleFetchPayruns } = usePayrunContext();
     const handleSaveDates = async () => {
+        // Prevent saving if no changes were made
+        if (
+            editDates.payrun_start_date === payrun.payrun_start_date &&
+            editDates.payrun_end_date === payrun.payrun_end_date
+        ) {
+            setIsEditingDates(false);
+            return;
+        }
         setIsSavingDates(true);
         setDateError("");
         try {
             await editPayrunPeriod(payrun.company_id, payrun.payrun_id, editDates);
+            // Re-fetch payrun data from backend to ensure UI is up-to-date
+            const result = await getPayrun(payrun.company_id, payrun.payrun_id);
+            payrun.payrun_start_date = result.data.payrun.payrun_start_date;
+            payrun.payrun_end_date = result.data.payrun.payrun_end_date;
+            // If you want to update payment_date as well, uncomment below:
+            // payrun.payment_date = result.data.payrun.payment_date;
             setIsEditingDates(false);
-            // Optionally, refresh payrun data here if needed
+            // Refresh payrun table
+            await handleFetchPayruns();
         } catch (err) {
             setDateError("Failed to update dates. Please try again.");
         } finally {
@@ -157,7 +174,7 @@ const OptionEdit = () => {
             </div>
 
             {/* Date selection grid - now with edit capability */}
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6">
+            <div className="flex flex-wrap gap-1 mb-6 items-center">
                 {/* Date From */}
                 <div className="space-y-2">
                     <label className="block text-xs font-medium text-gray-700">Date From</label>
@@ -167,10 +184,10 @@ const OptionEdit = () => {
                             name="payrun_start_date"
                             value={editDates.payrun_start_date?.slice(0, 10) || ""}
                             onChange={handleDateChange}
-                            className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm"
+                            className="w-36 px-2 py-2 border border-teal-500 rounded-3xl text-sm focus:ring-2 focus:ring-teal-500"
                         />
                     ) : (
-                        <div className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm">
+                        <div className="w-36 px-2 py-2 border border-gray-500 rounded-3xl text-sm">
                             {convertToISO8601(payrun.payrun_start_date)}
                         </div>
                     )}
@@ -185,59 +202,60 @@ const OptionEdit = () => {
                             name="payrun_end_date"
                             value={editDates.payrun_end_date?.slice(0, 10) || ""}
                             onChange={handleDateChange}
-                            className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm"
+                            className="w-36 px-2 py-2 border border-teal-500 rounded-3xl text-sm focus:ring-2 focus:ring-teal-500"
                         />
                     ) : (
-                        <div className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm">
+                        <div className="w-36 px-2 py-2 border border-gray-500 rounded-3xl text-sm">
                             {convertToISO8601(payrun.payrun_end_date)}
                         </div>
                     )}
                 </div>
 
-                {/* Payment Date (read-only) */}
+                {/* Payment Date (read-only) with inline icon button */}
                 <div className="space-y-2">
                     <label className="block text-xs font-medium text-gray-700">Payment Date</label>
-                    <div className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm bg-gray-100">
-                        {convertToISO8601(payrun.payment_date)}
-                    </div>
-                </div>
-
-                {/* Edit/Save/Cancel buttons */}
-                <div className="flex flex-col justify-end gap-2 col-span-1 lg:col-span-2">
-                    {!isApproved && (
-                        isEditingDates ? (
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={handleSaveDates}
-                                    disabled={isSavingDates}
-                                    className="px-4 py-2 text-sm font-medium rounded-xl bg-teal-600 text-white hover:bg-teal-700 disabled:bg-gray-300 disabled:text-gray-500"
-                                >
-                                    {isSavingDates ? "Saving..." : "Save Dates"}
-                                </button>
-                                <button
-                                    onClick={() => { setIsEditingDates(false); setEditDates({
-                                        payrun_start_date: payrun.payrun_start_date,
-                                        payrun_end_date: payrun.payrun_end_date,
-                                        payment_date: payrun.payment_date,
-                                    }); setDateError(""); }}
-                                    disabled={isSavingDates}
-                                    className="px-4 py-2 text-sm font-medium rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-50"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        ) : (
+                    <div className="flex items-center">
+                        <div className="w-36 px-2 py-2 border border-gray-500 rounded-3xl text-sm bg-gray-100">
+                            {convertToISO8601(payrun.payment_date)}
+                        </div>
+                        {!isApproved && !isEditingDates && (
                             <button
                                 onClick={() => setIsEditingDates(true)}
-                                className="px-4 py-2 text-sm font-medium rounded-xl bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100"
+                                className="ml-2 p-2 rounded-full hover:bg-teal-50 focus:outline-none border border-teal-100 text-teal-600 shadow-sm transition-all"
+                                title="Edit Pay Period"
                             >
-                                Edit Dates
+                                <PencilSquareIcon className="w-5 h-5" />
                             </button>
-                        )
-                    )}
-                    {dateError && <span className="text-xs text-red-500">{dateError}</span>}
+                        )}
+                    </div>
                 </div>
             </div>
+
+            {/* Inline editing controls for pay period */}
+            {isEditingDates && !isApproved && (
+                <div className="flex gap-2 mb-4">
+                    <button
+                        onClick={handleSaveDates}
+                        disabled={isSavingDates}
+                        className="px-4 py-2 text-sm font-medium rounded-xl bg-teal-600 text-white hover:bg-teal-700 disabled:bg-gray-300 disabled:text-gray-500"
+                    >
+                        {isSavingDates ? "Saving..." : "Save Dates"}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => { setIsEditingDates(false); setEditDates({
+                            payrun_start_date: payrun.payrun_start_date,
+                            payrun_end_date: payrun.payrun_end_date,
+                            payment_date: payrun.payment_date,
+                        }); setDateError(""); }}
+                        disabled={isSavingDates}
+                        className="px-4 py-2 text-sm font-medium rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+                    {dateError && <span className="text-xs text-red-500 mt-2 block">{dateError}</span>}
+                </div>
+            )}
             {employeeForLastPay && (
                 <div className="pt-4 border-t border-gray-200 mt-2">
                     <p className="text-xs font-medium text-gray-700 mb-2">Employee for Last Payroll:</p>
@@ -251,7 +269,7 @@ const OptionEdit = () => {
             )}
 
             {/* Editing Controls- at the bottom with proper spacing */}
-            <div className="flex items-center justify-end pt-4 border-t mt-4 border-gray-200 space-x-5">
+            <div className="flex items-center justify-end pt-4 border-t mt-4 border-gray-200 space-x-5 relative">
                 {/* Remove employee */}
                 <label className="text-sm font-medium text-gray-700">Remove employee:</label>
                 <div className="flex items-center gap-2">
@@ -293,6 +311,7 @@ const OptionEdit = () => {
                         ))}
                     </select>
                 </div>
+
             </div>
 
             {isEditEmployeeOnDraft && <DeleteEmployeesOnPayrunDraft />}
