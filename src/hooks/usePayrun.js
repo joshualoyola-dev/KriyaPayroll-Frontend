@@ -24,7 +24,11 @@ const usePayrun = () => {
     const [salariesLoading, setSalariesLoading] = useState(false);
 
     // --- Payrun date editing state ---
-    const [editDates, setEditDates] = useState(null); // { payrun_start_date, payrun_end_date, payment_date }
+    const [editDates, setEditDates] = useState({
+        payrun_start_date: null,
+        payrun_end_date: null,
+        payment_date: null,
+    });
     const [isEditingDates, setIsEditingDates] = useState(false);
     const [isSavingDates, setIsSavingDates] = useState(false);
     const [dateError, setDateError] = useState("");
@@ -58,13 +62,28 @@ const usePayrun = () => {
     };
 
     // Handler for saving dates
-    const handleSaveDates = async (company_id, payrun_id) => {
+    // Accept setPayrun from context to update payrun state after edit
+    const handleSaveDates = async (payrun, setPayrun) => {
+        // Only save if changed
+        if (
+            editDates.payrun_start_date === payrun.payrun_start_date &&
+            editDates.payrun_end_date === payrun.payrun_end_date &&
+            editDates.payment_date === payrun.payment_date
+        ) {
+            setIsEditingDates(false);
+            return;
+        }
         setIsSavingDates(true);
         setDateError("");
         try {
-            await editPayrunPeriod(company_id, payrun_id, editDates);
+            await editPayrunPeriod(payrun.company_id, payrun.payrun_id, editDates);
+            // Refetch updated payrun
+            const result = await getPayrun(payrun.company_id, payrun.payrun_id);
+            if (setPayrun) {
+                setPayrun(result.data.payrun);
+            }
             setIsEditingDates(false);
-            // Optionally, refresh payrun data here if needed
+            await handleFetchPayruns();
         } catch (err) {
             setDateError("Failed to update dates. Please try again.");
         } finally {
@@ -279,15 +298,15 @@ const usePayrun = () => {
         salariesLoading, setSalariesLoading,
         mapPayrunIdToReadableName,
 
-        // Payrun date editing state and handlers
-        editDates, setEditDates,
-        isEditingDates, setIsEditingDates,
-        isSavingDates, setIsSavingDates,
-        dateError, setDateError,
-        startEditDates,
-        cancelEditDates,
-        handleDateChange,
-        handleSaveDates,
+    // Payrun date editing state and handlers
+    editDates, setEditDates,
+    isEditingDates, setIsEditingDates,
+    isSavingDates, setIsSavingDates,
+    dateError, setDateError,
+    startEditDates,
+    cancelEditDates,
+    handleDateChange,
+    handleSaveDates,
     };
 };
 

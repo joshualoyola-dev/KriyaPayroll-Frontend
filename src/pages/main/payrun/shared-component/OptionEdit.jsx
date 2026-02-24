@@ -7,6 +7,7 @@ import Tooltip from "../../../../components/Tooltip";
 import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
 import PayrunLogs from "./PayrunLogs";
 import DeleteEmployeesOnPayrunDraft from "./DeleteEmployeesOnPayrunDraft";
+import usePayrun from '../../../../hooks/usePayrun';
 import { useState } from "react";
 import { editPayrunPeriod, getPayrun } from "../../../../services/payrun.service";
 import { usePayrunContext } from "../../../../contexts/PayrunProvider";
@@ -15,6 +16,7 @@ const OptionEdit = () => {
     const { payitems } = usePayitemContext();
     const {
         payrun,
+        setPayrun,
         handleClosePayrun,
         handleSaveEdit,
         handleChangeStatus,
@@ -31,52 +33,21 @@ const OptionEdit = () => {
     const isForApproval = payrun.status === "FOR_APPROVAL";
     const isApproved = payrun.status === "APPROVED";
 
-    // Local state for editable dates
-    const [editDates, setEditDates] = useState({
-        payrun_start_date: payrun.payrun_start_date,
-        payrun_end_date: payrun.payrun_end_date,
-        payment_date: payrun.payment_date,
-    });
-    const [isEditingDates, setIsEditingDates] = useState(false);
-    const [isSavingDates, setIsSavingDates] = useState(false);
-    const [dateError, setDateError] = useState("");
-
-    // Handler for input changes
-    const handleDateChange = (e) => {
-        const { name, value } = e.target;
-        setEditDates((prev) => ({ ...prev, [name]: value }));
-    };
-
-    // Handler for saving dates
-    const { handleFetchPayruns } = usePayrunContext();
-    const handleSaveDates = async () => {
-   
-        if (
-            editDates.payrun_start_date === payrun.payrun_start_date &&
-            editDates.payrun_end_date === payrun.payrun_end_date &&
-            editDates.payment_date === payrun.payment_date
-        ) {
-            setIsEditingDates(false);
-            return;
-        }
-        setIsSavingDates(true);
-        setDateError("");
-        try {
-            await editPayrunPeriod(payrun.company_id, payrun.payrun_id, editDates);
-           
-            const result = await getPayrun(payrun.company_id, payrun.payrun_id);
-            payrun.payrun_start_date = result.data.payrun.payrun_start_date;
-            payrun.payrun_end_date = result.data.payrun.payrun_end_date;
-            payrun.payment_date = result.data.payrun.payment_date;
-            setIsEditingDates(false);
-       
-            await handleFetchPayruns();
-        } catch (err) {
-            setDateError("Failed to update dates. Please try again.");
-        } finally {
-            setIsSavingDates(false);
-        }
-    };
+    // Use payrun date editing state and handlers from usePayrun
+    const {
+        editDates,
+        setEditDates,
+        isEditingDates,
+        setIsEditingDates,
+        isSavingDates,
+        setIsSavingDates,
+        dateError,
+        setDateError,
+        startEditDates,
+        cancelEditDates,
+        handleDateChange,
+        handleSaveDates,
+    } = usePayrun();
 
     // TODO: approved payrun feature
     /**
@@ -230,7 +201,7 @@ const OptionEdit = () => {
                         )}
                         {!isApproved && !isEditingDates && (
                             <button
-                                onClick={() => setIsEditingDates(true)}
+                                onClick={() => startEditDates(payrun)}
                                 className="ml-2 p-2 rounded-full  transition-all group"
                                 title="Edit Pay Period"
                             >
@@ -240,7 +211,7 @@ const OptionEdit = () => {
                         {isEditingDates && !isApproved && (
                             <div className="flex gap-2">
                                 <button
-                                    onClick={handleSaveDates}
+                                    onClick={() => handleSaveDates(payrun, setPayrun)}
                                     disabled={isSavingDates}
                                     className="px-4 py-2 text-sm font-medium rounded-xl bg-teal-600 text-white hover:bg-teal-700 disabled:bg-gray-300 disabled:text-gray-500"
                                 >
@@ -248,11 +219,7 @@ const OptionEdit = () => {
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => { setIsEditingDates(false); setEditDates({
-                                        payrun_start_date: payrun.payrun_start_date,
-                                        payrun_end_date: payrun.payrun_end_date,
-                                        payment_date: payrun.payment_date,
-                                    }); setDateError(""); }}
+                                    onClick={() => cancelEditDates(payrun)}
                                     disabled={isSavingDates}
                                     className="px-4 py-2 text-sm font-medium rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-50"
                                 >
