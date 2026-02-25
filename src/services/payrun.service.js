@@ -73,8 +73,3 @@ export const deletePayslipsDraftsAndRelatedRecord = async (company_id, payrun_id
 
     return await payroll_api.delete(`/api/v1/payruns/${company_id}/${payrun_id}/payslips?employee_ids=${joinedeEmployeeIds}`);
 };
-
-export const editPayrunPeriod = async (company_id, payrun_id, formData) => {
-    return await payroll_api.patch(`/api/v1/payruns/${company_id}/${payrun_id}/dates`, formData);
-};
-
