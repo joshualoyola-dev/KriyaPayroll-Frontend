@@ -12,7 +12,7 @@ import env from "../../../../configs/env.config";
 import NoAccess from "../../../../components/NoAccess";
 
 
-const PayrunPageInner = ({ payruns, isPayrunLoading, handleClickPayrun, handleDeleteOnePayrun, deleteLoading, handleNavigateSendPayslip, handleDownloadPayslipsExcel, isDownloading, handleDownloadAllLastPayrunsSummary, hasDeleteAccess }) => {
+const PayrunPageInner = ({ isPayrunLoading, handleClickPayrun, handleDeleteOnePayrun, deleteLoading, handleNavigateSendPayslip, handleDownloadPayslipsExcel, isDownloading, handleDownloadAllLastPayrunsSummary, hasDeleteAccess }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [payrunToDelete, setPayrunToDelete] = useState(null);
     const {
@@ -26,8 +26,6 @@ const PayrunPageInner = ({ payruns, isPayrunLoading, handleClickPayrun, handleDe
         setToDate,
         payrunTabs,
         payrunTypeMap,
-        dateFilterType,
-        setDateFilterType
     } = usePayrunFiltersContext();
 
     return (
