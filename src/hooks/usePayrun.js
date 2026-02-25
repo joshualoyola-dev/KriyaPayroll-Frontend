@@ -242,7 +242,7 @@ const usePayrun = () => {
         netSalariesPerPayrun, setNetSalariesPerPayrun,
         handlefetchPayrunNetSalaries,
         salariesLoading, setSalariesLoading,
-        mapPayrunIdToReadableName,
+        mapPayrunIdToReadableName
     };
 };
 
