@@ -12,8 +12,6 @@ const SendPayslipPage = () => {
         isSending,
         isPayslipsLoading,
         handleSendFinalPayslip,
-        handleDownloadPayslips,
-
         isPDFServiceReady,
         isCheckingPDFService
     } = usePayslipContext();
@@ -39,11 +37,6 @@ const SendPayslipPage = () => {
                     )}
                 </div>
                 <div className="flex gap-x-3">
-                    <button
-                        onClick={handleDownloadPayslips}
-                        className="px-3 py-1 border text-gray-600 border-gray-600 hover:bg-teal-600 hover:border-teal-600 hover:cursor-pointer hover:text-white rounded-xl text-sm font-medium">
-                        Download
-                    </button>
                     <button
                         onClick={handleSendFinalPayslip}
                         disabled={!isPDFServiceReady || isCheckingPDFService}
