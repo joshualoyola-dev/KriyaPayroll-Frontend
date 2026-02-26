@@ -1,6 +1,6 @@
 import {InformationCircleIcon, UserMinusIcon, PencilIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
-import {convertToISO8601, formatDateToWords } from "../../../../utility/datetime.utility";
+import {formatDateToWords } from "../../../../utility/datetime.utility";
 import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import env from "../../../../configs/env.config";
 import Tooltip from "../../../../components/Tooltip";
