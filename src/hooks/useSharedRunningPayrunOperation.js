@@ -229,8 +229,8 @@ const useSharedRunningPayrunOperation = () => {
                     payrun_end_date: convertToISO8601(options.date_to),
                     employee_ids: options.employee_ids, //if empty, means include all active in payrun
                     payrun_type: payrunType.toUpperCase(),
-                    ytd_from: convertToISO8601(options.ytd_from),
-                    ytd_to: convertToISO8601(options.ytd_to),
+                    ytd_from: options.ytd_from,
+                    ytd_to: options.ytd_to,
                     ytd_export_by_method: options.ytd_export_by_method,
                 }
             );
@@ -388,25 +388,25 @@ const useSharedRunningPayrunOperation = () => {
     // --- Payrun date editing handlers ---
     const startEditDates = (payrunToEdit) => {
         setEditPayrunInfoForm({
-            payrun_start_date: payrunToEdit.payrun_start_date,
-            payrun_end_date: payrunToEdit.payrun_end_date,
-            payment_date: payrunToEdit.payment_date,
+            payrun_start_date: convertToISO8601(payrunToEdit.payrun_start_date),
+            payrun_end_date: convertToISO8601(payrunToEdit.payrun_end_date),
+            payment_date: convertToISO8601(payrunToEdit.payment_date),
         });
         setIsEditingDates(true);
     };
 
     const cancelEditDates = (payrunToEdit) => {
         setEditPayrunInfoForm({
-            payrun_start_date: payrunToEdit.payrun_start_date,
-            payrun_end_date: payrunToEdit.payrun_end_date,
-            payment_date: payrunToEdit.payment_date,
+            payrun_start_date: convertToISO8601(payrunToEdit.payrun_start_date),
+            payrun_end_date: convertToISO8601(payrunToEdit.payrun_end_date),
+            payment_date: convertToISO8601(payrunToEdit.payment_date),
         });
         setIsEditingDates(false);
     };
 
     const handleDateChange = (e) => {
-        const { name, value } = e.target;
-        setEditPayrunInfoForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value } = e.target;
+    setEditPayrunInfoForm((prev) => ({ ...prev, [name]: convertToISO8601(value) }));
     };
 
     const handleSaveDates = async (payrunToEdit) => {
