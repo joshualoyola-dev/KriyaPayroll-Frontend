@@ -47,14 +47,9 @@ const useSharedRunningPayrunOperation = () => {
     const [isEditEmployeesOnDraftLoading, setIsEditEmployeesOnDraftLoading] = useState(false);
 
     // --- Payrun date editing state ---
-    const [editDates, setEditDates] = useState({
-        payrun_start_date: null,
-        payrun_end_date: null,
-        payment_date: null,
-    });
+    const [editPayrunInfoForm, setEditPayrunInfoForm] = useState({});
     const [isEditingDates, setIsEditingDates] = useState(false);
     const [isSavingDates, setIsSavingDates] = useState(false);
-    const [dateError, setDateError] = useState("");
 
     const { payitems } = usePayitemContext();
     const { activeEmployees, employees } = useEmployeeContext();
@@ -392,44 +387,41 @@ const useSharedRunningPayrunOperation = () => {
 
     // --- Payrun date editing handlers ---
     const startEditDates = (payrunToEdit) => {
-        setEditDates({
+        setEditPayrunInfoForm({
             payrun_start_date: payrunToEdit.payrun_start_date,
             payrun_end_date: payrunToEdit.payrun_end_date,
             payment_date: payrunToEdit.payment_date,
         });
         setIsEditingDates(true);
-        setDateError("");
     };
 
     const cancelEditDates = (payrunToEdit) => {
-        setEditDates({
+        setEditPayrunInfoForm({
             payrun_start_date: payrunToEdit.payrun_start_date,
             payrun_end_date: payrunToEdit.payrun_end_date,
             payment_date: payrunToEdit.payment_date,
         });
         setIsEditingDates(false);
-        setDateError("");
     };
 
     const handleDateChange = (e) => {
         const { name, value } = e.target;
-        setEditDates((prev) => ({ ...prev, [name]: value }));
+        setEditPayrunInfoForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSaveDates = async (payrunToEdit) => {
         // Only save if changed
         if (
-            editDates.payrun_start_date === payrunToEdit.payrun_start_date &&
-            editDates.payrun_end_date === payrunToEdit.payrun_end_date &&
-            editDates.payment_date === payrunToEdit.payment_date
+            editPayrunInfoForm.payrun_start_date === payrunToEdit.payrun_start_date &&
+            editPayrunInfoForm.payrun_end_date === payrunToEdit.payrun_end_date &&
+            editPayrunInfoForm.payment_date === payrunToEdit.payment_date
         ) {
             setIsEditingDates(false);
             return;
         }
         setIsSavingDates(true);
-        setDateError("");
         try {
-            await editPayrunPeriod(company.company_id, payrunToEdit.payrun_id, editDates);
+            await editPayrunPeriod(company.company_id, payrunToEdit.payrun_id, editPayrunInfoForm);
             // Refetch updated payrun to refresh the table
             const result = await getPayrun(company.company_id, payrunToEdit.payrun_id);
             setPayrun(result.data.payrun);
@@ -440,7 +432,6 @@ const useSharedRunningPayrunOperation = () => {
             await handleFetchPayruns();
             addToast("Successfully updated payrun dates", "success");
         } catch (err) {
-            setDateError("Failed to update dates. Please try again.");
             addToast("Failed to update payrun dates", "error");
         } finally {
             setIsSavingDates(false);
@@ -491,10 +482,9 @@ const useSharedRunningPayrunOperation = () => {
         deleteSelectedPayslipsFromDraft,
 
         // Payrun date editing state and handlers
-        editDates, setEditDates,
+        editPayrunInfoForm, setEditPayrunInfoForm,
         isEditingDates, setIsEditingDates,
         isSavingDates, setIsSavingDates,
-        dateError, setDateError,
         startEditDates,
         cancelEditDates,
         handleDateChange,

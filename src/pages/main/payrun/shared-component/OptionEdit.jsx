@@ -32,14 +32,12 @@ const OptionEdit = () => {
 
     // Use payrun date editing state and handlers from useSharedRunningPayrunOperationContext
     const {
-        editDates,
-        setEditDates,
+        editPayrunInfoForm,
+        setEditPayrunInfoForm,
         isEditingDates,
         setIsEditingDates,
         isSavingDates,
         setIsSavingDates,
-        dateError,
-        setDateError,
         startEditDates,
         cancelEditDates,
         handleDateChange,
@@ -150,7 +148,7 @@ const OptionEdit = () => {
                         <input
                             type="date"
                             name="payrun_start_date"
-                            value={editDates.payrun_start_date?.slice(0, 10) || ""}
+                            value={editPayrunInfoForm.payrun_start_date?.slice(0, 10) || ""}
                             onChange={handleDateChange}
                             className="w-36 px-2 py-2 border border-teal-500 rounded-3xl text-sm focus:ring-2 focus:ring-teal-500"
                         />
@@ -168,7 +166,7 @@ const OptionEdit = () => {
                         <input
                             type="date"
                             name="payrun_end_date"
-                            value={editDates.payrun_end_date?.slice(0, 10) || ""}
+                            value={editPayrunInfoForm.payrun_end_date?.slice(0, 10) || ""}
                             onChange={handleDateChange}
                             className="w-36 px-2 py-2 border border-teal-500 rounded-3xl text-sm focus:ring-2 focus:ring-teal-500"
                         />
@@ -187,7 +185,7 @@ const OptionEdit = () => {
                             <input
                                 type="date"
                                 name="payment_date"
-                                value={editDates.payment_date?.slice(0, 10) || ""}
+                                value={editPayrunInfoForm.payment_date?.slice(0, 10) || ""}
                                 onChange={handleDateChange}
                                 className="w-36 px-2 py-2 border border-teal-500 rounded-3xl text-sm focus:ring-2 focus:ring-teal-500"
                             />
@@ -225,7 +223,7 @@ const OptionEdit = () => {
                             </div>
                         )}
                     </div>
-                    {dateError && <span className="text-xs text-red-500 mt-2 block">{dateError}</span>}
+
                 </div>
             </div>
             {employeeForLastPay && (
