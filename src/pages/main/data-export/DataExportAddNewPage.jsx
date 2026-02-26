@@ -5,7 +5,7 @@ import StartIllustration from "../../../components/Start";
 import NoAccess from "../../../components/NoAccess";
 import env from "../../../configs/env.config";
 import { userHasFeatureAccess } from "../../../utility/access-controll.utility";
-import { getFormTypeById, getHistoryPath, SECTION_2316_COLUMNS } from "../../../configs/data-export.config";
+import { getFormTypeById, getHistoryPath } from "../../../configs/data-export.config";
 import DataExportGenerateForm from "./DataExportGenerateForm";
 import FixedHeaderTable from "./FixedHeaderTable";
 import { useYtdContext } from "../../../contexts/YtdProvider";
@@ -14,7 +14,8 @@ import { useCompanyContext } from "../../../contexts/CompanyProvider";
 import { useToastContext } from "../../../contexts/ToastProvider";
 import { convertToISO8601 } from "../../../utility/datetime.utility";
 import { downloadExcel1601c } from "../../../utility/excel.utility";
-import { fetch2316Data, createTaxExportHistory, getTaxExportDetail, updateTaxExportHistory } from "../../../services/data-export.service";
+import { normalizeTemplateValues } from "../../../data/data-form.data";
+import { fetchTemplate, fetch2316Data, createTaxExportHistory, getTaxExportDetail, updateTaxExportHistory } from "../../../services/data-export.service";
 import { generate2316Pdf, generate1601cPdf } from "../../../api/export.api";
 
 const toNum = (v) => {
@@ -50,6 +51,34 @@ const recompute2316Row = (row) => {
 
     r.total_taxable_compensation = toNum(r.taxable_compensation);               // 52 = 21
     return r;
+};
+
+// Fields that are auto-calculated and must be skipped during validation
+const COMPUTED_2316_FIELDS = new Set([
+    "taxable_compensation",
+    "gross_taxable_compensation",
+    "total_tax_withheld",
+    "total_tax_withheld_after_credit",
+    "total_non_taxable_compensation",
+    "total_taxable_compensation",
+]);
+
+// Merge backend field_code-keyed values into the template array
+const mergeTemplate2316WithBackend = (template, backendRow) => {
+    return normalizeTemplateValues(
+        template.map((f) => ({
+            ...f,
+            value: backendRow[f.field_code] !== undefined ? backendRow[f.field_code] : (f.value ?? ""),
+        }))
+    );
+};
+
+// Convert template array → flat row object keyed by field_code
+const templateToRow2316 = (template) => {
+    return template.reduce((acc, f) => {
+        acc[f.field_code] = f.value ?? "";
+        return acc;
+    }, {});
 };
 
 const defaultFormData = {
@@ -93,7 +122,31 @@ const DataExportAddNewPage = () => {
     const [formData2316, setFormData2316] = useState({ ...defaultFormData });
     const [loading2316, setLoading2316] = useState(false);
     const [rows2316, setRows2316] = useState([]);
+    const [template2316, setTemplate2316] = useState([]);
+    const [columns2316, setColumns2316] = useState([]);
+    const [columnsLoading2316, setColumnsLoading2316] = useState(false);
 
+    // Commit a fresh 2316 template into all derived state — mirrors applyTemplate in use1601c
+    const applyTemplate2316 = (fetchedTemplate) => {
+        setTemplate2316(fetchedTemplate);
+        setColumns2316(fetchedTemplate.map((f) => ({ key: f.field_code, label: f.field_name })));
+    };
+
+    // Load 2316 template once on mount — mirrors use1601c's loadTemplate useEffect
+    useEffect(() => {
+        const loadTemplate = async () => {
+            setColumnsLoading2316(true);
+            try {
+                const res = await fetchTemplate("2316");
+                applyTemplate2316(res?.data?.template ?? []);
+            } catch (err) {
+                addToast(`Failed to load 2316 template: ${err?.message || err}`, "error");
+            } finally {
+                setColumnsLoading2316(false);
+            }
+        };
+        loadTemplate();
+    }, []); 
     useEffect(() => {
         if (!formTypeConfig) {
             navigate(getHistoryPath("ytd"), { replace: true });
@@ -104,7 +157,7 @@ const DataExportAddNewPage = () => {
     useEffect(() => {
         const id = editId || viewId;
         if (formTypeFromPath !== "1601c" || !id) return;
-        if (hook1601c.columnsLoading || !hook1601c.columns?.length) return;
+        if (!hook1601c || hook1601c.columnsLoading || !hook1601c.columns?.length) return;
         let cancelled = false;
         const load = async () => {
             try {
@@ -134,34 +187,52 @@ const DataExportAddNewPage = () => {
         return () => {
             cancelled = true;
         };
-    }, [formTypeFromPath, editId, viewId, hook1601c.columnsLoading, hook1601c.columns?.length]);
+    }, [formTypeFromPath, editId, viewId, hook1601c?.columnsLoading, hook1601c?.columns?.length]);
 
     // Load draft for edit/view when URL has ?edit=<id> or ?view=<id> (2316)
+    // Now guards on template loaded, mirrors 1601c draft load pattern
     useEffect(() => {
         const id = editId || viewId;
         if (formTypeFromPath !== "2316" || !id) return;
+        if (columnsLoading2316 || !columns2316?.length) return;
         let cancelled = false;
         const load = async () => {
             try {
                 const detail = await getTaxExportDetail(id);
                 if (cancelled || !detail) return;
-                const snapshot = detail.form_data_snapshot ?? {};
+                const raw = detail.form_data_snapshot ?? {};
+                const snapshot =
+                    typeof raw === "string"
+                        ? (() => { try { return JSON.parse(raw); } catch { return {}; } })()
+                        : raw ?? {};
                 const fromDate = detail.period_from ? new Date(detail.period_from).toISOString().slice(0, 10) : "";
                 const toDate = detail.period_to ? new Date(detail.period_to).toISOString().slice(0, 10) : "";
                 setFormData2316((prev) => ({ ...prev, date_start: fromDate, date_end: toDate }));
-                const rows = Array.isArray(snapshot.rows) && snapshot.rows.length > 0
-                    ? snapshot.rows.map((r) => recompute2316Row(r))
-                    : (snapshot && typeof snapshot === "object" && !snapshot.template
-                        ? [recompute2316Row(snapshot)]
-                        : []);
-                setRows2316(rows);
+
+                // Support both multi-row (snapshot.rows) and single-row (snapshot.template / snapshot)
+                let rowsToLoad = [];
+                if (Array.isArray(snapshot.rows) && snapshot.rows.length > 0) {
+                    rowsToLoad = snapshot.rows;
+                } else {
+                    const rowData =
+                        snapshot && typeof snapshot === "object" && !Array.isArray(snapshot)
+                            ? (snapshot.template ?? snapshot)
+                            : {};
+                    if (Object.keys(rowData).length) rowsToLoad = [rowData];
+                }
+
+                // Merge each saved row against the template then recompute — mirrors loadDraftForEdit
+                setRows2316(rowsToLoad.map((savedRow) => {
+                    const filled = mergeTemplate2316WithBackend(template2316, savedRow);
+                    return recompute2316Row(templateToRow2316(filled));
+                }));
             } catch {
                 if (!cancelled) addToast("Failed to load draft for editing", "error");
             }
         };
         load();
         return () => { cancelled = true; };
-    }, [formTypeFromPath, editId, viewId]);
+    }, [formTypeFromPath, editId, viewId, columnsLoading2316, columns2316?.length]);
 
     const handleSuccess = () => {
         navigate(getHistoryPath(formTypeFromPath), { replace: true });
@@ -201,7 +272,15 @@ const DataExportAddNewPage = () => {
                 formData2316.employee_ids,
             );
             const data2316 = res?.data?.data2316 ?? {};
-            const rowList = Object.values(data2316).map(recompute2316Row);
+
+            // Prefer fresh template from response, fall back to cached — mirrors handleGenerate in use1601c
+            const activeTemplate = res?.data?.template?.length ? res.data.template : template2316;
+            if (res?.data?.template?.length) applyTemplate2316(res.data.template);
+
+            const rowList = Object.values(data2316).map((backendRow) => {
+                const filled = mergeTemplate2316WithBackend(activeTemplate, backendRow);
+                return recompute2316Row(templateToRow2316(filled));
+            });
             setRows2316(rowList);
             addToast("2316 data generated from payrun.", "success");
         } catch (err) {
@@ -333,7 +412,8 @@ const DataExportAddNewPage = () => {
     const is2316 = formTypeFromPath === "2316";
     const viewOnlyMode = !!viewId; // View-only mode when ?view= param is present
     const show1601cTable = is1601c && (hook1601c.columns?.length ?? 0) > 0 && (hook1601c.rows?.length ?? 0) > 0;
-    const show2316Table = is2316 && rows2316.length > 0;
+    // Also requires columns2316 to be loaded — mirrors show1601cTable guard
+    const show2316Table = is2316 && columns2316.length > 0 && rows2316.length > 0;
 
     const handle2316CellChange = (rowIdx, key, value) => {
         setRows2316((prev) => {
@@ -399,49 +479,29 @@ const DataExportAddNewPage = () => {
             addToast("Please generate data first before creating a PDF", "error");
             return;
         }
-        
-        // Validate that all columns are filled (excluding computed columns)
-        const columns = SECTION_2316_COLUMNS || [];
-        // Computed fields that are auto-calculated and shouldn't be validated
-        const computedFields = new Set([
-            "taxable_compensation",           // 21 = computed
-            "gross_taxable_compensation",     // 23 = computed
-            "total_tax_withheld",             // 26 = computed
-            "total_tax_withheld_after_credit", // 28 = computed
-            "total_non_taxable_compensation",  // 38 = computed
-            "total_taxable_compensation",      // 52 = computed
-        ]);
-        
+
+        // Validate using columns2316 from template, skip computed and locked fields
         const emptyColumns = [];
         
         // Check all rows for empty columns
         for (const row of rows2316) {
-            for (const column of columns) {
+            for (const column of columns2316) {
                 const key = column.key;
-                // Skip computed columns
-                if (computedFields.has(key)) {
-                    continue;
-                }
-                
+                if (COMPUTED_2316_FIELDS.has(key)) continue;
                 const value = row[key];
-                // Check if value is empty, null, undefined, or just whitespace
-                if (value === null || value === undefined || value === "" || (typeof value === "string" && value.trim() === "")) {
-                    const columnLabel = column.label || key;
-                    // Only add if not already in the list
-                    if (!emptyColumns.includes(columnLabel)) {
-                        emptyColumns.push(columnLabel);
-                    }
+                if (
+                    (value === null || value === undefined || value === "" || (typeof value === "string" && value.trim() === "")) &&
+                    !emptyColumns.includes(column.label || key)
+                ) {
+                    emptyColumns.push(column.label || key);
                 }
             }
         }
-        
         if (emptyColumns.length > 0) {
             addToast(`Please fill up all columns. You cannot generate a PDF if not filling all columns. Missing: ${emptyColumns.slice(0, 3).join(", ")}${emptyColumns.length > 3 ? ` and ${emptyColumns.length - 3} more` : ""}`, "error");
             return;
         }
-        
         try {
-            // 1. Update draft / create entry first (so backend can fetch from DB)
             if (editId) {
                 await updateTaxExportHistory(editId, {
                     status: "PDF",
@@ -456,18 +516,13 @@ const DataExportAddNewPage = () => {
                     status: "PDF",
                 });
             }
-            
-            // 2. Generate PDF (await so it runs for both new and edit)
             addToast(`Generating PDF for year ${year}...`, "info");
             const success = await generate2316Pdf(company.company_id, year);
-            
             if (success) {
                 addToast("PDF generated successfully and saved to Google Drive!", "success");
             } else {
                 addToast("PDF generation failed", "error");
             }
-            
-            // 3. Navigate back after PDF generation
             navigate(getHistoryPath("2316"), { replace: true });
         } catch (err) {
             console.error("Save or PDF Error:", err);
@@ -479,7 +534,7 @@ const DataExportAddNewPage = () => {
     const handle2316Download = () => {
         if (rows2316.length === 0) return;
         const filename = `2316-export-${formData2316.date_start || "date"}-${formData2316.date_end || "date"}`.replace(/\//g, "-");
-        downloadExcel1601c(SECTION_2316_COLUMNS, rows2316, filename, "2316");
+        downloadExcel1601c(columns2316, rows2316, filename, "2316");
     };
 
     const handle1601cSaveDraft = async () => {
@@ -527,49 +582,32 @@ const DataExportAddNewPage = () => {
             addToast("Please select a valid date range (From and To)", "warning");
             return;
         }
-        
-        // Extract year and month from period_to for PDF generation
         const dateObj = period_to ? new Date(period_to) : null;
         const year = dateObj ? dateObj.getFullYear() : null;
         const month = dateObj ? dateObj.getMonth() + 1 : null;
-        
         if (!year || !month) {
             addToast("Could not determine year/month from date range", "error");
             return;
         }
-        
         const row = hook1601c.rows?.[0];
         if (!row) {
             addToast("Please generate data first before creating a PDF", "error");
             return;
         }
-        
-        // Validate that all columns are filled (excluding locked/computed columns)
         const columns = hook1601c.columns || [];
-        const lockedKeys = hook1601c.lockedKeys || new Set();
         const emptyColumns = [];
-        
         for (const column of columns) {
             const key = column.key;
-            // Skip locked/computed columns as they are auto-calculated
-            if (lockedKeys.has(key)) {
-                continue;
-            }
-            
             const value = row[key];
-            // Check if value is empty, null, undefined, or just whitespace
             if (value === null || value === undefined || value === "" || (typeof value === "string" && value.trim() === "")) {
                 emptyColumns.push(column.label || key);
             }
         }
-        
         if (emptyColumns.length > 0) {
             addToast(`Please fill up all columns. You cannot generate a PDF if not filling all columns. Missing: ${emptyColumns.slice(0, 3).join(", ")}${emptyColumns.length > 3 ? ` and ${emptyColumns.length - 3} more` : ""}`, "error");
             return;
         }
-        
         try {
-            // 1. Update draft / create entry first (so backend can fetch from DB)
             if (editId) {
                 await updateTaxExportHistory(editId, {
                     status: "PDF",
@@ -584,18 +622,13 @@ const DataExportAddNewPage = () => {
                     status: "PDF",
                 });
             }
-            
-            // 2. Generate PDF (await so it runs for both new and edit)
             addToast(`Generating PDF for ${month}/${year}...`, "info");
             const success = await generate1601cPdf(company.company_id, year, month);
-            
             if (success) {
                 addToast("PDF generated successfully and saved to Google Drive!", "success");
             } else {
                 addToast("PDF generation failed", "error");
             }
-            
-            // 3. Navigate back after PDF generation
             navigate(getHistoryPath("1601c"), { replace: true });
         } catch (err) {
             console.error("Save or PDF Error:", err);
@@ -620,11 +653,9 @@ const DataExportAddNewPage = () => {
                         </button>
                     </div>
                 )}
-                
                 <h1 className="text-xl font-bold text-gray-900 mb-4">
                     {viewOnlyMode ? "View" : "Add New"} — {formTypeConfig.historyTitle.replace(" History", "")}
                 </h1>
-                
                 {/* Show form and action buttons only if NOT in view-only mode */}
                 {!viewOnlyMode && (
                     <div className="flex flex-wrap items-end justify-between gap-4">
@@ -706,7 +737,7 @@ const DataExportAddNewPage = () => {
                     <div className="mt-8">
                         {is1601c && (editId || viewId) && hook1601c.columnsLoading ? (
                             <p className="text-center text-gray-500">Loading {viewOnlyMode ? 'data' : 'draft'}…</p>
-                        ) : is2316 && (editId || viewId) ? (
+                        ) : is2316 && (editId || viewId) && columnsLoading2316 ? (
                             <p className="text-center text-gray-500">Loading {viewOnlyMode ? 'data' : 'draft'}…</p>
                         ) : (
                             !viewOnlyMode && (
@@ -724,18 +755,17 @@ const DataExportAddNewPage = () => {
                             columns={hook1601c.columns}
                             rows={hook1601c.rows}
                             onChangeCell={viewOnlyMode ? undefined : hook1601c.handleChangeCell}
-                            lockedKeys={viewOnlyMode ? new Set(hook1601c.columns.map(c => c.key)) : hook1601c.lockedKeys}
+                              lockedKeys={viewOnlyMode ? new Set(hook1601c.columns.map(c => c.key)) : hook1601c.lockedKeys}
                         />
                     </div>
                 )}
                 {show2316Table && (
                     <div className="mt-6">
                         <FixedHeaderTable
-                            columns={SECTION_2316_COLUMNS}
+                            columns={columns2316}
                             rows={rows2316}
                             onChangeCell={viewOnlyMode ? undefined : handle2316CellChange}
-                            lockedKeys={viewOnlyMode ? new Set(SECTION_2316_COLUMNS.map(c => c.key)) : new Set()}
-                        />
+                            lockedKeys={viewOnlyMode ? new Set(columns2316.map(c => c.key)) : new Set()}                        />
                     </div>
                 )}
             </div>

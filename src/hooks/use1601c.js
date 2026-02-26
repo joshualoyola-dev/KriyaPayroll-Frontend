@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { convertToISO8601 } from "../utility/datetime.utility";
-import { fetch1601cColumns, fetch1601cDataAdvanced } from "../services/data-export.service";
+import { fetch1601cData, fetchTemplate } from "../services/data-export.service";
 import { indexTemplateByCode, normalizeTemplateValues } from "../data/data-form.data";
 import { downloadExcel1601c } from "../utility/excel.utility";
 
@@ -36,219 +36,156 @@ const ensureRowShape = (row, columns) => {
     return shaped;
 };
 
+
+export const mergeTemplateWithBackend = (template, backendRow) => {
+    return normalizeTemplateValues(
+        template.map(f => ({
+            ...f,
+            value: backendRow[f.field_code] ?? f.value ?? "", // use backend value if exists
+        }))
+    );
+}
+
+// Convert template → row keyed by field_code
+export const templateToRow = (template) => {
+    return template.reduce((acc, f) => {
+        acc[f.field_code] = f.value ?? "";
+        return acc;
+    }, {});
+};
+
+
 const use1601c = () => {
-    const [formData, setFormData] = useState({ ...defaultFormData });
+    const [formData, setFormData] = useState({
+        date_start: "",
+        date_end: "",
+        active_employees: true,
+        payrun_payment_or_period: "PAYMENT",
+        payrun_status: ["APPROVED"],
+        employee_ids: [],
+    });
     const [rows, setRows] = useState([]);
     const [generateLoading, setGenerateLoading] = useState(false);
     const [downloadLoading, setDownloadLoading] = useState(false);
     const [columns, setColumns] = useState([]);
-    const [lockedKeys, setLockedKeys] = useState(new Set());
-    const [zeroDefaultKeys, setZeroDefaultKeys] = useState([]);
     const [template, setTemplate] = useState([]);
     const [columnsLoading, setColumnsLoading] = useState(false);
 
     const { company } = useCompanyContext();
     const { addToast } = useToastContext();
 
-    // Load columns on mount
+    const applyTemplate = (fetchedTemplate) => {
+        setTemplate(fetchedTemplate);
+        setColumns(fetchedTemplate.map((f) => ({ key: f.field_code, label: f.field_name })));
+    };
+
     useEffect(() => {
-        const loadColumns = async () => {
+        if (!company?.company_id) return;
+
+        const loadTemplate = async () => {
             setColumnsLoading(true);
             try {
-                const res = await fetch1601cColumns();
-                const data = res?.data ?? {};
-                setColumns(data.columns ?? []);
-                setLockedKeys(new Set(data.lockedKeys ?? []));
-                setZeroDefaultKeys(data.zeroDefaultKeys ?? []);
-                setTemplate(data.template ?? []);
-            } catch (error) {
-                addToast("Failed to load 1601C columns", "error");
+                const res = await fetchTemplate("1601C");
+                applyTemplate(res?.data?.template ?? []);
+            } catch (err) {
+                addToast(`Failed to load 1601C template: ${err?.message || err}`, "error");
             } finally {
                 setColumnsLoading(false);
             }
         };
-        loadColumns();
-    }, [addToast]);
+
+        loadTemplate();
+    }, [company?.company_id]);
 
     const recompute1601cRow = (row, columnsList) => {
-        const totalComp = toNumber(row["Total Comp (14)"]);
-        const minWage = toNumber(row["Min Wage (15)"]);
-        const holidayPay = toNumber(row["Holiday Pay (16)"]);
-        const thirteenth = toNumber(row["13th Month (17)"]);
-        const deMinimis = toNumber(row["De Minimis (18)"]);
-        const sssPhic = toNumber(row["SSS/PHIC (19)"]);
-        const otherNonTax = toNumber(row["Other Non-Tax (20)"]);
-        const exempt = toNumber(row["ess: Exempt (23)"]);
+        const totalComp = toNumber(row["total_compensation"]);
+        const minWage = toNumber(row["minimum_wage"]);
+        const holidayPay = toNumber(row["holiday_pay"]);
+        const thirteenth = toNumber(row["thirteenth_month"]);
+        const deMinimis = toNumber(row["de_minimis"]);
+        const sssPhic = toNumber(row["mandatory_contributions"]);
+        const otherNonTax = toNumber(row["other_non_taxable"]);
+        const exempt = toNumber(row["less_exempt"]);
 
         const totalNonTax = minWage + holidayPay + thirteenth + deMinimis + sssPhic + otherNonTax;
         const totalTaxable = totalComp - totalNonTax;
         const netTaxable = totalTaxable - exempt;
 
-        const taxWithheld = toNumber(row["Tax Withheld (25)"]);
-        const adjustment = toNumber(row["Adjustment (26)"]);
+        const taxWithheld = toNumber(row["tax_withheld"]);
+        const adjustment = toNumber(row["adjustment"]);
         const taxRemittance = taxWithheld + adjustment;
 
-        const prevRemitted = toNumber(row["Prev Remitted (28)"]);
-        const otherRemit = toNumber(row["Other Remit (29)"]);
+        const prevRemitted = toNumber(row["previous_remitted"]);
+        const otherRemit = toNumber(row["other_remit"]);
         const totalRemit = prevRemitted + otherRemit;
         const taxDue = taxRemittance - totalRemit;
 
-        const surcharge = toNumber(row["Surcharge (32)"]);
-        const interest = toNumber(row["Interest (33)"]);
-        const compromise = toNumber(row["Compromise (34)"]);
+        const surcharge = toNumber(row["surcharge"]);
+        const interest = toNumber(row["interest"]);
+        const compromise = toNumber(row["compromise"]);
         const totalPenalties = surcharge + interest + compromise;
         const totalAmountDue = taxDue + totalPenalties;
 
-        const totalAdjSch = toNumber(row["Adjustment 1"]) + toNumber(row["Adjustment 2"]) + toNumber(row["Adjustment 3"]);
+        const totalAdjSch = toNumber(row["adjustment_1"]) + toNumber(row["adjustment_2"]) + toNumber(row["adjustment_3"]);
 
         return ensureRowShape({
             ...row,
-            "Total Non-Tax (21)": formatMoney(totalNonTax),
-            "Total Taxable (22)": formatMoney(totalTaxable),
-            "Net Taxable (24)": formatMoney(netTaxable),
-            "Tax Remittance (27)": formatMoney(taxRemittance),
-            "Total Remit (30)": formatMoney(totalRemit),
-            "Tax Due (31)": formatMoney(taxDue),
-            "Total Penalties (35)": formatMoney(totalPenalties),
-            "Total Amount Due (36)": formatMoney(totalAmountDue),
-            "Total Adj (Sch)": formatMoney(totalAdjSch),
+            "total_non_taxable": formatMoney(totalNonTax),
+            "total_taxable_compensation": formatMoney(totalTaxable),
+            "net_taxable": formatMoney(netTaxable),
+            "tax_remittance": formatMoney(taxRemittance),
+            "total_remit": formatMoney(totalRemit),
+            "tax_due": formatMoney(taxDue),
+            "total_penalties": formatMoney(totalPenalties),
+            "total_amount_due": formatMoney(totalAmountDue),
+            "total_adjustment": formatMoney(totalAdjSch),
         }, columnsList);
     };
 
-    // Backend sends data with column keys ("Total Comp (14)", "Agent Name", etc.), not field_code
-    const FIELD_CODE_TO_COLUMN_KEY = {
-        month: "Month",
-        year: "Year",
-        sheets_attached: "Sheets Attached",
-        tin: "TIN",
-        company_tin: "TIN",
-        rdo: "RDO Code",
-        company_name: "Agent Name",
-        company_address: "Address",
-        company_phone: "Contact No",
-        company_email: "Email",
-        total_compensation: "Total Comp (14)",
-        minimum_wage: "Min Wage (15)",
-        holiday_overtime_night_diff_hazard: "Holiday Pay (16)",
-        holiday_pay: "Holiday Pay (16)",
-        thirteenth_month: "13th Month (17)",
-        de_minimis: "De Minimis (18)",
-        mandatory_contributions: "SSS/PHIC (19)",
-        other_non_taxable: "Other Non-Tax (20)",
-        total_non_taxable: "Total Non-Tax (21)",
-        total_taxable_compensation: "Total Taxable (22)",
-        less_exempt: "ess: Exempt (23)",
-        net_taxable_compensation: "Net Taxable (24)",
-        tax_withheld: "Tax Withheld (25)",
-        total_taxes_withheld: "Tax Withheld (25)",
-        amended_return: "Amended Return?",
-        taxes_withheld_flag: "Taxes Withheld?",
-        tax_relief: "Tax Relief",
-        specify: "Specify(13A)",
-        prev_month_1: "Prev Month 1",
-        date_paid_1: "Date Paid 1",
-        bank_1: "Bank 1",
-        ref_1: "Ref 1",
-        tax_paid_1: "Tax Paid 1",
-        tax_due_1: "Tax Due 1",
-        adjustment_1: "Adjustment 1",
-        prev_month_2: "Prev Month 2",
-        date_paid_2: "Date Paid 2",
-        bank_2: "Bank 2",
-        ref_2: "Ref 2",
-        tax_paid_2: "Tax Paid 2",
-        tax_due_2: "Tax Due 2",
-        adjustment_2: "Adjustment 2",
-        prev_month_3: "Prev Month 3",
-        date_paid_3: "Date Paid 3",
-        bank_3: "Bank 3",
-        ref_3: "Ref 3",
-        tax_paid_3: "Tax Paid 3",
-        tax_due_3: "Tax Due 3",
-        adjustment_3: "Adjustment 3",
-        total_adjustment: "Total Adj (Sch)",
-        payment_type: "Payment Type",
-        pay_bank: "Pay Bank",
-        pay_number: "Pay Number",
-        pay_date: "Pay Date",
-        pay_amount: "Pay Amount",
-        others: "Others",
-        zipcode: "Zipcode",
-    };
-
-    const fillTemplateWithBackend = (tpl, backendRow = {}) => {
-        const next = (tpl ?? []).map((f) => {
-            if (!f?.field_code) return f;
-            const columnKey = FIELD_CODE_TO_COLUMN_KEY[f.field_code];
-            if (!columnKey || backendRow[columnKey] === undefined) return f;
-            return { ...f, value: backendRow[columnKey] };
-        });
-        return normalizeTemplateValues(next);
-    };
-
-    const templateToRow = (tpl) => {
-        const byCode = indexTemplateByCode(tpl);
-
-        // Map template field_code -> current table column keys (same as FIELD_CODE_TO_COLUMN_KEY for BIR 1601c)
-        const map = { ...FIELD_CODE_TO_COLUMN_KEY };
-
-        const row = {};
-        for (const [code, colKey] of Object.entries(map)) {
-            const item = byCode.get(code);
-            if (!item) continue;
-            row[colKey] = item.value;
-        }
-        return row;
-    };
 
     const handleGenerate = async (e) => {
         if (e) e.preventDefault();
+        if (!company?.company_id) {
+            addToast("No company selected", "error");
+            return;
+        }
+        const date_start = convertToISO8601(formData.date_start);
+        const date_end = convertToISO8601(formData.date_end);
+
+        if (!date_start || !date_end) return;
         setGenerateLoading(true);
         try {
-            if (columns.length === 0) {
-                addToast("Columns are not loaded yet.", "warning");
-                return;
-            }
-            if (!company?.company_id) {
-                addToast("No company selected", "error");
-                return;
-            }
-            const date_start = convertToISO8601(formData.date_start);
-            const date_end = convertToISO8601(formData.date_end);
-
-            if (!date_start || !date_end) {
-                addToast("Please select a valid date range", "warning");
-                return;
-            }
-
             // 1) Call backend to compute/fill by field_code
             const activeEmployeesBool = formData.active_employees ? "true" : "false";
-            const res = await fetch1601cDataAdvanced(
+            const res = await fetch1601cData(
                 company.company_id,
                 date_start,
                 date_end,
                 activeEmployeesBool,
                 formData.payrun_payment_or_period,
                 formData.payrun_status,
+                // formData.payrun_type,
                 formData.employee_ids,
             );
-            const companyRow = res?.data?.data1601c?.[company.company_id] ?? {};
+            console.log("📄 Backend response for 1601C:", res?.data);
+            const data = res?.data ?? {};
+            console.log("Backend response for columns and template:", res?.data);
+            // setColumns(data.columns ?? []);
+            const fetchedTemplate = data.template ?? [];
+            const backendRow = data.data1601c?.[company.company_id] ?? {};
 
-            // 2) Merge backend values into template (then normalize number types)
-            const filledTemplate = fillTemplateWithBackend(template, companyRow);
-
-            // 3) Convert template -> table row keys used by FixedHeaderTable
-            const templateRow = templateToRow(filledTemplate);
-
-            const baseRow = ensureRowShape(templateRow, columns);
-
-            for (const key of zeroDefaultKeys) {
-                if (!baseRow[key] && baseRow[key] !== 0) baseRow[key] = "0";
+            if (data.template?.length) {
+                setTemplate(data.template);
+                setColumns(data.template.map((f) => ({ key: f.field_code, label: f.field_name })));
             }
+            const filledTemplate = mergeTemplateWithBackend(fetchedTemplate, backendRow);
+            const tableRow = templateToRow(filledTemplate);
 
-            // 4) Keep your existing frontend computed columns logic
-            setRows([recompute1601cRow(baseRow, columns)]);
+            setRows([(tableRow)]);
+
         } catch (error) {
+            addToast(`Error generating report: ${error?.message || error}`, "error");
+
             addToast("Error generating report", "error");
         } finally {
             setGenerateLoading(false);
@@ -256,7 +193,6 @@ const use1601c = () => {
     };
 
     const handleChangeCell = (rowIdx, key, value) => {
-        if (lockedKeys.has(key)) return;
         setRows((prev) => {
             const next = [...prev];
             next[rowIdx] = recompute1601cRow({ ...next[rowIdx], [key]: value }, columns);
@@ -289,7 +225,11 @@ const use1601c = () => {
             setFormData((prev) => ({ ...prev, date_start: fromStr, date_end: toStr }));
             const row = snapshotRow && typeof snapshotRow === "object" && !Array.isArray(snapshotRow) ? snapshotRow : {};
             const cols = Array.isArray(columns) ? columns : [];
-            setRows([recompute1601cRow(row, cols)]);
+            // setRows([recompute1601cRow(row, cols)]);
+
+            const filledTemplate = mergeTemplateWithBackend(template, row);
+            const tableRow = templateToRow(filledTemplate);
+            setRows([recompute1601cRow(tableRow)]);
         } catch (err) {
             addToast("Failed to load draft data", "error");
             setRows([]);
@@ -301,14 +241,14 @@ const use1601c = () => {
         rows, setRows,
         generateLoading,
         downloadLoading,
-        columns,
-        lockedKeys,
-        columnsLoading,
+        columns, columnsLoading,
         handleGenerate,
         handleDownload,
         handleChangeCell,
         loadDraftForEdit,
     };
 };
+
+
 
 export default use1601c;

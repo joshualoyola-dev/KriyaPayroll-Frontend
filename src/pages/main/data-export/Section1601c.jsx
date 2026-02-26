@@ -24,6 +24,7 @@ const Section1601c = () => {
         handleChangeCell
     } = use1601c();
 
+
     const { employees, mapEmployeeIdToEmployeeName } = useEmployeeContext();
 
     const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
@@ -255,7 +256,6 @@ const Section1601c = () => {
                         columns={columns}
                         rows={rows}
                         onChangeCell={handleChangeCell}
-                        lockedKeys={lockedKeys}
                     />
                 )}
             </div>
