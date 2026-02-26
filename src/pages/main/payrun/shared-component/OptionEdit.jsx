@@ -11,35 +11,30 @@ import DeleteEmployeesOnPayrunDraft from "./DeleteEmployeesOnPayrunDraft";
 
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();
-    const {
-        payrun,
-        setPayrun,
-        handleClosePayrun,
-        handleSaveEdit,
-        handleChangeStatus,
-        statusLoading,
-        isSaving,
-        handleAddPayitemToPayslips,
-        toggleLogs, handleToggleLogs,
-        logs,
-        employeeForLastPay,
-        isEditEmployeeOnDraft, setIsEditEmployeeOnDraft
-    } = useSharedRunningPayrunOperationContext();
-
+  const {
+    payrun,
+    setPayrun,
+    handleClosePayrun,
+    handleSaveEdit,
+    handleChangeStatus,
+    statusLoading,
+    isSaving,
+    handleAddPayitemToPayslips,
+    toggleLogs, handleToggleLogs,
+    logs,
+    employeeForLastPay,
+    isEditEmployeeOnDraft, setIsEditEmployeeOnDraft,
+    editPayrunInfoForm,
+    isEditingDates,
+    isSavingDates,
+    startEditDates,
+    cancelEditDates,
+    handleDateChange,
+    handleSaveDates,
+} = useSharedRunningPayrunOperationContext();
 
     const isForApproval = payrun.status === "FOR_APPROVAL";
     const isApproved = payrun.status === "APPROVED";
-
-    // Use payrun date editing state and handlers from useSharedRunningPayrunOperationContext
-    const {
-        editPayrunInfoForm,
-        isEditingDates,
-        isSavingDates,
-        startEditDates,
-        cancelEditDates,
-        handleDateChange,
-        handleSaveDates,
-    } = useSharedRunningPayrunOperationContext();
 
     // TODO: approved payrun feature
     /**
