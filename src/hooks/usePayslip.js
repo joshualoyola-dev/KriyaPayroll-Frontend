@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useToastContext } from "../contexts/ToastProvider";
 import { getPayrun, getPayslips, sendMultiplePayslip } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
+import { downloadExcelPayrunSummary } from "../utility/excel.utility";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { usePayitemContext } from "../contexts/PayitemProvider";
 import { checkPDFGenerationService } from "../services/integration.service";
@@ -116,6 +117,22 @@ const usePayslip = () => {
         }
     }, [location.pathname, company]);
 
+    const handleDownloadPayslips = async () => {
+        try {
+            const cleanedPayslips = payslips.map(payslip => ({
+                employee_id: payslip.employee_id,
+                total_deductions: payslip.total_deductions,
+                total_earnings: payslip.total_earnings,
+                total_taxes: payslip.total_taxes,
+                net_salary: payslip.net_salary,
+            }));
+            downloadExcelPayrunSummary(cleanedPayslips, mapEmployeeIdToEmployeeName, 'Payrun Summary', 'Payrun-summary');
+        } catch (error) {
+            console.log(error);
+            addToast("Failed to download payslips", "error");
+        }
+    };
+
     const checkPDFGenerationServerStatus = useCallback(async () => {
         setIsCheckingPDFService(true);
 
@@ -141,6 +158,7 @@ const usePayslip = () => {
         handleSendFinalPayslip,
         payrun, setPayrun,
         isPayrunLoading, setIsPayrunLoading,
+        handleDownloadPayslips,
         selectedEmployeeIds,
         handleToggleEmployee,
         handleSelectAll,

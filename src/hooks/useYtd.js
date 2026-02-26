@@ -61,20 +61,7 @@ const useYtd = () => {
         setDownloadLoading(true);
         try {
             const filename = `Year-to-Date - ${formatDateToWords(dateRangeFormData.date_start)} to ${formatDateToWords(dateRangeFormData.date_end)}`;
-            downloadExcelMatrix(
-                ytds,
-                mapEmployeeIdToEmployeeName,
-                mapPayitemIdToPayitemName,
-                filename,
-                'Year-to-Date',
-                {
-                    type: 'Year-to-Date',
-                    start_date: formatDateToWords(dateRangeFormData.date_start),
-                    end_date: formatDateToWords(dateRangeFormData.date_end),
-                    export_method: `By ${dateRangeFormData.payrun_payment_or_period.toLocaleLowerCase()}`,
-                }
-
-            );
+            downloadExcelMatrix(ytds, mapEmployeeIdToEmployeeName, mapPayitemIdToPayitemName, filename, 'Year-to-Date');
             return;
         } catch (error) {
             addToast(`Failed to download the year to date summary: ${error.message}`, "error");
