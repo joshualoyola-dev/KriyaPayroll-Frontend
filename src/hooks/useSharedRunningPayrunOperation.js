@@ -3,7 +3,7 @@ import { usePayitemContext } from "../contexts/PayitemProvider";
 import { useEmployeeContext } from "../contexts/EmployeeProvider";
 import { useToastContext } from "../contexts/ToastProvider";
 import { convertToISO8601, formatDateToWords } from "../utility/datetime.utility";
-import { deletePayslipsDraftsAndRelatedRecord, generatePayrun, getPayrun, getPayrunPayslipPayables, getPayslipsTotals, saveEdit, savePayrunDraft, updateStatus } from "../services/payrun.service";
+import { deletePayslipsDraftsAndRelatedRecord, generatePayrun, getPayrun, getPayrunPayslipPayables, getPayslipsTotals, saveEdit, savePayrunDraft, updateStatus, editPayrunPeriod } from "../services/payrun.service";
 import { useCompanyContext } from "../contexts/CompanyProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sanitizedPayslips } from "../utility/payrun.utility";
@@ -45,6 +45,11 @@ const useSharedRunningPayrunOperation = () => {
     const [employeeIdsForm, setEmployeeIdsForm] = useState([]);
     const [isEditEmployeeOnDraft, setIsEditEmployeeOnDraft] = useState(false);
     const [isEditEmployeesOnDraftLoading, setIsEditEmployeesOnDraftLoading] = useState(false);
+
+    // --- Payrun date editing state ---
+    const [editPayrunInfoForm, setEditPayrunInfoForm] = useState({});
+    const [isEditingDates, setIsEditingDates] = useState(false);
+    const [isSavingDates, setIsSavingDates] = useState(false);
 
     const { payitems } = usePayitemContext();
     const { activeEmployees, employees } = useEmployeeContext();
@@ -220,8 +225,8 @@ const useSharedRunningPayrunOperation = () => {
             const result = await generatePayrun(company.company_id,
                 {
                     payitem_ids,
-                    payrun_start_date: options.date_from,
-                    payrun_end_date: options.date_to,
+                    payrun_start_date: convertToISO8601(options.date_from),
+                    payrun_end_date: convertToISO8601(options.date_to),
                     employee_ids: options.employee_ids, //if empty, means include all active in payrun
                     payrun_type: payrunType.toUpperCase(),
                     ytd_from: options.ytd_from,
@@ -249,10 +254,10 @@ const useSharedRunningPayrunOperation = () => {
             const payload = {
                 payslips: cleanedPayslips,
                 payrun_type: payrunType.toUpperCase(),
-                payrun_start_date: options.date_from,
-                payrun_end_date: options.date_to,
-                payment_date: options.payment_date,
-                payrun_title: `${String(payrunType).toUpperCase() === 'LAST' ? employeeForLastPay.last_name : payrunType.toUpperCase()}: ${formatDateToWords(options.date_from)} to ${formatDateToWords(options.date_to)}`,
+                payrun_start_date: convertToISO8601(options.date_from),
+                payrun_end_date: convertToISO8601(options.date_to),
+                payment_date: convertToISO8601(options.payment_date),
+                payrun_title: `${String(payrunType).toUpperCase() === 'LAST' ? employeeForLastPay?.last_name : payrunType.toUpperCase()}: ${formatDateToWords(options.date_from)} to ${formatDateToWords(options.date_to)}`,
                 generated_by: localStorage.getItem('system_user_id'),
                 status: 'DRAFT',
             };
@@ -380,6 +385,66 @@ const useSharedRunningPayrunOperation = () => {
         }
     };
 
+    // --- Payrun date editing handlers ---
+    const startEditDates = (payrunToEdit) => {
+        setEditPayrunInfoForm({
+            payrun_start_date: convertToISO8601(payrunToEdit.payrun_start_date),
+            payrun_end_date: convertToISO8601(payrunToEdit.payrun_end_date),
+            payment_date: convertToISO8601(payrunToEdit.payment_date),
+        });
+        setIsEditingDates(true);
+    };
+
+    const cancelEditDates = (payrunToEdit) => {
+        setEditPayrunInfoForm({
+            payrun_start_date: convertToISO8601(payrunToEdit.payrun_start_date),
+            payrun_end_date: convertToISO8601(payrunToEdit.payrun_end_date),
+            payment_date: convertToISO8601(payrunToEdit.payment_date),
+        });
+        setIsEditingDates(false);
+    };
+
+    const handleDateChange = (e) => {
+    const { name, value } = e.target;
+    setEditPayrunInfoForm((prev) => ({ ...prev, [name]: convertToISO8601(value) }));
+    };
+
+    const handleSaveDates = async (payrunToEdit) => {
+        // Only save if changed
+        const isoStart = convertToISO8601(editPayrunInfoForm.payrun_start_date);
+        const isoEnd = convertToISO8601(editPayrunInfoForm.payrun_end_date);
+        const isoPayment = convertToISO8601(editPayrunInfoForm.payment_date);
+        if (
+            isoStart === convertToISO8601(payrunToEdit.payrun_start_date) &&
+            isoEnd === convertToISO8601(payrunToEdit.payrun_end_date) &&
+            isoPayment === convertToISO8601(payrunToEdit.payment_date)
+        ) {
+            setIsEditingDates(false);
+            return;
+        }
+        setIsSavingDates(true);
+        try {
+            await editPayrunPeriod(company.company_id, payrunToEdit.payrun_id, {
+                payrun_start_date: isoStart,
+                payrun_end_date: isoEnd,
+                payment_date: isoPayment,
+            });
+            // Refetch updated payrun to refresh the table
+            const result = await getPayrun(company.company_id, payrunToEdit.payrun_id);
+            setPayrun(result.data.payrun);
+            setIsEditingDates(false);
+            // Refresh the payslips as well
+            await initializePayrun(payrunToEdit.payrun_id);
+            // Refresh the payrun list - same as handleSaveDraft
+            await handleFetchPayruns();
+            addToast("Successfully updated payrun dates", "success");
+        } catch (err) {
+            addToast("Failed to update payrun dates", "error");
+        } finally {
+            setIsSavingDates(false);
+        }
+    };
+
     return {
         options, setOptions,
         //options controll
@@ -421,7 +486,16 @@ const useSharedRunningPayrunOperation = () => {
         employeeIdsForm, setEmployeeIdsForm,
         isEditEmployeeOnDraft, setIsEditEmployeeOnDraft,
         isEditEmployeesOnDraftLoading, setIsEditEmployeesOnDraftLoading,
-        deleteSelectedPayslipsFromDraft
+        deleteSelectedPayslipsFromDraft,
+
+        // Payrun date editing state and handlers
+        editPayrunInfoForm, setEditPayrunInfoForm,
+        isEditingDates, setIsEditingDates,
+        isSavingDates, setIsSavingDates,
+        startEditDates,
+        cancelEditDates,
+        handleDateChange,
+        handleSaveDates,
     };
 };
 
