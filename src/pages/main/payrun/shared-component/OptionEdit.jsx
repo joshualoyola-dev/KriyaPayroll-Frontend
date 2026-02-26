@@ -1,6 +1,6 @@
 import {InformationCircleIcon, UserMinusIcon, PencilIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
-import {formatDateToWords } from "../../../../utility/datetime.utility";
+import {convertToISO8601, formatDateToWords } from "../../../../utility/datetime.utility";
 import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import env from "../../../../configs/env.config";
 import Tooltip from "../../../../components/Tooltip";
@@ -33,11 +33,8 @@ const OptionEdit = () => {
     // Use payrun date editing state and handlers from useSharedRunningPayrunOperationContext
     const {
         editPayrunInfoForm,
-        setEditPayrunInfoForm,
         isEditingDates,
-        setIsEditingDates,
         isSavingDates,
-        setIsSavingDates,
         startEditDates,
         cancelEditDates,
         handleDateChange,
