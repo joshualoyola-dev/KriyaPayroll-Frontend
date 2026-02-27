@@ -175,17 +175,12 @@ export const updateTaxExportHistory = async (id, payload) => {
     await payroll_api.post(`/api/v1/data-exports/tax-history/${id}`, payload);
 };
 
-export const fetch1601cColumns = async () => {
-    return await payroll_api.get("/api/v1/data-exports/1601c/columns");
+export const fetchTemplate = async (form) => {
+    return await payroll_api.get(`/api/v1/data-exports/${form}/template`);
 };
 
-export const fetch1601cData = async (company_id, date_start, date_end, active_employees) => {
-    return await payroll_api.get(
-        `/api/v1/data-exports/company/${company_id}/1601c?date_start=${date_start}&date_end=${date_end}&active_employees=${active_employees}`,
-    );
-};
 
-export const fetch1601cDataAdvanced = async (
+export const fetch1601cData = async (
     company_id,
     date_start,
     date_end,
