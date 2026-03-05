@@ -71,7 +71,7 @@ const useSharedRunningPayrunOperation = () => {
     const [bonusesForm, setBonusesForm] = useState({
         ...getBonusesYtdDefaultDates(),
         filter_by: "paymentDate",
-        statuses: ["DRAFT", "FOR_APPROVAL", "REJECTED"],
+        statuses: ["DRAFT", "FOR_APPROVAL", "APPROVED", "REJECTED"],
     });
 
     const { payitems } = usePayitemContext();

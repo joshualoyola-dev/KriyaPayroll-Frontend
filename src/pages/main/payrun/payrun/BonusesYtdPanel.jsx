@@ -6,6 +6,7 @@ import { BONUS_THRESHOLD } from "../../../../hooks/useSharedRunningPayrunOperati
 const STATUS_OPTIONS = [
     { label: "Draft", value: "DRAFT" },
     { label: "For Approval", value: "FOR_APPROVAL" },
+    { label: "Approved", value: "APPROVED" },
     { label: "Rejected", value: "REJECTED" },
 ];
 
