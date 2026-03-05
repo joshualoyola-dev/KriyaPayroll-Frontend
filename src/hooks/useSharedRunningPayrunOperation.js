@@ -11,15 +11,6 @@ import { usePayrunContext } from "../contexts/PayrunProvider";
 import { fetchPayrunLogs } from "../services/log.service";
 import { getBonusesYtd } from "../services/payrun.service";
 
-// --- Bonuses YTD constants ---
-export const BONUS_PAYITEM_IDS = [
-    'payitem-id-14', // 13th Month Bonus - Taxable
-    'payitem-id-15', // 13th Month Bonus - Non-Taxable
-    'payitem-id-16', // 14th Month Bonus - Taxable
-    'payitem-id-17', // 14th Month Bonus - Non Taxable
-    'payitem-id-18', // Social Activities Bonus
-    'payitem-id-19', // Anniversary Bonus
-];
 export const BONUS_THRESHOLD = 90000;
 
 const getBonusesYtdDefaultDates = () => {
