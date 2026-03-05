@@ -8,7 +8,6 @@ import { useSharedRunningPayrunOperationContext } from "../../../../contexts/Sha
 import PayrunLogs from "./PayrunLogs";
 import DeleteEmployeesOnPayrunDraft from "./DeleteEmployeesOnPayrunDraft";
 import BonusesYtdPanel from "../payrun/BonusesYtdPanel";
-import useBonusesYtd from "../../../../hooks/useBonusesYtd";
 
 
 const OptionEdit = () => {
@@ -33,18 +32,15 @@ const OptionEdit = () => {
         cancelEditDates,
         handleDateChange,
         handleSaveDates,
+        isBonusesOpen,
+        isBonusesLoading,
+        bonusesData,
+        bonusesForm,
+        handleToggleBonuses,
+        handleBonusesFormChange,
+        handleBonusesStatusToggle,
+        handleFetchBonuses,
     } = useSharedRunningPayrunOperationContext();
-
-    const {
-        isOpen: isBonusesOpen,
-        isLoading: isBonusesLoading,
-        data: bonusesData,
-        form: bonusesForm,
-        handleToggle: handleToggleBonuses,
-        handleFormChange: handleBonusesFormChange,
-        handleStatusToggle: handleBonusesStatusToggle,
-        handleFetch: handleFetchBonuses,
-    } = useBonusesYtd();
 
     const isForApproval = payrun.status === "FOR_APPROVAL";
     const isApproved = payrun.status === "APPROVED";
