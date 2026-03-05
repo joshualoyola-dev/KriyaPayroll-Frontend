@@ -7,31 +7,44 @@ import Tooltip from "../../../../components/Tooltip";
 import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
 import PayrunLogs from "./PayrunLogs";
 import DeleteEmployeesOnPayrunDraft from "./DeleteEmployeesOnPayrunDraft";
+import BonusesYtdPanel from "../payrun/BonusesYtdPanel";
+import useBonusesYtd from "../../../../hooks/useBonusesYtd";
 
 
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();
-  const {
-    payrun,
-    setPayrun,
-    handleClosePayrun,
-    handleSaveEdit,
-    handleChangeStatus,
-    statusLoading,
-    isSaving,
-    handleAddPayitemToPayslips,
-    toggleLogs, handleToggleLogs,
-    logs,
-    employeeForLastPay,
-    isEditEmployeeOnDraft, setIsEditEmployeeOnDraft,
-    editPayrunInfoForm,
-    isEditingDates,
-    isSavingDates,
-    startEditDates,
-    cancelEditDates,
-    handleDateChange,
-    handleSaveDates,
-} = useSharedRunningPayrunOperationContext();
+    const {
+        payrun,
+        setPayrun,
+        handleClosePayrun,
+        handleSaveEdit,
+        handleChangeStatus,
+        statusLoading,
+        isSaving,
+        handleAddPayitemToPayslips,
+        toggleLogs, handleToggleLogs,
+        logs,
+        employeeForLastPay,
+        isEditEmployeeOnDraft, setIsEditEmployeeOnDraft,
+        editPayrunInfoForm,
+        isEditingDates,
+        isSavingDates,
+        startEditDates,
+        cancelEditDates,
+        handleDateChange,
+        handleSaveDates,
+    } = useSharedRunningPayrunOperationContext();
+
+    const {
+        isOpen: isBonusesOpen,
+        isLoading: isBonusesLoading,
+        data: bonusesData,
+        form: bonusesForm,
+        handleToggle: handleToggleBonuses,
+        handleFormChange: handleBonusesFormChange,
+        handleStatusToggle: handleBonusesStatusToggle,
+        handleFetch: handleFetchBonuses,
+    } = useBonusesYtd();
 
     const isForApproval = payrun.status === "FOR_APPROVAL";
     const isApproved = payrun.status === "APPROVED";
@@ -277,6 +290,25 @@ const OptionEdit = () => {
             </div>
 
             {isEditEmployeeOnDraft && <DeleteEmployeesOnPayrunDraft />}
+
+            {/* Bonuses & Benefits YTD Checker */}
+            <div className="mt-4">
+                <button
+                    onClick={handleToggleBonuses}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition ${isBonusesOpen ? 'bg-yellow-100 border-yellow-400 text-yellow-800' : 'bg-white border-gray-300 text-gray-600 hover:bg-yellow-50 hover:border-yellow-400 hover:text-yellow-800'}`}
+                >
+                    {isBonusesOpen ? "▲" : "▼"} Bonuses & Benefits YTD
+                </button>
+                <BonusesYtdPanel
+                    isOpen={isBonusesOpen}
+                    isLoading={isBonusesLoading}
+                    data={bonusesData}
+                    form={bonusesForm}
+                    handleFormChange={handleBonusesFormChange}
+                    handleStatusToggle={handleBonusesStatusToggle}
+                    handleFetch={handleFetchBonuses}
+                />
+            </div>
 
         </div>
     );

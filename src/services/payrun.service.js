@@ -78,3 +78,7 @@ export const editPayrunPeriod = async (company_id, payrun_id, formData) => {
     return await payroll_api.patch(`/api/v1/payruns/${company_id}/${payrun_id}/dates`, formData);
 };
 
+export const getBonusesYtd = async (company_id, payload) => {
+    return await payroll_api.post(`/api/v1/payruns/${company_id}/bonuses-ytd`, payload);
+};
+
