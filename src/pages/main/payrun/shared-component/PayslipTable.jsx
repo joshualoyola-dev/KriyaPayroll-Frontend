@@ -45,28 +45,28 @@ const PayslipTable = ({
             <table className="border-collapse border border-gray-300 text-sm">
                 <thead className="bg-gray-100">
                     <tr>
-                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-0 top-0 z-30 bg-gray-100 shadow-sm whitespace-nowrap min-w-[200px]">
+                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-0 top-0 z-10 bg-gray-100 shadow-sm whitespace-nowrap min-w-[200px]">
                             Employee
                         </th>
-                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-[200px] top-0 z-30 bg-gray-100 shadow-sm whitespace-nowrap min-w-[150px]">
+                        <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky left-[200px] top-0 z-10 bg-gray-100 shadow-sm whitespace-nowrap min-w-[150px]">
                             Employee Id
                         </th>
                         {
                             (payrunType === 'LAST' && Object.keys(startEndDates).length) > 0 &&
                             <>
-                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap">
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-10 bg-gray-100 shadow-sm whitespace-nowrap">
                                     Payrun Start Date
                                 </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap">
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-10 bg-gray-100 shadow-sm whitespace-nowrap">
                                     Payrun End Date
                                 </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap">
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-10 bg-gray-100 shadow-sm whitespace-nowrap">
                                     Date Hired
                                 </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap">
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-10 bg-gray-100 shadow-sm whitespace-nowrap">
                                     Date Ended
                                 </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap">
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-10 bg-gray-100 shadow-sm whitespace-nowrap">
                                     Payment Date
                                 </th>
                             </>
@@ -74,7 +74,7 @@ const PayslipTable = ({
                         {payitem_ids.map((payitem_id) => (
                             <th
                                 key={payitem_id}
-                                className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-gray-100 shadow-sm whitespace-nowrap min-w-[120px]"
+                                className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-10 bg-gray-100 shadow-sm whitespace-nowrap min-w-[120px]"
                             >
                                 {mapPayitemIdToPayitemName(payitem_id)}
                             </th>
@@ -82,16 +82,16 @@ const PayslipTable = ({
                         {
                             totals.length !== 0 &&
                             <>
-                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-red-300 shadow-sm whitespace-nowrap">
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-10 bg-red-300 shadow-sm whitespace-nowrap">
                                     Total Earnings
                                 </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-red-300 shadow-sm whitespace-nowrap">
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-10 bg-red-300 shadow-sm whitespace-nowrap">
                                     Total Deductions
                                 </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-red-300 shadow-sm whitespace-nowrap">
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-10 bg-red-300 shadow-sm whitespace-nowrap">
                                     Total Taxes
                                 </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-20 bg-red-300 shadow-sm whitespace-nowrap">
+                                <th className="border border-gray-300 px-4 py-2 text-left font-medium sticky top-0 z-10 bg-red-300 shadow-sm whitespace-nowrap">
                                     Net Salary
                                 </th>
                             </>
