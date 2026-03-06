@@ -1,12 +1,14 @@
-import {InformationCircleIcon, UserMinusIcon, PencilIcon } from "@heroicons/react/24/solid";
+import { InformationCircleIcon, UserMinusIcon, PencilIcon } from "@heroicons/react/24/solid";
+import { useState } from "react";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
-import {formatDateToWords } from "../../../../utility/datetime.utility";
+import { formatDateToWords } from "../../../../utility/datetime.utility";
 import { userHasFeatureAccess } from "../../../../utility/access-controll.utility";
 import env from "../../../../configs/env.config";
 import Tooltip from "../../../../components/Tooltip";
 import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
 import PayrunLogs from "./PayrunLogs";
 import DeleteEmployeesOnPayrunDraft from "./DeleteEmployeesOnPayrunDraft";
+import PayitemDropdown from "./PayitemDropdown";
 
 
 const OptionEdit = () => {
@@ -246,32 +248,14 @@ const OptionEdit = () => {
                 {/* Add payitems */}
                 <div className="flex items-center gap-2">
                     <label className="text-sm font-medium text-gray-700">Add Pay Item:</label>
-                    <select
-                        onChange={(e) => {
-                            if (e.target.value) {
-                                handleAddPayitemToPayslips(e.target.value);
-                            }
+                    <PayitemDropdown
+                        onSelect={(payitem_id) => {
+                            handleAddPayitemToPayslips(payitem_id);
+                            setAddedPayitemIds(prev => [...prev, payitem_id]);
                         }}
                         disabled={isForApproval || isApproved}
-                        className={`w-48 px-3 py-2 text-sm border border-gray-300 rounded-xl bg-white ${isForApproval || isApproved
-                            ? "cursor-not-allowed bg-gray-100 text-gray-400"
-                            : ""
-                            }`}
-                        defaultValue=""
-                    >
-                        <option value="" disabled>
-                            Select payitem...
-                        </option>
-                        {payitems.map((item) => (
-                            <option
-                                key={item.payitem_id}
-                                value={item.payitem_id}
-                                className="text-gray-700"
-                            >
-                                {item.payitem_name}
-                            </option>
-                        ))}
-                    </select>
+                        filterIds={addedPayitemIds}
+                    />
                 </div>
 
             </div>
