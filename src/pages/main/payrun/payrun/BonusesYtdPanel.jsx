@@ -42,7 +42,7 @@ const BonusesYtdPanel = ({ isOpen, isLoading, data, form, handleFormChange, hand
         : 0;
 
     return (
-        <div className="mt-3 bg-gray-50 border border-yellow-200 rounded-xl p-3">
+        <div className="mt-3 bg-gray-50 border border-gray-200 rounded-xl p-3">
             {/* Filters row */}
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-3">
                 {/* Date range */}
