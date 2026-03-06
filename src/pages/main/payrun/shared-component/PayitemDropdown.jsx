@@ -26,10 +26,10 @@ const PayitemDropdown = ({ onSelect, disabled = false, filterIds = [] }) => {
             {open && !disabled && (
                 <>
                     <div
-                        className="fixed inset-0 z-10"
+                        className="fixed inset-0 z-40"
                         onClick={() => setOpen(false)}
                     />
-                    <div className="absolute z-20 mt-2 w-full bg-white border border-gray-500 rounded-xl max-h-80 overflow-auto">
+                    <div className="absolute z-50 mt-2 w-full bg-white border border-gray-500 rounded-xl max-h-80 overflow-auto">
                         {filtered.map(item => (
                             <button
                                 key={item.payitem_id}
