@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
 import DualBallLoading from "../../../../components/DualBallLoading";
@@ -13,6 +14,18 @@ const STATUS_OPTIONS = [
 const BonusesYtdPanel = ({ isOpen, isLoading, data, form, handleFormChange, handleStatusToggle, handleFetch }) => {
     const { mapPayitemIdToPayitemName } = usePayitemContext();
     const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
+    const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+    const statusDropdownRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (statusDropdownRef.current && !statusDropdownRef.current.contains(e.target)) {
+                setStatusDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     if (!isOpen) return null;
 
@@ -66,19 +79,41 @@ const BonusesYtdPanel = ({ isOpen, isLoading, data, form, handleFormChange, hand
                 </div>
 
                 {/* Statuses */}
-                <div className="flex items-center gap-2">
+                <div className="relative flex items-center gap-1" ref={statusDropdownRef}>
                     <label className="text-xs font-medium text-gray-600 whitespace-nowrap">Status</label>
-                    {STATUS_OPTIONS.map(opt => (
-                        <label key={opt.value} className="flex items-center gap-1 cursor-pointer text-xs text-gray-700 select-none">
-                            <input
-                                type="checkbox"
-                                checked={form.statuses.includes(opt.value)}
-                                onChange={() => handleStatusToggle(opt.value)}
-                                className="accent-teal-600"
-                            />
-                            {opt.label}
-                        </label>
-                    ))}
+                    <button
+                        type="button"
+                        onClick={() => setStatusDropdownOpen(prev => !prev)}
+                        className="flex items-center gap-1 rounded-full bg-white border border-gray-300 px-2 py-1 text-xs text-gray-700 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition cursor-pointer"
+                    >
+                        {form.statuses.length === 0
+                            ? "None"
+                            : form.statuses.length === STATUS_OPTIONS.length
+                                ? "All"
+                                : STATUS_OPTIONS.filter(o => form.statuses.includes(o.value)).map(o => o.label).join(", ")
+                        }
+                        <svg className={`w-3 h-3 transition-transform ${statusDropdownOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    {statusDropdownOpen && (
+                        <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[140px]">
+                            {STATUS_OPTIONS.map(opt => (
+                                <label
+                                    key={opt.value}
+                                    className="flex items-center gap-2 px-3 py-1.5 cursor-pointer text-xs text-gray-700 hover:bg-gray-50 select-none"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={form.statuses.includes(opt.value)}
+                                        onChange={() => handleStatusToggle(opt.value)}
+                                        className="accent-teal-600"
+                                    />
+                                    {opt.label}
+                                </label>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Fetch button */}
@@ -118,7 +153,8 @@ const BonusesYtdPanel = ({ isOpen, isLoading, data, form, handleFormChange, hand
                         <table className="w-full text-xs border-collapse">
                             <thead>
                                 <tr className="bg-gray-100 text-gray-600">
-                                    <th className="text-left px-3 py-2 border-b border-gray-200 font-semibold sticky left-0 bg-gray-100 whitespace-nowrap">Employee</th>
+                                    <th className="text-left px-3 py-2 border-b border-gray-200 font-semibold sticky left-0 z-[1] bg-gray-100 whitespace-nowrap">Employee</th>
+                                    <th className="text-left px-3 py-2 border-b border-gray-200 font-semibold sticky left-[160px] z-[1] bg-gray-100 whitespace-nowrap">Employee ID</th>
                                     {allPayitemIds.map(id => (
                                         <th key={id} className="text-right px-3 py-2 border-b border-gray-200 font-semibold whitespace-nowrap">
                                             {mapPayitemIdToPayitemName(id)}
@@ -140,6 +176,9 @@ const BonusesYtdPanel = ({ isOpen, isLoading, data, form, handleFormChange, hand
                                                         <span className="px-1.5 py-0.5 rounded-full bg-yellow-200 text-yellow-900 text-[10px] font-bold">⚠ Exceeds ₱90k</span>
                                                     </div>
                                                 )}
+                                            </td>
+                                            <td className={`px-3 py-1.5 border-b border-gray-100 font-mono text-gray-500 whitespace-nowrap sticky left-[160px] ${isExceeding ? "bg-yellow-50" : "bg-white"}`}>
+                                                {emp_id}
                                             </td>
                                             {allPayitemIds.map(id => (
                                                 <td key={id} className="text-right px-3 py-1.5 border-b border-gray-100 text-gray-600 tabular-nums">
