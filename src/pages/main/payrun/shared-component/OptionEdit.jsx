@@ -13,6 +13,7 @@ import PayitemDropdown from "./PayitemDropdown";
 
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();
+    const [addedPayitemIds, setAddedPayitemIds] = useState([]);
     const {
         payrun,
         setPayrun,
