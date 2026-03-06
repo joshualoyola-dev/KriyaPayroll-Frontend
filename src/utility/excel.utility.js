@@ -14,6 +14,7 @@ export const downloadExcelMatrix = (
     mapPayitemIdToPayitemName,
     filename,
     sheetName,
+    meta = null
 ) => {
     const allInnerKeys = Array.from(
         new Set(Object.values(data).flatMap(inner => Object.keys(inner)))
@@ -36,15 +37,38 @@ export const downloadExcelMatrix = (
         rows.push(row);
     }
 
-    const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
+    let worksheet;
+
+    if (meta) {
+        const metaRows = [
+            ['Type', meta.type || ''],
+            ['Start Date', meta.start_date || ''],
+            ['End Date', meta.end_date || ''],
+            ['Export Method', meta.export_method || ''],
+            [] // empty row before table
+        ];
+
+        // Create sheet with meta first
+        worksheet = XLSX.utils.aoa_to_sheet(metaRows);
+
+        // Append table below meta
+        XLSX.utils.sheet_add_json(worksheet, rows, {
+            origin: metaRows.length,
+            skipHeader: false
+        });
+    } else {
+        // No meta → just the table
+        worksheet = XLSX.utils.json_to_sheet(rows);
+    }
+
     XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 
-    //  Download as Excel
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(blob, `${filename}.xlsx`);
 };
+
 
 export const downloadPayablesAndTotals = (
     data,
@@ -53,13 +77,15 @@ export const downloadPayablesAndTotals = (
     filename,
     sheetName,
     payslips,
+    meta = null,
 ) => {
+
     const allInnerKeys = Array.from(
         new Set(Object.values(data).flatMap(inner => Object.keys(inner)))
     );
+
     const employeeIds = Object.keys(data);
 
-    // Create a map for quick payslip lookup by employee_id
     const payslipMap = new Map();
     if (payslips && Array.isArray(payslips)) {
         payslips.forEach(slip => {
@@ -77,79 +103,66 @@ export const downloadPayablesAndTotals = (
 
         for (const payItemId of allInnerKeys) {
             const payItemName = mapPayitemIdToPayitemName(payItemId) || payItemId;
-            row[payItemName] = data[empId]?.[payItemId] != null ? Number(data[empId]?.[payItemId]) : 0;
+            row[payItemName] =
+                data[empId]?.[payItemId] != null
+                    ? Number(data[empId]?.[payItemId])
+                    : 0;
         }
 
-        // Add payslip data
         const payslip = payslipMap.get(empId);
-        if (payslip) {
-            row['Total Earnings'] = payslip.total_earnings != null ? Number(payslip.total_earnings) : 0;
-            row['Total Deductions'] = payslip.total_deductions != null ? Number(payslip.total_deductions) : 0;
-            row['Total Taxes'] = payslip.total_taxes != null ? Number(payslip.total_taxes) : 0;
-            row['Net Salary'] = payslip.net_salary != null ? Number(payslip.net_salary) : 0;
-        } else {
-            row['Total Earnings'] = 0;
-            row['Total Deductions'] = 0;
-            row['Total Taxes'] = 0;
-            row['Net Salary'] = 0;
-        }
+
+        row['Total Earnings'] = payslip?.total_earnings != null ? Number(payslip.total_earnings) : 0;
+        row['Total Deductions'] = payslip?.total_deductions != null ? Number(payslip.total_deductions) : 0;
+        row['Total Taxes'] = payslip?.total_taxes != null ? Number(payslip.total_taxes) : 0;
+        row['Net Salary'] = payslip?.net_salary != null ? Number(payslip.net_salary) : 0;
 
         rows.push(row);
     }
 
-    const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
+
+    let worksheet;
+
+    // If meta exists → build sheet manually
+    if (meta) {
+        const metaRows = [
+            ['Payrun Type', meta.payrun_type || ''],
+            ['Payrun Start Date', meta.payrun_start_date || ''],
+            ['Payrun End Date', meta.payrun_end_date || ''],
+            ['Payment Date', meta.payment_date || ''],
+            [] // empty row before table
+        ];
+
+        // Convert table rows to sheet
+        const dataSheet = XLSX.utils.json_to_sheet(rows, { origin: 0 });
+
+        // Create sheet from meta first
+        worksheet = XLSX.utils.aoa_to_sheet(metaRows);
+
+        // Append table below meta (after metaRows length)
+        XLSX.utils.sheet_add_json(worksheet, rows, {
+            origin: metaRows.length,
+            skipHeader: false
+        });
+
+    } else {
+        // No meta → normal behavior
+        worksheet = XLSX.utils.json_to_sheet(rows);
+    }
+
     XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 
-    //  Download as Excel
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    const excelBuffer = XLSX.write(workbook, {
+        bookType: 'xlsx',
+        type: 'array'
+    });
+
+    const blob = new Blob([excelBuffer], {
+        type: 'application/octet-stream'
+    });
+
     saveAs(blob, `${filename}.xlsx`);
 };
-
-export const downloadExcelPayrunSummary = (
-    data,
-    mapEmployeeIdToEmployeeName,
-    sheetName = "Payrun Summary",
-    filename = "Payrun-summary"
-) => {
-    try {
-        // Validate data
-        if (!Array.isArray(data) || data.length === 0) {
-            console.error("No data to export");
-            return;
-        }
-
-        // Transform data into desired Excel structure
-        const rows = data.map(payslip => ({
-            "Employee ID": payslip.employee_id || null,
-            "Employee Name": mapEmployeeIdToEmployeeName(payslip.employee_id) || null,
-            "Total Earnings": Number(payslip.total_earnings),
-            "Total Deductions": Number(payslip.total_deductions),
-            "Total Taxes": Number(payslip.total_taxes),
-            "Net Salary": Number(payslip.net_salary),
-        }));
-
-        // Create worksheet and workbook
-        const worksheet = XLSX.utils.json_to_sheet(rows);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-
-        // Auto-fit columns (optional improvement)
-        const columnWidths = Object.keys(rows[0]).map(key => ({
-            wch: Math.max(key.length + 2, 15)
-        }));
-        worksheet["!cols"] = columnWidths;
-
-        // Generate Excel file and trigger download
-        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-        const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-        saveAs(blob, `${filename}.xlsx`);
-    } catch (error) {
-        console.error("Error generating Excel file:", error);
-    }
-};
-
 
 // Helper function to convert Excel decimal time to HH:MM format
 export const convertExcelTimeToHHMM = (value) => {

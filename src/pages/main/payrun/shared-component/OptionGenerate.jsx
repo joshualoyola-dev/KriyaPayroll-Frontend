@@ -1,10 +1,10 @@
-import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { usePayitemContext } from "../../../../contexts/PayitemProvider";
 import { useSharedRunningPayrunOperationContext } from "../../../../contexts/SharedRunningPayrunOperationProvider";
 import { useToastContext } from "../../../../contexts/ToastProvider";
 import EmployeeSelection from "./EmployeeSelection";
 import { formatDateToWords } from "../../../../utility/datetime.utility";
 import { useEmployeeContext } from "../../../../contexts/EmployeeProvider";
+import PayitemDropdown from "./PayitemDropdown";
 
 const OptionGenerate = () => {
     const { payitems } = usePayitemContext();
@@ -17,7 +17,6 @@ const OptionGenerate = () => {
         payrunType,
         handleClosePayrun,
         employeeForLastPay,
-        payitemDropdownOpen, setPayitemDropdownOpen
     } = useSharedRunningPayrunOperationContext();
     const { addToast } = useToastContext();
     const { mapEmployeeIdToEmployeeName } = useEmployeeContext();
@@ -128,37 +127,10 @@ const OptionGenerate = () => {
                     <label className="block text-xs font-medium text-gray-700">
                         Pay Items
                     </label>
-                    <div className="relative">
-                        <button
-                            type="button"
-                            onClick={() => setPayitemDropdownOpen(o => !o)}
-                            className="w-full px-3 py-2.5 border border-gray-500 rounded-3xl text-sm flex justify-between items-center"
-                        >
-                            Select Pay Items
-                            <ChevronDownIcon className="h-5 w-5 text-gray-400" />
-                        </button>
-
-                        {payitemDropdownOpen && (
-                            <div className="absolute z-10 mt-2 w-full  bg-white border border-gray-500  rounded-xl max-h-80 overflow-auto">
-                                {payitems
-                                    .filter(item =>
-                                        !options.pay_items.some(
-                                            p => Object.keys(p)[0] === item.payitem_id
-                                        )
-                                    )
-                                    .map(item => (
-                                        <button
-                                            key={item.payitem_id}
-                                            type="button"
-                                            onClick={() => handlePayitemChange(item.payitem_id)}
-                                            className="w-full text-left px-4 py-2 hover:bg-teal-50 text-sm text-gray-700"
-                                        >
-                                            {item.payitem_name}
-                                        </button>
-                                    ))}
-                            </div>
-                        )}
-                    </div>
+                    <PayitemDropdown
+                        onSelect={handlePayitemChange}
+                        filterIds={options.pay_items.map(p => Object.keys(p)[0])}
+                    />
                 </div>
 
                 {/* Generate Button */}
