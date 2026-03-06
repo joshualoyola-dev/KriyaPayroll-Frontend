@@ -328,6 +328,7 @@ const useSharedRunningPayrunOperation = () => {
         setPayrun(null);
         setPayslips([]);
         setEmployeeForLastPay(null);
+        setBonusesData(null);
         navigate('/payrun');
     };
 
