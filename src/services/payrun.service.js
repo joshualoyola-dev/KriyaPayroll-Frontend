@@ -78,3 +78,16 @@ export const editPayrunPeriod = async (company_id, payrun_id, formData) => {
     return await payroll_api.patch(`/api/v1/payruns/${company_id}/${payrun_id}/dates`, formData);
 };
 
+export const getBonusesYtd = async (company_id, payload) => {
+    const params = new URLSearchParams({
+        date_start: payload.date_start,
+        date_end: payload.date_end,
+        payrun_payment_or_period: payload.payrun_payment_or_period,
+    });
+
+    payload.payrun_statuses.forEach(status => params.append('payrun_statuses', status));
+
+    const url = `/api/v1/data-exports/company/${company_id}/ytds/bonuses?${params.toString()}`;
+    return await payroll_api.get(url);
+};
+

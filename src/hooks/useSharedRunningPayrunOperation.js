@@ -9,6 +9,19 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { sanitizedPayslips } from "../utility/payrun.utility";
 import { usePayrunContext } from "../contexts/PayrunProvider";
 import { fetchPayrunLogs } from "../services/log.service";
+import { getBonusesYtd } from "../services/payrun.service";
+
+export const BONUS_THRESHOLD = 90000;
+
+const getBonusesYtdDefaultDates = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const pad = (n) => String(n).padStart(2, "0");
+    return {
+        start_date: `${year}-01-01`,
+        end_date: `${year}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`,
+    };
+};
 
 const formData = {
     date_from: '',
@@ -50,6 +63,16 @@ const useSharedRunningPayrunOperation = () => {
     const [editPayrunInfoForm, setEditPayrunInfoForm] = useState({});
     const [isEditingDates, setIsEditingDates] = useState(false);
     const [isSavingDates, setIsSavingDates] = useState(false);
+
+    // --- Bonuses YTD state ---
+    const [isBonusesOpen, setIsBonusesOpen] = useState(false);
+    const [isBonusesLoading, setIsBonusesLoading] = useState(false);
+    const [bonusesData, setBonusesData] = useState(null);
+    const [bonusesForm, setBonusesForm] = useState({
+        ...getBonusesYtdDefaultDates(),
+        filter_by: "paymentDate",
+        statuses: ["APPROVED"],
+    });
 
     const { payitems } = usePayitemContext();
     const { activeEmployees, employees } = useEmployeeContext();
@@ -305,6 +328,7 @@ const useSharedRunningPayrunOperation = () => {
         setPayrun(null);
         setPayslips([]);
         setEmployeeForLastPay(null);
+        setBonusesData(null);
         navigate('/payrun');
     };
 
@@ -445,6 +469,52 @@ const useSharedRunningPayrunOperation = () => {
         }
     };
 
+    // --- Bonuses YTD handlers ---
+    const handleToggleBonuses = () => {
+        setIsBonusesOpen(prev => !prev);
+        if (!isBonusesOpen) setBonusesData(null);
+    };
+
+    const handleBonusesFormChange = (field, value) => {
+        setBonusesForm(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleBonusesStatusToggle = (status) => {
+        setBonusesForm(prev => {
+            const exists = prev.statuses.includes(status);
+            return {
+                ...prev,
+                statuses: exists
+                    ? prev.statuses.filter(s => s !== status)
+                    : [...prev.statuses, status],
+            };
+        });
+    };
+
+    const handleFetchBonuses = async () => {
+        if (!bonusesForm.start_date || !bonusesForm.end_date) {
+            return addToast("Please provide both start and end dates", "error");
+        }
+        if (bonusesForm.statuses.length === 0) {
+            return addToast("Please select at least one payrun status", "error");
+        }
+        setIsBonusesLoading(true);
+        try {
+            const result = await getBonusesYtd(company.company_id, {
+                date_start: bonusesForm.start_date,
+                date_end: bonusesForm.end_date,
+                payrun_payment_or_period: bonusesForm.filter_by === "paymentDate" ? "PAYMENT" : "PERIOD",
+                payrun_statuses: bonusesForm.statuses,
+            });
+            setBonusesData(result.data.bonuses);
+        } catch (error) {
+            console.log(error);
+            addToast("Failed to fetch bonuses YTD data", "error");
+        } finally {
+            setIsBonusesLoading(false);
+        }
+    };
+
     return {
         options, setOptions,
         //options controll
@@ -482,7 +552,6 @@ const useSharedRunningPayrunOperation = () => {
         employeeForLastPay, setEmployeeForLastPay,
         payitemDropdownOpen, setPayitemDropdownOpen,
 
-
         employeeIdsForm, setEmployeeIdsForm,
         isEditEmployeeOnDraft, setIsEditEmployeeOnDraft,
         isEditEmployeesOnDraftLoading, setIsEditEmployeesOnDraftLoading,
@@ -496,6 +565,16 @@ const useSharedRunningPayrunOperation = () => {
         cancelEditDates,
         handleDateChange,
         handleSaveDates,
+
+        // Bonuses YTD
+        isBonusesOpen,
+        isBonusesLoading,
+        bonusesData,
+        bonusesForm,
+        handleToggleBonuses,
+        handleBonusesFormChange,
+        handleBonusesStatusToggle,
+        handleFetchBonuses,
     };
 };
 

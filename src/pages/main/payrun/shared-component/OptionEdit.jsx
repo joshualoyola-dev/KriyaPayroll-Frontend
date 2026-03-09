@@ -15,27 +15,27 @@ import PayitemDropdown from "./PayitemDropdown";
 const OptionEdit = () => {
     const { payitems } = usePayitemContext();
     const [addedPayitemIds, setAddedPayitemIds] = useState([]);
-  const {
-    payrun,
-    setPayrun,
-    handleClosePayrun,
-    handleSaveEdit,
-    handleChangeStatus,
-    statusLoading,
-    isSaving,
-    handleAddPayitemToPayslips,
-    toggleLogs, handleToggleLogs,
-    logs,
-    employeeForLastPay,
-    isEditEmployeeOnDraft, setIsEditEmployeeOnDraft,
-    editPayrunInfoForm,
-    isEditingDates,
-    isSavingDates,
-    startEditDates,
-    cancelEditDates,
-    handleDateChange,
-    handleSaveDates,
-} = useSharedRunningPayrunOperationContext();
+    const {
+        payrun,
+        setPayrun,
+        handleClosePayrun,
+        handleSaveEdit,
+        handleChangeStatus,
+        statusLoading,
+        isSaving,
+        handleAddPayitemToPayslips,
+        toggleLogs, handleToggleLogs,
+        logs,
+        employeeForLastPay,
+        isEditEmployeeOnDraft, setIsEditEmployeeOnDraft,
+        editPayrunInfoForm,
+        isEditingDates,
+        isSavingDates,
+        startEditDates,
+        cancelEditDates,
+        handleDateChange,
+        handleSaveDates,
+    } = useSharedRunningPayrunOperationContext();
 
     const isForApproval = payrun.status === "FOR_APPROVAL";
     const isApproved = payrun.status === "APPROVED";
